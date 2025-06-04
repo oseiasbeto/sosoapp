@@ -9,7 +9,7 @@ const instance = axios.create({
     baseURL: node_env == 'dev' ? 
             'http://localhost:5050/v1' : node_env == 'prod' ? 
             'https://api.1kole.com/v1/' : 
-            'http://192.168.1.130:5050/v1',
+            'http://192.168.1.129:5050/v1',
     headers: {
         'Content-Type': 'application/json'
     }

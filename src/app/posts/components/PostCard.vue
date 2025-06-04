@@ -1,5 +1,5 @@
 <template>
-    <div @click="goToDetails(post)" class="p-4 border-b border-white/20">
+    <div @click="goToDetails(post)" ref="postCardRef" class="p-4 border-b border-white/20">
 
         <!--start header-->
 
@@ -9,13 +9,7 @@
 
         <div>
             <!--start author details-->
-            <div class="flex flex-col mb-2">
-                <span>{{ post?.is_repost ? post?.original_post?.author?.name : post.author.name }}</span>
-                <router-link @click.stop class="text-gray-500 w-min"
-                    :to="`/profile/${post?.is_repost ? post?.original_post?.author?._id : post.author._id}`">{{
-                        post?.is_repost ? post?.original_post?.author?.username : post.author.username
-                    }}</router-link>
-            </div>
+            <author-post-details :author="post?.is_repost ? post?.original_post?.author : post.author" />
             <!--end author details-->
         </div>
         <!--end header-->
@@ -24,8 +18,7 @@
         <div>
             <!--start content post-->
             <div class="mb-2">
-                <p v-if="!post?.is_repost">{{ post?.content }}</p>
-                <p v-else>{{ post?.original_post?.content }}</p>
+                <p>{{ post.is_repost ? post?.original_post?.content : post?.content }}</p>
             </div>
             <!--end content post-->
         </div>
@@ -33,9 +26,8 @@
 
         <!--start footer post-->
         <div @click.stop class="flex items-center gap-5">
-            <button
-                @click="goToReply(post?.is_repost ? post.original_post : post, post?.is_repost ? post._id : null)">Reply({{
-                    repliesCount }})
+            <button @click="goToReply(post, post.originalRepostId)">Reply({{
+                repliesCount }})
             </button>
 
             <button :disabled="loadingToggleLike" :class="isLiked ? 'text-blue-500' : 'text-white'"
@@ -58,11 +50,12 @@
 
 
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { usePost } from "@/hooks/posts";
 import TagAuthorRepost from './TagAuthorRepost.vue';
+import AuthorPostDetails from './AuthorPostDetails.vue';
 
 const router = useRouter()
 const route = useRoute()
@@ -75,11 +68,13 @@ const props = defineProps({
         type: Object,
         required: true
     },
+    postModule: String,
     isReply: {
         type: Boolean,
         default: false
     }
 });
+const emit = defineEmits(['update:height']);
 
 const user = computed(() => store.getters.currentUser)
 
@@ -91,16 +86,39 @@ const repliesCount = computed(() => props.post?.is_repost ? props.post.original_
 const repostsCount = computed(() => props.post?.is_repost ? props.post.original_post.reposts.length : props.post?.reposts?.length || 0);
 
 const goToDetails = (post) => {
-    store.dispatch("setPost", post)
-    router.push(`/post/${post._id}`)
+    store.dispatch("setPost", post.is_repost ? {
+        ...post.original_post,
+        originalRepostId: post._id
+    } : post)
+    router.push({
+        path: `/post/${post.is_repost ? post.original_post?._id : post._id}`,
+        query: {
+            post_module: props.postModule
+        }
+    })
 }
 
+const postCardRef = ref(null);
+
+const measureHeight = () => {
+    if (postCardRef.value) {
+        const height = postCardRef.value.offsetHeight;
+        emit('update:height', height);
+    }
+};
+
 const handleLike = async (postId, originalRepostId, isRepost) => {
+    if ('vibrate' in navigator) {
+        navigator.vibrate(10);
+    } else {
+        console.log('API de vibração não suportada.');
+    }
     await toggleLike({
         postId,
         isReply: props.isReply,
         isRepost,
-        originalRepostId
+        originalRepostId,
+        postModule: props.postModule
     })
 }
 
@@ -112,7 +130,8 @@ const handleRepost = (originalPost) => {
         data: {
             originalPost,
             isPost: !props.isReply,
-            isViewPage: false
+            isViewPage: false,
+            postModule: props.postModule
         }
     })
 }
@@ -123,7 +142,8 @@ const handleMoreOptions = (originalPost) => {
         name: "post_more_options",
         show: true,
         data: {
-            originalPost
+            originalPost,
+            postModule: props.postModule
         }
     })
 }
@@ -135,10 +155,17 @@ const goToReply = (post, originalRepostId) => {
         query: {
             replyto: post._id,
             add_reply_from: props.isReply ? 'original_reply' : 'original_post',
-            ...(props.post?.is_repost && {
-                original_repost: originalRepostId
-            })
+            post_module: props.postModule
         }
     })
 }
+
+onMounted(() => {
+    measureHeight();
+    const observer = new ResizeObserver(measureHeight);
+    if (postCardRef.value) {
+        observer.observe(postCardRef.value);
+    }
+    return () => observer.disconnect();
+})
 </script>

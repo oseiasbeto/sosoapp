@@ -1,6 +1,6 @@
 <template>
-    <div @click="goToReply(props.original_post)">
-        Escreva o seu comentario
+    <div @click="goToReply(props.originalPost)">
+        Escreva o seu comentario 
     </div>
 </template>
 
@@ -9,9 +9,13 @@ import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 
 const props = defineProps(({
-    original_post: {
+    originalPost: {
         type: Object,
         required: true
+    },
+    postModule: {
+        type: String,
+        default: 'feed'
     }
 }))
 
@@ -25,9 +29,7 @@ const goToReply = (post) => {
         query: { 
             replyto: post._id, 
             should_add_reply_from_replies: true,
-            ...(post?.is_repost && {
-                original_repost: post._id
-            })
+            post_module: props.postModule
         }
     })
 }

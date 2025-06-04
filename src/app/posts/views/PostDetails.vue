@@ -13,23 +13,8 @@
         <!--start post details-->
         <div>
             <div v-if="!loadingGetPostId">
-                <!--start original repost author tag-->
-                <tag-author-repost v-if="post?.is_repost" :author="post?.author" />
-                <!--end original repost author tag-->
-
                 <!--start author details-->
-                <div v-if="post?.is_repost && post?.original_post" class="flex flex-col mb-2">
-                    <span>{{ post?.original_post?.author?.name }}</span>
-                    <router-link class="text-gray-500 w-min" :to="'/profile/' + post?.original_post.author?._id">{{
-                        post?.original_post.author?.username
-                    }}</router-link>
-                </div>
-                <div v-else class="flex flex-col mb-2">
-                    <span>{{ post?.author?.name }}</span>
-                    <router-link class="text-gray-500 w-min" :to="'/profile/' + post?.author?._id">{{
-                        post?.author?.username
-                    }}</router-link>
-                </div>
+                <author-post-details :author="post?.is_repost ? post?.original_post?.author : post.author" />
                 <!--end author details-->
 
                 <!--start reply author tag-->
@@ -37,21 +22,22 @@
                 <!--end reply author tag-->
 
                 <h1 class="text-2xl">
-                    <p v-if="!post?.is_repost">{{ post?.content }}</p>
-                    <p v-else>{{ post?.original_post?.content }}</p>
+                    <p>{{ post?.content }}</p>
+
                 </h1>
                 <hr class="my-2">
                 <div class="flex items-center gap-5">
+                    <button @click="handleReply(post)">Reply({{
+                        repliesCount
+                    }})</button>
                     <button :disabled="loadingToggleLike" :class="isLiked ? 'text-blue-500' : 'text-white'"
-                        @click="handleLike(post?.is_repost ? post.original_post._id : post._id)">Like({{
+                        @click="handleLike(post._id, post.originalRepostId)">Like({{
                             likesCount
-                        }})</button>
-                    <button
-                        @click="handleReply(post?.is_repost ? post.original_post : post, post?.is_repost, post?._id)">Reply({{
-                            repliesCount
-                        }})</button>
+                        }})
+                    </button>
+
                     <button :class="isReposted ? 'text-green-500' : 'text-white'"
-                        @click="handleRepost(post?.is_repost ? post.original_post : post, post._id)">Repost({{
+                        @click="handleRepost(post, post._id)">Repost({{
                             repostsCount
                         }})</button>
                 </div>
@@ -66,13 +52,13 @@
         <!--start replies-->
 
         <!--start create reply trigger-->
-        <create-reply-trigger :original_post="post" />
+        <create-reply-trigger :original-post="post" :post-module="postModule" />
         <!--end create reply trigger-->
 
 
         <!--end replies-->
         <div>
-            <post-list :posts="replies.data" :is-replies="true" :loading="loadingGetReplies"
+            <post-list :posts="replies.data" :is-replies="true" :loading="loadingGetReplies" :post-module="postModule"
                 :loading-load-more="loadingLoadMoreReplies" :pagination="replies.pagination"
                 @load-more="_loadMoreReplies" />
         </div>
@@ -90,6 +76,7 @@ import PostList from '../components/PostList.vue';
 import CreateReplyTrigger from '../components/CreateReplyTrigger.vue';
 import TagAuthorRepost from '../components/TagAuthorRepost.vue';
 import TagAuthorReply from '../components/TagAuthorReply.vue';
+import AuthorPostDetails from '../components/AuthorPostDetails.vue';
 
 const { getPostById, loading: loadingGetPostId, } = usePost()
 const { getReplies, loading: loadingGetReplies } = usePost()
@@ -113,10 +100,8 @@ const replies = computed(() => {
     return store.getters.replies
 })
 
-const repliesStore = computed(() => {
-    return store.getters.repliesStore
-})
-
+const repliesStore = computed(() => store.getters.repliesStore)
+const postModule = computed(() => route.query.post_module)
 const isLiked = computed(() => post.value?.is_repost ? post.value?.original_post.likes.includes(user.value._id) : post.value?.likes?.includes(user.value._id) || false);
 const isReposted = computed(() => post.value?.is_repost ? post.value?.original_post.reposts.includes(user.value._id) : post.value?.reposts?.includes(user.value._id) || false);
 
@@ -144,8 +129,13 @@ const _loadMoreReplies = async (newPage) => {
     })
 }
 
-const handleLike = async (postId) => {
-    await toggleLike({ postId, isReply: true, isOriginalPost: true })
+const handleLike = async (postId, originalRepostId) => {
+     if ('vibrate' in navigator) {
+        navigator.vibrate(10);
+    } else {
+        console.log('API de vibração não suportada.');
+    }
+    await toggleLike({ postId, originalRepostId, postModule: postModule.value, isReply: true, isOriginalPost: true })
 }
 
 const handleRepost = async (originalPost, originalRepostId) => {
@@ -156,21 +146,20 @@ const handleRepost = async (originalPost, originalRepostId) => {
         data: {
             originalPost,
             originalRepostId,
+            postModule: postModule.value,
             isViewPage: true
         }
     })
 }
 
-const handleReply = async (post, isRepost, originalRepostId) => {
+const handleReply = async (post) => {
     store.dispatch("setOriginalPost", post)
     router.push({
         path: "/composer",
         query: {
             replyto: post._id,
             should_add_reply_from_replies: true,
-            ...(isRepost && {
-                original_repost: originalRepostId
-            })
+            post_module: postModule.value
         }
     })
 }
@@ -194,6 +183,7 @@ watch(() => route.params.id, async (newId, oldId) => {
     if (originalPostStore) {
         // Se o Post já foi visualizado, carrega do cache local
         const post = originalPostStore.original_post
+
         const replies = originalPostStore.replies
 
         store.dispatch('setPost', post);
@@ -263,9 +253,9 @@ onMounted(async () => {
             })
         } else {
             store.dispatch("setReplies", {
-                replies: existingPostStore.replies.data, 
-                original_post: existingPostStore.original_post, 
-                page: existingPostStore.replies.pagination.currentPage, 
+                replies: existingPostStore.replies.data,
+                original_post: existingPostStore.original_post,
+                page: existingPostStore.replies.pagination.currentPage,
                 totalPages: existingPostStore.replies.pagination.totalPages
             })
         }

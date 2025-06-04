@@ -74,7 +74,11 @@ onUnmounted(() => {
   <div class="font-primary w-screen text-white bg-black pt-safe pb-safe" v-if="!loading">
     <!--start content-->
     <div>
-      <router-view></router-view>
+      <router-view v-slot="{ Component }">
+        <keep-alive include="Home,PostDetails">
+          <component :is="Component" />
+        </keep-alive>
+      </router-view>
     </div>
     <!--end content-->
 
@@ -87,7 +91,7 @@ onUnmounted(() => {
 
     <!--start drawers-->
     <drawer-repost />
-    <drawer-post-more-options/>
+    <drawer-post-more-options />
     <!--end drawers-->
   </div>
   <div v-else>

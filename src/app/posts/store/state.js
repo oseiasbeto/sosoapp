@@ -1,10 +1,7 @@
 export default {
     post: {},
     originalPost: {},
-    posts: {
-        data: [],
-        pagination: {}
-    },
+    posts: [],
     replies: {
         data: [],
         lastRequest: {

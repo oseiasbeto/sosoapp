@@ -1,5 +1,9 @@
 <template>
     <div class="mb-14">
+        <!--start pull refresh-->
+
+        <!--end pull refresh-->
+
         <!---start header-->
         <div>
             <router-link to="/profile">
@@ -20,24 +24,24 @@
         <div>
             <div class="my-2">
                 <!--start create post trigger-->
-                <create-post-trigger />
+                <create-post-trigger post-module="feed" />
                 <!--end create post trigger-->
             </div>
 
 
             <!--start post list-->
-            <post-list :posts="posts.data" :is-replies="false" :loading="loadingGetFeedPosts"
-                :loading-load-more="loadingLoadMorePosts" :pagination="posts.pagination" @load-more="_loadMorePosts" />
+            <post-list :posts="feedPosts?.posts || []" :is-replies="false" :loading="loadingGetFeedPosts"
+                posts-module="feed" :loading-load-more="loadingLoadMorePosts" :pagination="feedPosts?.pagination"
+                @load-more="_loadMorePosts" />
             <!--end post list-->
 
         </div>
         <!---end body-->
     </div>
-
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 import { usePost } from '@/hooks/posts';
 import CreatePostTrigger from '@/app/posts/components/CreatePostTrigger.vue';
@@ -47,13 +51,10 @@ const store = useStore()
 const { getFeedPosts, loading: loadingGetFeedPosts } = usePost();
 const { loadMorePosts, loading: loadingLoadMorePosts } = usePost();
 
-const user = computed(() => {
-    return store.getters.currentUser
-})
-
-const posts = computed(() => {
-    return store.getters.posts
-})
+const user = computed(() => store.getters.currentUser)
+const posts = computed(() => store.getters.posts)
+const feedPosts = computed(() => posts.value.find(m => m.byId === 'feed'))
+const isRefreshing = ref(false);
 
 const _loadMorePosts = async (newPage) => {
     await loadMorePosts({
@@ -62,32 +63,24 @@ const _loadMorePosts = async (newPage) => {
     })
 }
 
-const onTouchStart = (event) => {
-    console.log(event)
-}
+const onRefresh = async () => {
+    isRefreshing.value = true
+    await getFeedPosts({
+        page: 1,
+        limit: 10
+    }).finally(() => {
+        isRefreshing.value = false
+    })
+};
 
-const onTouchMove = (event) => {
-    console.log(event)
-}
-
-const onTouchEnd = (event) => {
-    console.log(event)
-}
 
 onMounted(async () => {
-    if (!posts.value.data.length) {
+    console.log("aki")
+    if (!feedPosts.value) {
         await getFeedPosts({
             page: 1,
             limit: 10
         })
     }
 })
-
-const openModal = (name, data) => {
-    store.dispatch("openModal", {
-        show: true,
-        name,
-        data
-    })
-}
 </script>

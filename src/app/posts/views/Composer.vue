@@ -62,7 +62,9 @@ const UPLOAD_PRESET = 'social_media_upload';
 
 const remainingChars = computed(() => MAX_CHARS - postContent.value.length);
 const replyTo = computed(() => route.query.replyto || null);
+const postModule = computed(() => route.query.post_module || null);
 const originalRepost = computed(() => route.query.original_repost || null);
+const originalRepostId = computed(() => route.query.original_repost_id || null);
 const shouldAddReply = computed(() => route.query.should_add_reply_from_replies || false);
 const addReplyFrom = computed(() => route.query.add_reply_from || null);
 const canPost = computed(() => {
@@ -260,7 +262,9 @@ const handleSubmit = async () => {
         originalRepost: originalPost.value?.original_post?._id,
         isRepost: originalPost.value?.is_repost,
         byRepostId: originalRepost.value ?? undefined,
+        originalRepostId: originalRepostId.value ?? undefined,
         addReplyFrom: addReplyFrom.value,
+        postModule: postModule.value,
         ...(originalPost.value?._id && replyTo.value && {
             isReply: true,
             originalPost: originalPost.value._id

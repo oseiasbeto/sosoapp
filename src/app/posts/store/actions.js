@@ -8,6 +8,9 @@ export default {
     setLoadPosts({ commit }, { posts, page, totalPages, total }) {
         commit('SET_LOAD_POSTS', { posts, page, totalPages, total });
     },
+    addPostFromModules({ commit }, { postModule }) {
+        commit('ADD_POST_FROM_MODULES', { postModule });
+    },
     setReplies({ commit }, { replies, original_post, page, totalPages, total }) {
         commit("SET_REPLIES", { replies, page, original_post, totalPages, total });
     },
@@ -23,35 +26,35 @@ export default {
     resetRepliesStore({ commit }) {
         commit("RESET_REPLIES_STORE");
     },
-    addNewPost({ commit }, newPost) {
-        commit('ADD_NEW_POST', newPost);
+    addNewPost({ commit }, newPost, postModule) {
+        commit('ADD_NEW_POST', newPost, postModule);
     },
-    addReplyFromReplies({ commit }, newReply) {
-        commit('ADD_REPLY_FROM_REPLIES', newReply);
+    addReplyFromReplies({ commit }, newReply, postModule) {
+        commit('ADD_REPLY_FROM_REPLIES', newReply, postModule);
     },
-    addReplyFromRepliesStore({ commit }, { index, newReply }) {
-        commit('ADD_REPLY_FROM_REPLIES_STORE', { index, newReply });
+    addReplyFromRepliesStore({ commit }, { index, postModule, newReply }) {
+        commit('ADD_REPLY_FROM_REPLIES_STORE', { index, postModule, newReply });
     },
-    incRepliesCountFromPosts({ commit }, { index, newReplyId }) {
-        commit('INC_REPLIES_COUNT_FROM_POSTS', { index, newReplyId });
+    incRepliesCountFromPosts({ commit }, { index, moduleIndex, newReply }) {
+        commit('INC_REPLIES_COUNT_FROM_POSTS', { index, moduleIndex, newReply });
     },
-    incRepliesCountFromReplies({ commit }, { index, newReplyId }) {
-        commit('INC_REPLIES_COUNT_FROM_REPLIES', { index, newReplyId });
+    incRepliesCountFromReplies({ commit }, { index, postModule, newReplyId }) {
+        commit('INC_REPLIES_COUNT_FROM_REPLIES', { index, postModule, newReplyId });
     },
-    incRepliesCountFromRepliesStore({ commit }, { index, newReplyId }) {
-        commit('INC_REPLIES_COUNT_FROM_REPLIES_STORE', { index, newReplyId });
+    incRepliesCountFromRepliesStore({ commit }, { index, postModule, newReplyId }) {
+        commit('INC_REPLIES_COUNT_FROM_REPLIES_STORE', { index, postModule, newReplyId });
     },
-    toggleLikePost({ commit }, { postId, userId, isRepost, originalRepostId }) {
-        commit('TOGGLE_LIKE_POST', { postId, userId, isRepost, originalRepostId });
+    toggleLikePost({ commit }, { postId, postModule, userId, isRepost, originalRepostId }) {
+        commit('TOGGLE_LIKE_POST', { postId, postModule, userId, isRepost, originalRepostId });
     },
-    toggleLikeReply({ commit }, { replyId, userId, isOriginalPost }) {
-        commit('TOGGLE_LIKE_REPLY', { replyId, userId, isOriginalPost });
+    toggleLikeReply({ commit }, { replyId, userId, postModule, isOriginalPost, originalRepostId }) {
+        commit('TOGGLE_LIKE_REPLY', { replyId, userId, postModule, isOriginalPost, originalRepostId });
     },
-    toggleRepostPost({ commit }, { postId, isViewPage, userId }) {
-        commit('TOGGLE_REPOST_POST', { postId, isViewPage, userId });
+    toggleRepostPost({ commit }, { postId, isViewPage, postModule, userId }) {
+        commit('TOGGLE_REPOST_POST', { postId, isViewPage, postModule, userId });
     },
-    toggleRepostReply({ commit }, { replyId, userId, isPost, isViewPage }) {
-        commit('TOGGLE_REPOST_REPLY', { replyId, userId, isPost, isViewPage });
+    toggleRepostReply({ commit }, { replyId, userId, postModule, isPost, isViewPage }) {
+        commit('TOGGLE_REPOST_REPLY', { replyId, userId, postModule, isPost, isViewPage });
     },
     replaceRepliesStore({ commit }, { originalPostId }) {
         commit('REPLACE_REPLIES_STORE', { originalPostId });

@@ -1,5 +1,27 @@
 <template>
-    <router-link to="/composer">
+    <button @click="goToPost(postModule)">
         Oque estas pensando?
-    </router-link>
+    </button>
 </template>
+
+<script setup>
+import { useRouter } from 'vue-router'
+
+const props = defineProps({
+    postModule: {
+        type: String,
+        required: true
+    }
+})
+
+const router = useRouter()
+
+const goToPost = (postModule) => {
+    router.push({
+        path: '/composer',
+        query: {
+            post_module: postModule
+        }
+    })
+}
+</script>
