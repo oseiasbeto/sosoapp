@@ -1,5 +1,5 @@
 <template>
-    <div @click="goToDetails(post)" ref="postCardRef" class="p-4 pb-2.5 shrink-0 border-b border-light-border dark:border-dark-border">
+    <div @click="goToDetails(post)" ref="postCardRef" class="p-4 pb-2.5 mb-0.5 shrink-0 border-b border-light-border dark:border-dark-border">
         <!--start flags-->
         <!--start original repost author tag-->
         <tag-author-repost v-if="post?.is_repost" :author="post?.author" />
@@ -10,6 +10,7 @@
             <div id="left-part" class="pl-1 pr-3">
                 <avatar
                     :src="post?.is_repost ? post?.original_post?.author?.profile_image?.low : post.author?.profile_image?.low" 
+                    alt-text="Foto"
                     />
             </div>
             <div id="right-part" class="min-w-0 flex-1 flex-shrink-0">

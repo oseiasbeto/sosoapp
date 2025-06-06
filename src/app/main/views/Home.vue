@@ -4,7 +4,7 @@
 
         <!--end pull refresh-->
 
-        <!---start header-->
+        <!---start header
         <div>
             <router-link to="/profile">
                 Meu perfil
@@ -13,7 +13,7 @@
                 Configuracoes
             </router-link>
         </div>
-
+-->
         <div>
             <!--start tabs -->
             <!--end tabs -->
@@ -23,16 +23,22 @@
         <!---start body-->
         <div>
             <div class="my-2">
-                <!--start create post trigger-->
-                <create-post-trigger post-module="feed" />
+                <!--start create post trigger
+                <create-post-trigger post-module="feed" />-->
                 <!--end create post trigger-->
             </div>
 
 
             <!--start post list-->
-            <post-list :posts="feedPosts?.posts || []" :is-replies="false" :loading="loadingGetFeedPosts"
-                posts-module="feed" :loading-load-more="loadingLoadMorePosts" :pagination="feedPosts?.pagination"
-                @load-more="_loadMorePosts" />
+            <post-list 
+            :posts="feedPosts?.posts || []" 
+            :is-replies="false" :loading="loadingGetFeedPosts"
+            posts-module="feed" 
+            :b-space="56"
+            :loading-load-more="loadingLoadMorePosts" 
+            :pagination="feedPosts?.pagination"
+            @load-more="_loadMorePosts" 
+            />
             <!--end post list-->
 
         </div>

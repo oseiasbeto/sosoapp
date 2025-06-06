@@ -1,28 +1,17 @@
 <template>
   <div class="scroll-container">
-    <DynamicScroller 
-    ref="scroller" 
-    :items="props.posts" 
-    :min-item-size="120" 
-    class="scroller" 
-    :emit-update="true"
-    @update="handleUpdate" 
-    key-field="_id"
-    >
+    <DynamicScroller ref="scroller" :items="props.posts" :min-item-size="120" class="scroller " :style="`padding-bottom: ${bSpace}px;`" :emit-update="true"
+      @update="handleUpdate" key-field="_id">
       <!-- Slot para conteúdo ANTES da lista -->
       <template #before>
         <slot name="before-content"></slot>
       </template>
 
       <template v-if="!props.loading && props.posts.length" v-slot="{ item, index, active }">
-
         <DynamicScrollerItem :item="item" :active="active"
           :size-dependencies="[item._id, item.updatedAt, item.likes?.length, item.reposts?.length]" :data-index="index"
           class="scroller-item">
-          <PostCard 
-          :post-module="props.postsModule" 
-          :is-reply="props.isReplies" 
-          :post="item" />
+          <PostCard :post-module="props.postsModule" :is-reply="props.isReplies" :post="item" />
         </DynamicScrollerItem>
       </template>
       <!-- Slot para conteúdo após a lista -->
@@ -66,6 +55,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  bSpace: {
+    type: Number,
+    default: 0
+  },
   isReplies: {
     type: Boolean,
     required: true,
@@ -77,8 +70,6 @@ const scroller = ref(null);
 const scrollPosition = ref(0);
 const currentPage = computed(() => props.pagination.currentPage);
 const totalPages = computed(() => props.pagination.totalPages);
-
-
 
 // Gerencia o carregamento de mais posts
 const handleUpdate = (startIndex, endIndex) => {
@@ -96,8 +87,8 @@ const handleUpdate = (startIndex, endIndex) => {
 
 <style scoped>
 .scroll-container {
-  height: 100vh;
   width: 100%;
+  height: 100vh;
   position: relative;
   overflow: hidden;
   /* Evita barras de rolagem externas */

@@ -20,13 +20,13 @@ module.exports = {
       'liked': '#ec4899',
       'reposted': '#5cefaa',
       // Dark Mode
-      'dark-bg': '#14191f',
-      'dark-card': '#2D3748',
+      'dark-bg': '#161e27',
+      'dark-card': '#1e2936',
       'dark-border': '#2e4052',
       'dark-text-primary': '#f1f3f5',
       'dark-text-secondary': '#788ea5',
       'dark-text-link': '#208bfe',
-      'dark-accent': '#3B82F6',
+      'dark-text-light': '#93a5b7',
       'dark-accent-hover': '#60A5FA',
       'dark-error': '#DC2626',
       'dark-success': '#16A34A'

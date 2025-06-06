@@ -14,12 +14,12 @@
         </span>
         
         <!-- Versão mobile concatenada -->
-        <span class="flex text-sm text-light-text-secondary dark:text-dark-text-secondary items-baseline min-w-0 overflow-hidden">
+        <span class="flex text-sm text-light-text-secondary dark:text-dark-text-light items-baseline min-w-0 overflow-hidden">
           <span class="text-gray-500 truncate text-ellipsis ml-1">
             @{{ author?.username }}
           </span>
           <span class="text-gray-500 whitespace-nowrap ml-1">
-            · {{ formattedTime }}
+            · {{ formattedTime(postCreatedAt) }}
           </span>
         </span>
       </div>
@@ -27,6 +27,7 @@
   </div>
 </template>
 <script setup>
+import formattedTime from '@/utils/formatted-time';
 import { ref, computed, onMounted, onUpdated, onBeforeUnmount } from 'vue';
 
 const props = defineProps({
@@ -44,31 +45,6 @@ const props = defineProps({
     type: String,
     default: '100%'
   }
-});
-
-
-// Formatar o tempo relativo melhorado
-const formattedTime = computed(() => {
-  const now = new Date();
-  const postDate = new Date(props.postCreatedAt);
-  const diffMs = now - postDate;
-  const diffSeconds = Math.floor(diffMs / 1000);
-  const diffMinutes = Math.floor(diffSeconds / 60);
-  const diffHours = Math.floor(diffMinutes / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffSeconds < 60) return `${diffSeconds}s`;
-  if (diffMinutes < 60) return `${diffMinutes}m`;
-  if (diffHours < 24) return `${diffHours}h`;
-  if (diffDays < 7) return `${diffDays}d`;
-  if (diffDays < 365) return postDate.toLocaleDateString('pt-BR', {
-    day: 'numeric',
-    month: 'short',
-  });
-  return postDate.toLocaleDateString('pt-BR', {
-    year: 'numeric',
-    month: 'short',
-  });
 });
 </script>
 
