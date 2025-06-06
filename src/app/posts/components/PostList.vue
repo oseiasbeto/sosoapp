@@ -1,17 +1,38 @@
 <template>
-  <div>
-    <div v-if="!props.loading" class="w-full">
+  <div class="scroll-container">
+    <DynamicScroller 
+    ref="scroller" 
+    :items="props.posts" 
+    :min-item-size="120" 
+    class="scroller" 
+    :emit-update="true"
+    @update="handleUpdate" 
+    key-field="_id"
+    >
+      <!-- Slot para conteúdo ANTES da lista -->
+      <template #before>
+        <slot name="before-content"></slot>
+      </template>
 
-      <PostCard v-for="post in posts" :key="post._id" v-memo="[post._id, post.updateAt,
-      post.likes?.length, post.reposts?.length]" :post-module="props.postsModule" :is-reply="props.isReplies"
-        :post="post" />
+      <template v-if="!props.loading && props.posts.length" v-slot="{ item, index, active }">
 
-      <div v-if="currentPage < totalPages" ref="loadTrigger"
-        class="flex justify-center my-16">
-        <p class="loading-text">Carregando mais...</p>
-      </div>
-    </div>
-    <div v-else class="loading-container flex justify-center my-8">
+        <DynamicScrollerItem :item="item" :active="active"
+          :size-dependencies="[item._id, item.updatedAt, item.likes?.length, item.reposts?.length]" :data-index="index"
+          class="scroller-item">
+          <PostCard 
+          :post-module="props.postsModule" 
+          :is-reply="props.isReplies" 
+          :post="item" />
+        </DynamicScrollerItem>
+      </template>
+      <!-- Slot para conteúdo após a lista -->
+      <template #after>
+        <div v-if="currentPage < totalPages && !props.loading" class="load-more-container flex justify-center my-4">
+          <p v-if="props.loadingLoadMore" class="loading-text">Carregando mais...</p>
+        </div>
+      </template>
+    </DynamicScroller>
+    <div v-if="props.loading" class="loading-container flex justify-center my-8">
       <p class="loading-text">Carregando...</p>
     </div>
   </div>
@@ -19,8 +40,9 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue';
-import { useIntersectionObserver } from "@vueuse/core";
+import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 import PostCard from './PostCard.vue';
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 
 const props = defineProps({
   posts: {
@@ -50,28 +72,54 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["loadMore"]);
-const loadTrigger = ref(null); // Elemento que acionará a API
-const currentPage = computed(() => props.pagination.currentPage)
-const totalPages = computed(() => props.pagination.totalPages)
+const emit = defineEmits(['loadMore']);
+const scroller = ref(null);
+const scrollPosition = ref(0);
+const currentPage = computed(() => props.pagination.currentPage);
+const totalPages = computed(() => props.pagination.totalPages);
 
-const loadMore = async () => {
-  if (props.loadingLoadMore || currentPage.value >= totalPages.value) return;
-  else {
-    const newPage = currentPage.value + 1
-    emit("loadMore", newPage)
+
+
+// Gerencia o carregamento de mais posts
+const handleUpdate = (startIndex, endIndex) => {
+  if (
+    endIndex >= props.posts.length - 3 &&
+    currentPage.value < totalPages.value &&
+    !props.loadingLoadMore &&
+    !props.loading
+  ) {
+    const newPage = currentPage.value + 1;
+    emit('loadMore', newPage);
   }
 };
-
-// Observa o último elemento da lista
-useIntersectionObserver(
-  loadTrigger,
-  ([{ isIntersecting }]) => {
-    if (isIntersecting) {
-      loadMore();
-    }
-  }
-);
 </script>
 
-<style scoped></style>
+<style scoped>
+.scroll-container {
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  /* Evita barras de rolagem externas */
+}
+
+.scroller {
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE e Edge */
+}
+
+.scroller::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari */
+}
+
+.scroller-item {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+</style>

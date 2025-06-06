@@ -1,66 +1,71 @@
 <template>
     <div>
-        <!--start header post-->
-        <div class="mb-2">
-            <div class="flex items-center gap-5">
-                <button @click="router.back()">Voltar</button>
-                <h1>Post</h1>
-            </div>
-        </div>
-        <!--end header post-->
-
-        <!--start body post-->
-        <!--start post details-->
-        <div>
-            <div v-if="!loadingGetPostId">
-                <!--start author details-->
-                <author-post-details :author="post?.is_repost ? post?.original_post?.author : post.author" />
-                <!--end author details-->
-
-                <!--start reply author tag-->
-                <tag-author-reply v-if="post?.is_reply" :author="post?.original_post?.author" />
-                <!--end reply author tag-->
-
-                <h1 class="text-2xl">
-                    <p>{{ post?.content }}</p>
-
-                </h1>
-                <hr class="my-2">
-                <div class="flex items-center gap-5">
-                    <button @click="handleReply(post)">Reply({{
-                        repliesCount
-                    }})</button>
-                    <button :disabled="loadingToggleLike" :class="isLiked ? 'text-blue-500' : 'text-white'"
-                        @click="handleLike(post._id, post.originalRepostId)">Like({{
-                            likesCount
-                        }})
-                    </button>
-
-                    <button :class="isReposted ? 'text-green-500' : 'text-white'"
-                        @click="handleRepost(post, post._id)">Repost({{
-                            repostsCount
-                        }})</button>
-                </div>
-            </div>
-            <div v-else>
-                <p>Carregando...</p>
-            </div>
-        </div>
-        <!--end post details-->
-
-        <hr class="my-2">
-        <!--start replies-->
-
-        <!--start create reply trigger-->
-        <create-reply-trigger :original-post="post" :post-module="postModule" />
-        <!--end create reply trigger-->
-
 
         <!--end replies-->
         <div>
             <post-list :posts="replies.data" :is-replies="true" :loading="loadingGetReplies" :post-module="postModule"
                 :loading-load-more="loadingLoadMoreReplies" :pagination="replies.pagination"
-                @load-more="_loadMoreReplies" />
+                @load-more="_loadMoreReplies">
+
+                <template #before-content>
+                    <!--start header post-->
+                    <div class="mb-2">
+                        <div class="flex items-center gap-5">
+                            <button @click="router.back()">Voltar</button>
+                            <h1>Post</h1>
+                        </div>
+                    </div>
+                    <!--end header post-->
+
+                    <!--start body post-->
+                    <!--start post details-->
+                    <div>
+                        <div v-if="!loadingGetPostId">
+                            <!--start author details-->
+                            <author-post-details
+                                :author="post?.is_repost ? post?.original_post?.author : post.author" />
+                            <!--end author details-->
+
+                            <!--start reply author tag-->
+                            <tag-author-reply v-if="post?.is_reply" :author="post?.original_post?.author" />
+                            <!--end reply author tag-->
+
+                            <!--start post text-->
+                            <PostText :text="post?.content" :is-bigger="true" />
+                            <!--end post text-->
+                            
+                            <hr class="my-2">
+                            <div class="flex items-center gap-5">
+                                <button @click="handleReply(post)">Reply({{
+                                    repliesCount
+                                }})</button>
+                                <button :disabled="loadingToggleLike" :class="isLiked ? 'text-blue-500' : 'text-white'"
+                                    @click="handleLike(post._id, post.originalRepostId)">Like({{
+                                        likesCount
+                                    }})
+                                </button>
+
+                                <button :class="isReposted ? 'text-green-500' : 'text-white'"
+                                    @click="handleRepost(post, post._id)">Repost({{
+                                        repostsCount
+                                    }})</button>
+                            </div>
+                        </div>
+                        <div v-else>
+                            <p>Carregando...</p>
+                        </div>
+                    </div>
+                    <!--end post details-->
+
+                    <hr class="my-2">
+                    <!--start replies-->
+
+                    <!--start create reply trigger-->
+                    <create-reply-trigger :original-post="post" :post-module="postModule" />
+                    <!--end create reply trigger-->
+
+                </template>
+            </post-list>
         </div>
         <!--end body post-->
     </div>
@@ -76,7 +81,8 @@ import PostList from '../components/PostList.vue';
 import CreateReplyTrigger from '../components/CreateReplyTrigger.vue';
 import TagAuthorRepost from '../components/TagAuthorRepost.vue';
 import TagAuthorReply from '../components/TagAuthorReply.vue';
-import AuthorPostDetails from '../components/AuthorPostDetails.vue';
+import AuthorPostDetails from '../components/PostAuthorDetails.vue';
+import PostText from '../components/PostText.vue';
 
 const { getPostById, loading: loadingGetPostId, } = usePost()
 const { getReplies, loading: loadingGetReplies } = usePost()
@@ -130,7 +136,7 @@ const _loadMoreReplies = async (newPage) => {
 }
 
 const handleLike = async (postId, originalRepostId) => {
-     if ('vibrate' in navigator) {
+    if ('vibrate' in navigator) {
         navigator.vibrate(10);
     } else {
         console.log('API de vibração não suportada.');

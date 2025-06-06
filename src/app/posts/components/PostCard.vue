@@ -1,50 +1,48 @@
 <template>
-    <div @click="goToDetails(post)" ref="postCardRef" class="p-4 border-b border-white/20">
-
-        <!--start header-->
-
+    <div @click="goToDetails(post)" ref="postCardRef" class="p-4 pb-2.5 shrink-0 border-b border-light-border dark:border-dark-border">
+        <!--start flags-->
         <!--start original repost author tag-->
         <tag-author-repost v-if="post?.is_repost" :author="post?.author" />
         <!--end original repost author tag-->
+        <!--end flags-->
 
-        <div>
-            <!--start author details-->
-            <author-post-details :author="post?.is_repost ? post?.original_post?.author : post.author" />
-            <!--end author details-->
-        </div>
-        <!--end header-->
-
-        <!--start body post-->
-        <div>
-            <!--start content post-->
-            <div class="mb-2">
-                <p>{{ post.is_repost ? post?.original_post?.content : post?.content }}</p>
+        <div class="flex">
+            <div id="left-part" class="pl-1 pr-3">
+                <avatar
+                    :src="post?.is_repost ? post?.original_post?.author?.profile_image?.low : post.author?.profile_image?.low" 
+                    />
             </div>
-            <!--end content post-->
+            <div id="right-part" class="min-w-0 flex-1 flex-shrink-0">
+                <!--start header-->
+                <div ref="parent" class="w-full min-w-0 max-w-full overflow-hidden flex-shrink-0">
+                    <!--start author details-->
+                    <author-post-details :post-created-at="post?.is_repost ? post?.original_post?.created_at : post.created_at" :author="post?.is_repost ? post?.original_post?.author : post.author" />
+                    <!--end author details-->
+                </div>
+                <!--end header-->
+
+                <!--start body post-->
+                <div>
+                    <!--start content post-->
+                    <div class="mb-2">
+                        <post-text :text="post.is_repost ? post?.original_post?.content : post?.content" />
+                    </div>
+                    <!--end content post-->
+                </div>
+                <!--end body post-->
+
+                <!--start footer post-->
+                <post-reactions :likes-count="likesCount" :replies-count="repliesCount" :reposts-count="repostsCount"
+                    @like-post="handleLike(post?.is_repost ? post.original_post._id : post._id, post._id, post?.is_repost)"
+                    @post-reply="goToReply(post, post.originalRepostId)"
+                    @repost="handleRepost(post?.is_repost ? post.original_post : post)"
+                    @open-more="handleMoreOptions(post)" 
+                    :has-liked="hasLiked"
+                    :has-reposted="hasReposted"
+                    />
+                <!--end footer post-->
+            </div>
         </div>
-        <!--end body post-->
-
-        <!--start footer post-->
-        <div @click.stop class="flex items-center gap-5">
-            <button @click="goToReply(post, post.originalRepostId)">Reply({{
-                repliesCount }})
-            </button>
-
-            <button :disabled="loadingToggleLike" :class="isLiked ? 'text-blue-500' : 'text-white'"
-                @click="handleLike(post?.is_repost ? post.original_post._id : post._id, post._id, post?.is_repost)">Like({{
-                    likesCount
-                }})
-            </button>
-
-            <button :class="isReposted ? 'text-green-500' : 'text-white'"
-                @click="handleRepost(post?.is_repost ? post.original_post : post)">Repost({{ repostsCount
-                }})
-            </button>
-
-            <button @click="handleMoreOptions(post)">Mais
-            </button>
-        </div>
-        <!--end footer post-->
     </div>
 </template>
 
@@ -55,7 +53,10 @@ import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { usePost } from "@/hooks/posts";
 import TagAuthorRepost from './TagAuthorRepost.vue';
-import AuthorPostDetails from './AuthorPostDetails.vue';
+import AuthorPostDetails from './PostAuthorDetails.vue';
+import PostText from './PostText.vue';
+import PostReactions from './PostReactions.vue';
+import Avatar from '@/components/utilities/Avatar.vue';
 
 const router = useRouter()
 const route = useRoute()
@@ -76,10 +77,11 @@ const props = defineProps({
 });
 const emit = defineEmits(['update:height']);
 
+const parent = ref(null);
 const user = computed(() => store.getters.currentUser)
 
-const isLiked = computed(() => props.post?.is_repost ? props.post.original_post.likes.includes(user.value._id) : props.post?.likes?.includes(user.value._id) || false);
-const isReposted = computed(() => props.post?.is_repost ? props.post.original_post.reposts.includes(user.value._id) : props.post?.reposts?.includes(user.value._id) || false);
+const hasLiked = computed(() => props.post?.is_repost ? props.post.original_post.likes.includes(user.value._id) : props.post?.likes?.includes(user.value._id) || false);
+const hasReposted = computed(() => props.post?.is_repost ? props.post.original_post.reposts.includes(user.value._id) : props.post?.reposts?.includes(user.value._id) || false);
 
 const likesCount = computed(() => props.post?.is_repost ? props.post.original_post.likes.length : props.post?.likes?.length || 0);
 const repliesCount = computed(() => props.post?.is_repost ? props.post.original_post.replies.length : props.post?.replies?.length || 0);
@@ -99,13 +101,6 @@ const goToDetails = (post) => {
 }
 
 const postCardRef = ref(null);
-
-const measureHeight = () => {
-    if (postCardRef.value) {
-        const height = postCardRef.value.offsetHeight;
-        emit('update:height', height);
-    }
-};
 
 const handleLike = async (postId, originalRepostId, isRepost) => {
     if ('vibrate' in navigator) {
@@ -159,13 +154,4 @@ const goToReply = (post, originalRepostId) => {
         }
     })
 }
-
-onMounted(() => {
-    measureHeight();
-    const observer = new ResizeObserver(measureHeight);
-    if (postCardRef.value) {
-        observer.observe(postCardRef.value);
-    }
-    return () => observer.disconnect();
-})
 </script>

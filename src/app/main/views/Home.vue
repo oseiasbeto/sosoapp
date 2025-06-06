@@ -1,5 +1,5 @@
 <template>
-    <div class="mb-14">
+    <div class="mb-14 overflow-hidden">
         <!--start pull refresh-->
 
         <!--end pull refresh-->

@@ -2,7 +2,7 @@
 import SplashScreen from "./components/base/SplashScreen.vue"
 import Sidebar from "./components/base/Sidebar.vue"
 import { useStore } from "vuex"
-import { computed, onMounted, onUnmounted } from "vue";
+import { computed, onMounted, ref, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import Cookies from "js-cookie";
 import { useAuth } from "./hooks/auth";
@@ -12,6 +12,8 @@ import DrawerPostMoreOptions from "./components/drawers/DrawerPostMoreOptions.vu
 const { refreshToken, loading } = useAuth()
 
 loading.value = true
+// Estado para o tema
+const isDark = ref(false);
 
 const store = useStore()
 const route = useRoute()
@@ -42,6 +44,14 @@ const closeModal = () => {
 };
 
 onMounted(async () => {
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    isDark.value = true;
+    document.documentElement.classList.add('dark');
+  } else {
+    isDark.value = false;
+    document.documentElement.classList.remove('dark');
+  }
   if (sessionId) {
     await refreshToken(sessionId).then(() => {
       const socket = getSocket();
@@ -70,32 +80,36 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <!-- start main app area-->
-  <div class="font-primary w-screen text-white bg-black pt-safe pb-safe" v-if="!loading">
-    <!--start content-->
-    <div>
-      <router-view v-slot="{ Component }">
-        <keep-alive include="Home,PostDetails">
-          <component :is="Component" />
-        </keep-alive>
-      </router-view>
+
+  <div class="font-primary w-screen h-screen text-light-text-primary dark:text-dark-text-primary bg-light-bg dark:bg-dark-bg">
+    <!-- start main app area-->
+    <div v-if="!loading">
+      <!--start content-->
+      <div>
+        <router-view v-slot="{ Component }">
+          <keep-alive include="Home,PostDetails">
+            <component :is="Component" />
+          </keep-alive>
+        </router-view>
+      </div>
+      <!--end content-->
+
+      <!--start sidebar-->
+      <sidebar v-show="isAuthenticated && route.meta.rootPage == 'main'" />
+      <!--end sidebar-->
+
+      <!--start modals-->
+      <!--end modals-->
+
+      <!--start drawers-->
+      <drawer-repost />
+      <drawer-post-more-options />
+      <!--end drawers-->
     </div>
-    <!--end content-->
-
-    <!--start sidebar-->
-    <sidebar v-show="isAuthenticated && route.meta.rootPage == 'main'" />
-    <!--end sidebar-->
-
-    <!--start modals-->
-    <!--end modals-->
-
-    <!--start drawers-->
-    <drawer-repost />
-    <drawer-post-more-options />
-    <!--end drawers-->
+    <div v-else>
+      <splash-screen />
+    </div>
+    <!-- end main app area-->
   </div>
-  <div v-else>
-    <splash-screen />
-  </div>
-  <!-- end main app area-->
+
 </template>
