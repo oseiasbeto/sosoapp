@@ -1,13 +1,13 @@
 <template>
   <div class="scroll-container">
-    <DynamicScroller ref="scroller" :items="props.posts" :min-item-size="120" class="scroller " :style="`padding-bottom: ${bSpace}px;`" :emit-update="true"
-      @update="handleUpdate" key-field="_id">
+    <DynamicScroller ref="scroller" :items="props?.posts" :min-item-size="120" class="scroller "
+      :style="`padding-bottom: ${bSpace}px;`" :emit-update="true" key-field="_id">
       <!-- Slot para conteúdo ANTES da lista -->
       <template #before>
         <slot name="before-content"></slot>
       </template>
 
-      <template v-if="!props.loading && props.posts.length" v-slot="{ item, index, active }">
+      <template v-if="!props.loading" v-slot="{ item, index, active }">
         <DynamicScrollerItem :item="item" :active="active"
           :size-dependencies="[item._id, item.updatedAt, item.likes?.length, item.reposts?.length]" :data-index="index"
           class="scroller-item">
@@ -15,9 +15,11 @@
         </DynamicScrollerItem>
       </template>
       <!-- Slot para conteúdo após a lista -->
+
       <template #after>
-        <div v-if="currentPage < totalPages && !props.loading" class="load-more-container flex justify-center my-4">
-          <p v-if="props.loadingLoadMore" class="loading-text">Carregando mais...</p>
+        <div v-if="currentPage < totalPages && !props.loading"
+          class="load-more-container bg-dark-error flex justify-center my-4">
+          <p class="loading-text">Carregando mais...</p>
         </div>
       </template>
     </DynamicScroller>
@@ -73,6 +75,7 @@ const totalPages = computed(() => props.pagination.totalPages);
 
 // Gerencia o carregamento de mais posts
 const handleUpdate = (startIndex, endIndex) => {
+  console.log("aki")
   if (
     endIndex >= props.posts.length - 3 &&
     currentPage.value < totalPages.value &&

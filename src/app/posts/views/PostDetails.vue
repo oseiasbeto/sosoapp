@@ -3,28 +3,36 @@
 
         <!--end replies-->
         <div>
-            <post-list :posts="replies.data" :is-replies="true" :loading="loadingGetReplies" :post-module="postModule"
-                :loading-load-more="loadingLoadMoreReplies" :pagination="replies.pagination"
-                @load-more="_loadMoreReplies">
+            <post-list 
+            :b-space="110" 
+            :posts="replies?.data || []" 
+            :is-replies="true" 
+            :loading="loadingGetReplies"
+            :post-module="postModule" 
+            :loading-load-more="loadingLoadMoreReplies" 
+            :pagination="replies.pagination"
+            @load-more="_loadMoreReplies">
 
                 <template #before-content>
                     <!--start header post-->
-                    <div class="mb-2">
-                        <div class="flex items-center gap-5">
-                            <button @click="router.back()">Voltar</button>
-                            <h1>Post</h1>
-                        </div>
-                    </div>
+                    <Navbar :title="'Postagem'" />
                     <!--end header post-->
 
                     <!--start body post-->
                     <!--start post details-->
-                    <div>
+                    <div class="p-4 mt-14 border-b border-light-border dark:border-dark-border">
                         <div v-if="!loadingGetPostId">
-                            <!--start author details-->
-                            <author-post-details
-                                :author="post?.is_repost ? post?.original_post?.author : post.author" />
-                            <!--end author details-->
+                            <div
+                                class="w-full min-w-0 mb-3 flex items-center gap-2.5 max-w-full overflow-hidden flex-shrink-0">
+                                <!--start avatar-->
+                                <Avatar :src="post?.author?.profile_image?.low" alt-text="Foto" />
+                                <!--end avatar-->
+
+                                <!--start author details-->
+                                <author-post-details :is-view-post="true" :show-time="false" :author="post.author" />
+                                <!--end author details-->
+                            </div>
+
 
                             <!--start reply author tag-->
                             <tag-author-reply v-if="post?.is_reply" :author="post?.original_post?.author" />
@@ -33,12 +41,12 @@
                             <!--start post text-->
                             <PostText :text="post?.content" :is-bigger="true" />
                             <!--end post text-->
-                            
+
                             <hr class="my-2">
                             <div class="flex items-center gap-5">
                                 <button @click="handleReply(post)">Reply({{
                                     repliesCount
-                                }})</button>
+                                    }})</button>
                                 <button :disabled="loadingToggleLike" :class="isLiked ? 'text-blue-500' : 'text-white'"
                                     @click="handleLike(post._id, post.originalRepostId)">Like({{
                                         likesCount
@@ -55,19 +63,14 @@
                             <p>Carregando...</p>
                         </div>
                     </div>
-                    <!--end post details-->
-
-                    <hr class="my-2">
-                    <!--start replies-->
-
-                    <!--start create reply trigger-->
-                    <create-reply-trigger :original-post="post" :post-module="postModule" />
-                    <!--end create reply trigger-->
-
                 </template>
             </post-list>
         </div>
         <!--end body post-->
+
+        <!--start create reply trigger-->
+        <create-reply-trigger :original-post="post" :post-module="postModule" />
+        <!--end create reply trigger-->
     </div>
 
 </template>
@@ -83,6 +86,8 @@ import TagAuthorRepost from '../components/TagAuthorRepost.vue';
 import TagAuthorReply from '../components/TagAuthorReply.vue';
 import AuthorPostDetails from '../components/PostAuthorDetails.vue';
 import PostText from '../components/PostText.vue';
+import Navbar from '@/components/base/Navbar.vue';
+import Avatar from '@/components/utilities/Avatar.vue';
 
 const { getPostById, loading: loadingGetPostId, } = usePost()
 const { getReplies, loading: loadingGetReplies } = usePost()
@@ -93,6 +98,7 @@ const { loadMoreReplies, loading: loadingLoadMoreReplies } = usePost()
 const store = useStore()
 const route = useRoute()
 const router = useRouter()
+
 
 const post = computed(() => {
     return store.getters.post
@@ -192,6 +198,7 @@ watch(() => route.params.id, async (newId, oldId) => {
 
         const replies = originalPostStore.replies
 
+        console.log(replies)
         store.dispatch('setPost', post);
 
         store.dispatch("setReplies", {

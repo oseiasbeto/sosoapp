@@ -14,7 +14,7 @@ export default [
         name: 'Post details',
         meta: {
             requiresAuth: true,
-            rootPage: 'posts',
+            rootPage: 'main',
             title: '1Kole - Postagem'
         },
         component: () => import('./views/PostDetails.vue')

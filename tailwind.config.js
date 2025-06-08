@@ -29,7 +29,12 @@ module.exports = {
       'dark-text-light': '#93a5b7',
       'dark-accent-hover': '#60A5FA',
       'dark-error': '#DC2626',
-      'dark-success': '#16A34A'
+      'dark-success': '#16A34A',
+      'btn-plus-start': 'rgb(90, 113, 250)', // Cor inicial
+      'btn-plus-end': 'rgb(0, 133, 255)',    // Cor final
+    },
+    backgroundImage: {
+      'btn-plus': 'linear-gradient(135deg, var(--tw-gradient-stops))', // Gradiente pronto
     },
     fontFamily: {
       primary: ['Inter', 'sans-serif'], // Fonte principal

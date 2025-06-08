@@ -9,7 +9,7 @@
         <div class="flex">
             <div id="left-part" class="pl-1 pr-3">
                 <avatar
-                    :src="post?.is_repost ? post?.original_post?.author?.profile_image?.low : post.author?.profile_image?.low" 
+                    :src="post?.is_repost ? post?.original_post?.author?.profile_image?.low : post.author?.profile_image?.low || null" 
                     alt-text="Foto"
                     />
             </div>
@@ -17,7 +17,7 @@
                 <!--start header-->
                 <div ref="parent" class="w-full min-w-0 max-w-full overflow-hidden flex-shrink-0">
                     <!--start author details-->
-                    <author-post-details :post-created-at="post?.is_repost ? post?.original_post?.created_at : post.created_at" :author="post?.is_repost ? post?.original_post?.author : post.author" />
+                    <author-post-details :post-created-at="post?.is_repost ? post?.original_post?.created_at : post?.created_at" :author="post?.is_repost ? post?.original_post?.author : post?.author" />
                     <!--end author details-->
                 </div>
                 <!--end header-->

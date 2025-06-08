@@ -1,4 +1,6 @@
 const formattedTime = (time) => {
+    if(!time) return
+    
     const now = new Date();
     const postDate = new Date(time);
     const diffMs = now - postDate;

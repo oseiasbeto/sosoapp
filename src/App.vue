@@ -81,13 +81,13 @@ onUnmounted(() => {
 
 <template>
 
-  <div class="font-primary w-screen h-screen text-light-text-primary dark:text-dark-text-primary bg-light-bg dark:bg-dark-bg">
+  <div class="font-primary w-screen text-sm h-screen text-light-text-primary dark:text-dark-text-primary bg-light-bg dark:bg-dark-bg overflow-y-hidden">
     <!-- start main app area-->
     <div v-if="!loading">
       <!--start content-->
       <div>
         <router-view v-slot="{ Component }">
-          <keep-alive include="Home,PostDetails">
+          <keep-alive include="Home, PostDetails">
             <component :is="Component" />
           </keep-alive>
         </router-view>
