@@ -7,6 +7,8 @@ module.exports = {
   darkMode: 'class', // ou 'media' para prefers-color-scheme
   theme: {
     colors: {
+      // Core 
+      'primary': 'rgb(32,139,254)',
       // Light Mode
       'light-bg': '#F7F7F8',
       'light-card': '#FFFFFF',

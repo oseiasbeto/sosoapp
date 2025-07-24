@@ -87,7 +87,7 @@ onUnmounted(() => {
       <!--start content-->
       <div>
         <router-view v-slot="{ Component }">
-          <keep-alive include="Home, PostDetails">
+          <keep-alive include="Home, Profile, PostDetails">
             <component :is="Component" />
           </keep-alive>
         </router-view>

@@ -1,6 +1,6 @@
 <template>
-    <div @click.stop class="flex h-7 justify-between text-light-text-secondary text-sm dark:text-dark-text-secondary items-center gap-5">
-        <button class="flex ml-[-6px] flex-1 py-[3px] px-[5px] h-full rounded-full items-center gap-1.5"
+    <div  class="flex h-7 justify-between text-light-text-secondary text-sm dark:text-dark-text-secondary items-center gap-5">
+        <button class="flex ml-[-6px] flex-1 py-[3px] px-[5px] h-full rounded-full items-center gap-1.5" @click.stop
             @click="replyPost">
             <span class="flex items-center h-full" name="icon">
                 <svg fill="none" width="18" viewBox="0 0 24 24" height="18"
@@ -12,7 +12,7 @@
             </span>
             <span v-show="repliesCount > 0" class="flex mt-0.5" name="count">{{ repliesCount }}</span>
         </button>
-        <button class="flex flex-1 py-[3px] px-[5px] h-full rounded-full items-center gap-1.5"
+        <button class="flex flex-1 py-[3px] px-[5px] h-full rounded-full items-center gap-1.5" @click.stop
             :class="{ 'text-reposted': hasReposted }" @click="repost">
             <span class="flex items-center h-full" name="icon">
                 <svg fill="none" width="18" viewBox="0 0 24 24" height="18" style="pointer-events: none;">
@@ -25,7 +25,7 @@
         </button>
 
         <button class="flex flex-1 py-[3px] px-[5px] h-full rounded-full items-center gap-1.5"
-            :disabled="loadingToggleLike" :class="{ 'text-liked': hasLiked }" @click="likePost">
+            :disabled="loadingToggleLike" :class="{ 'text-liked': hasLiked }" @click.stop @click="likePost">
             <span class="flex items-center h-full" name="icon">
                 <svg v-if="!hasLiked" fill="none" width="18" viewBox="0 0 24 24" height="18"
                     style="pointer-events: none;">
@@ -44,7 +44,7 @@
 
 
 
-        <button class="flex flex-1 py-[3px] px-[5px] h-full rounded-full" @click="openMore()">
+        <button class="flex flex-1 py-[3px] px-[5px] h-full rounded-full" @click.stop @click="openMore()">
             <svg fill="none" width="18" viewBox="0 0 24 24" height="18"
                 style="color: rgb(120, 142, 165); pointer-events: none;">
                 <path fill="hsl(211, 20%, 56%)" fill-rule="evenodd" clip-rule="evenodd"

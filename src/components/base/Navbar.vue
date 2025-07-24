@@ -2,7 +2,7 @@
     <div class="flex w-full border-b px-4 border-light-border dark:border-dark-border items-center justify-between h-14 bg-light-bg dark:bg-dark-bg z-10"
         :class="{ 'fixed top-0': isFixed }">
         <!--start left part-->
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3">
             <button class="text-light-text-secondary flex justify-center items-center w-[34px] h-[34px] dark:text-dark-text-light rounded-full active:bg-light-card dark:active:bg-dark-card" @click="router.back()"
                 v-show="showBackBtn">
                 <svg fill="none" width="24" viewBox="0 0 24 24" height="24">

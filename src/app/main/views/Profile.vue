@@ -1,40 +1,159 @@
 <template>
-    <div>
-        <!-- Start details profile -->
-        <div>{{ profile?.name || 'Carregando...' }}</div>
-        <!-- End details profile -->
-
-        <!-- Start actions profile -->
-        <div v-if="profile?._id && user?._id && profile._id !== user._id">
-            <button :disabled="loadingFollowUser" @click="handleFollowUser(userId, isFollowedBy && !isFollowing)">
-                <span v-if="isFollowing && isFollowedBy">Deixar de seguir</span>
-                <span v-else-if="isFollowing">Deixar de seguir</span>
-                <span v-else-if="isFollowedBy">Seguir de volta</span>
-                <span v-else>+ Seguir</span>
+    <div class="relative" v-if="!loadingGetById">
+        <!--start background image area-->
+        <div class="w-full h-[150px] bg-light-card dark:bg-dark-card relative">
+            <button @click="router.back()"
+                class="absolute z-[11] flex justify-center text-muted items-center rounded-full w-[30px] h-[30px] top-[10px] left-[10px] bg-[#000]/[0.5]">
+                <svg fill="none" viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="white" fill-rule="evenodd" clip-rule="evenodd"
+                        d="M3 12a1 1 0 0 1 .293-.707l6-6a1 1 0 0 1 1.414 1.414L6.414 11H20a1 1 0 1 1 0 2H6.414l4.293 4.293a1 1 0 0 1-1.414 1.414l-6-6A1 1 0 0 1 3 12Z">
+                    </path>
+                </svg>
             </button>
+            <img class="w-full h-full z-[1px] pointer-events-none object-cover absolute top-0 right-0 left-0"
+                v-if="profile?.cover_photo?.url || profile?.cover_photo?.low"
+                v-lazy="profile?.cover_photo.url || profile?.cover_photo?.low">
         </div>
-        <div v-else>
-            <router-link :to="'/profile/' + profile._id + '/setup'">
-                Editar perfil
-            </router-link>
+        <!--end background image area-->
+
+        <!--start content area-->
+        <div class="px-4 pb-2 pt-3">
+            <!--start actions area-->
+            <div class="pl-[90px] gap-1 flex items-center justify-end">
+                <div v-if="profile?._id && user?._id && profile._id !== user._id">
+                    <button
+                        class="flex text-light-text-primary dark:text-dark-text-light bg-light-card dark:bg-dark-card text-sm font-semibold gap-2 justify-center items-center bg-light-dark rounded-full w-[34px] h-[34px]">
+                        <svg v-if="true" fill="none" width="20" viewBox="0 0 24 24" height="20">
+                            <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
+                                d="M12 2a1 1 0 0 1 0 2 5.85 5.85 0 0 0-5.802 5.08L5.143 17h13.715l-.382-2.868-.01-.102a1 1 0 0 1 1.973-.262l.02.1.532 4a1 1 0 0 1-.99 1.132h-3.357c-.905 1.747-2.606 3-4.644 3s-3.74-1.253-4.643-3H4a1 1 0 0 1-.991-1.132l1.207-9.053A7.85 7.85 0 0 1 12 2ZM9.78 19c.61.637 1.397 1 2.22 1s1.611-.363 2.22-1H9.78ZM17 2.5a1 1 0 0 1 1 1V6h2.5a1 1 0 0 1 0 2H18v2.5a1 1 0 0 1-2 0V8h-2.5a1 1 0 1 1 0-2H16V3.5a1 1 0 0 1 1-1Z">
+                            </path>
+                        </svg>
+                        <svg v-else fill="none" width="20" viewBox="0 0 24 24" height="20">
+                            <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
+                                d="M12 2a7.854 7.854 0 0 1 7.784 6.815l1.207 9.053a1 1 0 0 1-.99 1.132h-3.354c-.904 1.748-2.608 3-4.647 3-2.038 0-3.742-1.252-4.646-3H4a1.002 1.002 0 0 1-.991-1.132l1.207-9.053A7.85 7.85 0 0 1 12 2ZM9.78 19c.608.637 1.398 1 2.221 1s1.613-.363 2.222-1H9.779ZM3.193 2.104a1 1 0 0 1 1.53 1.288A9.47 9.47 0 0 0 2.72 7.464a1 1 0 0 1-1.954-.427 11.46 11.46 0 0 1 2.428-4.933Zm16.205-.122a1 1 0 0 1 1.409.122 11.47 11.47 0 0 1 2.429 4.933 1 1 0 0 1-1.954.427 9.47 9.47 0 0 0-2.006-4.072 1 1 0 0 1 .122-1.41Z">
+                            </path>
+                        </svg>
+                    </button>
+                    <button :disabled="loadingFollowUser"
+                        @click="handleFollowUser(userId, isFollowedBy && !isFollowing)"
+                        class="flex text-sm border bg-primary border-primary text-white font-semibold gap-2 justify-center items-center bg-light-dark rounded-full py-1 px-5"
+                        :class="{ 'border-transparent !text-primary bg-primary/10': isFollowing }">
+                        <p class="mb-[3px]">
+                            <span v-if="isFollowing && isFollowedBy">Deixar de seguir</span>
+                            <span v-else-if="isFollowing">Deixar de seguir</span>
+                            <span v-else-if="isFollowedBy">Seguir de volta</span>
+                            <span v-else>+ Seguir</span>
+                        </p>
+                    </button>
+                </div>
+                <div v-else>
+                    <router-link :to="'/profile/' + profile._id + '/setup'"
+                        class="flex text-light-text-primary dark:text-dark-text-light bg-light-card dark:bg-dark-card text-[13px] font-semibold gap-2 justify-center items-center bg-light-dark rounded-full py-[7px] px-3">
+                        <p>Editar perfil</p>
+                    </router-link>
+                </div>
+
+                <button
+                    class="flex text-light-text-primary dark:text-dark-text-light bg-light-card dark:bg-dark-card active:brightness-100 text-sm font-semibold gap-2 justify-center items-center bg-light-dark rounded-full w-[34px] h-[34px]">
+                    <svg fill="none" width="16" viewBox="0 0 24 24" height="16">
+                        <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
+                            d="M2 12a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm16 0a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm-6-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z">
+                        </path>
+                    </svg>
+                </button>
+
+            </div>
+            <!--end actions area-->
+
+            <!--start content area-->
+            <div class="pt-4 gap-0.5 w-full pb-2">
+                <div
+                    class="text-[24px] font-extrabold flex text-light-text-primary dark:text-dark-text-primary flex-wrap items-center gap-1.5 truncate text-lg ">
+                    <p class="font-bold whitespace-break-spaces">
+                        {{ profile.name }}
+                    </p>
+                    <svg fill="none" width="18" viewBox="0 0 24 24" height="18">
+                        <circle cx="12" cy="12" r="11.5" fill="hsl(211, 99%, 56%)"></circle>
+                        <path fill="#fff" fill-rule="evenodd" clip-rule="evenodd"
+                            d="M17.659 8.175a1.361 1.361 0 0 1 0 1.925l-6.224 6.223a1.361 1.361 0 0 1-1.925 0L6.4 13.212a1.361 1.361 0 0 1 1.925-1.925l2.149 2.148 5.26-5.26a1.361 1.361 0 0 1 1.925 0Z">
+                        </path>
+                    </svg>
+                </div>
+                <div
+                    class="text-sm text-light-text-secondary dark:text-dark-text-light truncate overflow-hidden break-words text-ellipsis max-w-full text-muted">
+                    @{{ profile.username }}
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <router-link class="flex flex-wrap text-base hover:underline leading-3" to="#">
+                    <span
+                        class="flex items-center text-[15px] font-medium text-light-text-primary dark:text-dark-text-primary mr-1">{{
+                            130 }}</span>
+                    <span class="text-light-text-secondary dark:text-dark-text-light text-sm mt-[0.75px]">{{ 2 == 1 ?
+                        'Seguidor' : 'seguidores' }}</span>
+                </router-link>
+                <router-link class="flex flex-wrap text-base hover:underline leading-3" to="#">
+                    <span
+                        class="flex items-center text-[15px] font-medium text-light-text-primary dark:text-dark-text-primary mr-1">{{
+                            50 }}</span>
+                    <span
+                        class="text-light-text-secondary dark:text-dark-text-light text-sm mt-[0.75px]">seguindo</span>
+                </router-link>
+            </div>
+            <!--start bio-->
+            <p v-show="profile?.bio?.length"
+                class="text-light-text-primary break-words text-sm dark:text-dark-text-primary mt-2 whitespace-pre-wrap"
+                role="paragraph" aria-label="Texto do post">
+                {{ profile?.bio }}
+            </p>
+            <!--end bio-->
+            <!--end content area-->
         </div>
-        <!-- End actions profile -->
+        <!--end content area-->
+
+        <!--start avatar area-->
+        <div class="absolute top-[110px] left-[10px]">
+            <div class="border-[3px] rounded-full border-light-bg dark:border-dark-bg">
+                <avatar :src="profile?.profile_image?.url || profile?.profile_image?.low" size="big" />
+            </div>
+
+        </div>
+        <!--end avatar area-->
+        <!--tabs start-->
+        <Tabs v-model="activeTab" :tabs="tabs" />
+        <!--end start-->
+    </div>
+    <div v-else>
+        <ProfileSkeleton/>
     </div>
 </template>
 
 <script setup>
+import Tabs from '@/components/base/Tabs.vue';
+import Avatar from '@/components/utilities/Avatar.vue';
 import { useProfile } from '@/hooks/profiles';
-import { computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { computed, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
+import ProfileSkeleton from '../components/ProfileSkeleton.vue';
 
-const { 
-    getUserById, loading: loadingGetById, 
-    followUser, loading: loadingFollowUser 
+const {
+    getUserById, loading: loadingGetById,
+    followUser, loading: loadingFollowUser
 } = useProfile();
 
 const route = useRoute();
+const router = useRouter()
 const store = useStore();
+
+const activeTab = ref(0)
+const tabs = ref([
+    { label: "Postagens" },
+    { label: "Repostagens" },
+    { label: "Mídia" },
+    { label: "Curtidas" }
+])
 
 // Computeds
 const userId = computed(() => route.params.user_id);
