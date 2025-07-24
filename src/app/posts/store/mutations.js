@@ -7,11 +7,11 @@ export default {
         state.originalPost = originalPost
     },
 
-    SET_LOAD_POSTS(state, { posts, page, totalPages, total }) {
+    SET_LOAD_POSTS(state, { posts, page, totalPages, hasMore }) {
         state.posts.data = [...state.posts.data, ...posts]
         state.posts.pagination.currentPage = page;
         state.posts.pagination.totalPages = totalPages;
-        state.posts.pagination.hasMore = page < totalPages
+        state.posts.pagination.hasMore = hasMore
     },
 
     ADD_POST_FROM_MODULES(state, { postModule }) {
@@ -19,7 +19,6 @@ export default {
     },
 
     ADD_NEW_POST(state, { newPost, postModule }) {
-        console.log(postModule)
         const moduleIndex = state.posts.findIndex(m => m.byId === postModule)
 
         if (moduleIndex === -1) return
@@ -39,14 +38,14 @@ export default {
         state.replies.pagination.hasMore = page < totalPages
     },
 
-    SET_LOAD_REPLIES(state, { replies, page, totalPages, total }) {
+    SET_LOAD_REPLIES(state, { replies, page, totalPages, hasMore }) {
         state.replies.data = [...state.replies.data, ...replies]
         state.replies.pagination.currentPage = page;
         state.replies.pagination.totalPages = totalPages;
-        state.replies.pagination.hasMore = page < totalPages
+        state.replies.pagination.hasMore = hasMore
     },
 
-    SET_REPLIES_STORE(state, { original_post, replies, page: currentPage, totalPages, total }) {
+    SET_REPLIES_STORE(state, { original_post, replies, page: currentPage, totalPages, hasMore }) {
         if (!original_post || !original_post._id) return;
 
         const existingPostIndex = state.repliesStore.findIndex(data => data.original_post._id === original_post._id);
@@ -63,7 +62,7 @@ export default {
                     pagination: {
                         currentPage,
                         totalPages,
-                        hasMore: currentPage < totalPages
+                        hasMore
                     }
                 }
             }

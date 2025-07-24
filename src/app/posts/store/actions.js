@@ -11,14 +11,14 @@ export default {
     addPostFromModules({ commit }, { postModule }) {
         commit('ADD_POST_FROM_MODULES', { postModule });
     },
-    setReplies({ commit }, { replies, original_post, page, totalPages, total }) {
-        commit("SET_REPLIES", { replies, page, original_post, totalPages, total });
+    setReplies({ commit }, { replies, original_post, page, totalPages, hasMore }) {
+        commit("SET_REPLIES", { replies, page, original_post, totalPages, hasMore });
     },
-    setLoadReplies({ commit }, { replies, page, totalPages, total }) {
-        commit("SET_LOAD_REPLIES", { replies, page, totalPages, total });
+    setLoadReplies({ commit }, { replies, page, totalPages, hasMore }) {
+        commit("SET_LOAD_REPLIES", { replies, page, totalPages, hasMore });
     },
-    setRepliesStore({ commit }, { original_post, rafs, replies, page, totalPages, total }) {
-        commit("SET_REPLIES_STORE", { original_post, rafs, replies, page, totalPages, total });
+    setRepliesStore({ commit }, { original_post, rafs, replies, page, totalPages, hasMore }) {
+        commit("SET_REPLIES_STORE", { original_post, rafs, replies, page, totalPages, hasMore });
     },
     resetReplies({ commit }) {
         commit("RESET_REPLIES");

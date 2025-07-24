@@ -33,8 +33,12 @@
                 <!--end body post-->
 
                 <!--start footer post-->
-                <post-reactions :likes-count="likesCount" :replies-count="repliesCount" :reposts-count="repostsCount"
+                <post-reactions 
+                    :likes-count="likesCount" 
+                    :replies-count="repliesCount" 
+                    :reposts-count="repostsCount"
                     @like-post="handleLike(post?.is_repost ? post.original_post._id : post._id, post._id, post?.is_repost)"
+                    :loading-toggle-like="loadingToggleLike"
                     @post-reply="goToReply(post, post.originalRepostId)"
                     @repost="handleRepost(post?.is_repost ? post.original_post : post)"
                     @open-more="handleMoreOptions(post)" 

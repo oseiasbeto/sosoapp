@@ -1,18 +1,17 @@
 <template>
   <div v-if="author !== null" class="flex items-baseline min-w-0 w-full">
-    <router-link @click.stop :to="`/profile/${author?._id}`" class="flex items-baseline min-w-0 max-w-full group"
-      :aria-label="`Perfil de ${author?.name}`">
+    <div @click.stop @click="goToProfile(props.author)" :to="`/profile/${author?._id}`"
+      class="flex items-baseline min-w-0 max-w-full group" :aria-label="`Perfil de ${author?.name}`">
       <!-- Container principal que fará o truncamento concatenado -->
-      <div class="flex items-baseline min-w-0 max-w-full overflow-hidden" :class="isViewPost ? '!flex-col text-base leading-5' : 'text-sm'">
+      <div class="flex items-baseline min-w-0 max-w-full overflow-hidden"
+        :class="isViewPost ? '!flex-col text-base leading-5' : 'text-sm'">
         <!-- Nome -->
         <span class="font-semibold text-light-text-primary dark:text-dark-text-primary truncate text-ellipsis">
           {{ author?.name || 'Nome' }}
         </span>
 
         <!-- Versão mobile concatenada -->
-        <span
-          class="flex text-light-text-secondary dark:text-dark-text-light items-baseline min-w-0 overflow-hidden"
-          >
+        <span class="flex text-light-text-secondary dark:text-dark-text-light items-baseline min-w-0 overflow-hidden">
           <span class="text-gray-500 truncate text-ellipsis" :class="{ 'ml-1': !isViewPost }">
             @{{ author?.username }}
           </span>
@@ -21,14 +20,15 @@
           </span>
         </span>
       </div>
-    </router-link>
+    </div>
   </div>
 </template>
 <script setup>
 import formattedTime from '@/utils/formatted-time';
-import { ref, computed, onMounted, onUpdated, onBeforeUnmount } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
-const props = defineProps({
+const props = defineProps({   
   author: {
     type: Object,
     validator: (author) => '_id' in author && 'name' in author && 'username' in author,
@@ -47,6 +47,18 @@ const props = defineProps({
     default: true
   }
 });
+
+const store = useStore()
+const router = useRouter()
+const route = useRoute()
+
+const goToProfile = (author) => {
+  store.dispatch("addNewProfileFromProfiles", author)
+
+  if (route?.params?.user_id !== author?._id) {
+    router.push(`/profile/${author?._id}`)
+  }
+}
 </script>
 
 <style scoped>

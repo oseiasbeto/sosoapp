@@ -153,7 +153,7 @@ const { getReplies, loading: loadingGetReplies } = usePost()
 const { toggleLike, loading: loadingToggleLike } = usePost()
 const { toggleRepost, loading: loadingToggleRepost } = usePost()
 const { loadMoreReplies, loading: loadingLoadMoreReplies } = usePost()
-
+loadingGetPostId.value = true
 const store = useStore()
 const route = useRoute()
 const router = useRouter()
@@ -307,6 +307,7 @@ onMounted(async () => {
             })
         })
     } else {
+        loadingGetPostId.value = false
         const postId = route.params.id
         const originalPostId = replies.value.lastRequest.originalPostId
         let existingPostStore;

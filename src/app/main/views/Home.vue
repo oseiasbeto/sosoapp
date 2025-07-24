@@ -63,7 +63,6 @@
 import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 import { usePost } from '@/hooks/posts';
-import CreatePostTrigger from '@/app/posts/components/CreatePostTrigger.vue';
 import PostList from '@/app/posts/components/PostList.vue';
 import BtnPlus from '@/components/btns/BtnPlus.vue';
 import { useRouter } from 'vue-router';

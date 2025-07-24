@@ -7,17 +7,17 @@
       <div
         v-for="(tab, index) in tabs"
         :key="index"
-        class="relative"
+        class="relative flex-1"
       >
         <button
-          @click="selectTab(index)"
-          class="py-3 font-medium text-light-text-secondary dark:text-dark-text-light text-sm transition-colors"
-          :class="{'text-light-text-primary dark:text-dark-text-primary': activeTab === index}"
+          @click="selectTab(index, tab.value)"
+          class="py-3 w-full font-medium text-light-text-secondary dark:text-dark-text-light text-sm transition-colors"
+          :class="{'text-light-text-primary dark:text-dark-text-primary': activeTab === tab.value}"
         >
           {{ tab.label }}
           <!-- Borda estática apenas na tab ativa -->
           <div
-            v-if="activeTab === index"
+            v-if="activeTab === tab.value"
             class="absolute bottom-0 left-0 right-0 h-[3px] bg-primary"
           ></div>
         </button>
@@ -36,8 +36,8 @@ const props = defineProps({
     validator: (value) => value.every(item => 'label' in item)
   },
   modelValue: {
-    type: Number,
-    default: 0
+    type: String,
+    default: 'feed'
   }
 })
 
@@ -46,9 +46,9 @@ const emit = defineEmits(['update:modelValue'])
 const tabsContainer = ref(null)
 const activeTab = ref(props.modelValue)
 
-const selectTab = async (index) => {
-  activeTab.value = index
-  emit('update:modelValue', index)
+const selectTab = async (index, value) => {
+  activeTab.value = value
+  emit('update:modelValue', value)
   await nextTick()
   scrollToTab(index)
 }
@@ -74,7 +74,7 @@ const scrollToTab = (index) => {
 }
 
 onMounted(() => {
-  scrollToTab(activeTab.value)
+  scrollToTab(0)
 })
 </script>
 

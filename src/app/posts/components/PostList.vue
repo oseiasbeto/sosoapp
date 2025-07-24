@@ -17,9 +17,9 @@
       <!-- Slot para conteúdo após a lista -->
 
       <template #after>
-        <div v-if="currentPage < totalPages && !props.loading"
-          class="load-more-container bg-dark-error flex justify-center my-4">
-          <p class="loading-text">Carregando mais...</p>
+        <div v-if="props?.pagination?.hasMore && !props.loadingLoadMore"
+          class="load-more-container flex justify-center my-4">
+          <div class="w-6 h-6 border-2 border-solid border-primary border-t-light-bg dark:border-t-dark-bg rounded-full animate-spin"></div>
         </div>
       </template>
     </DynamicScroller>
@@ -47,7 +47,7 @@ const props = defineProps({
   },
   pagination: {
     type: Object,
-    default: () => ({ currentPage: 1, totalPages: 1 }),
+    default: () => ({ currentPage: 1, hasMore: false, totalPages: 1 }),
   },
   loading: {
     type: Boolean,
@@ -115,5 +115,19 @@ const handleUpdate = (startIndex, endIndex) => {
   display: flex;
   flex-direction: column;
   width: 100%;
+}
+
+@keyframes breathe {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    border-width: 1px;
+  }
+
+  50% {
+    opacity: 1;
+    border-width: 2px;
+  }
 }
 </style>

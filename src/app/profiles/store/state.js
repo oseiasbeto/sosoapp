@@ -1,3 +1,4 @@
 export default {
-    profile: {}
+    profile: {},
+    profiles: []
 };
