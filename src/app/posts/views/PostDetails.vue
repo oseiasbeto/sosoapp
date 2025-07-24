@@ -2,8 +2,10 @@
     <div>
         <!--end replies-->
         <div>
-            <post-list :b-space="110" :posts="replies?.data || []" :is-replies="true" :loading="loadingGetReplies"
-                :post-module="postModule" :loading-load-more="loadingLoadMoreReplies" :pagination="replies.pagination"
+            <post-list :b-space="110" :posts="replies?.data || []" :is-replies="true"       :loading="loadingGetReplies"
+                :post-module="postModule" 
+                :loading-load-more="loadingLoadMoreReplies" 
+                :pagination="replies.pagination"
                 @load-more="_loadMoreReplies">
 
                 <template #before-content>

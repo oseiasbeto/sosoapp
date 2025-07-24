@@ -363,16 +363,25 @@ export function usePost() {
       const response = await api.get(
         `/posts/profile/${tab}/${userId}?page=${page}&limit=${limit}`
       );
-      const { posts, page: currentPage, totalPages, hasMore, total } = response.data;
+      const {
+        posts,
+        page: currentPage,
+        totalPages,
+        hasMore,
+        total,
+      } = response.data;
 
-      store.dispatch("setLoadPosts", {
+      const newModule = {
         posts,
         byId: `profile_${tab}_${userId}`,
         page: currentPage,
         hasMore,
         totalPages,
         total,
-      });
+      };
+
+      store.dispatch("setLoadPosts", newModule);
+      return newModule
     } catch (err) {
       console.error("Erro ao carregar as postagens:", err.message);
       throw err;
@@ -392,6 +401,7 @@ export function usePost() {
       store.dispatch("setLoadPosts", {
         posts,
         page: currentPage,
+        byId: `${tab}`,
         totalPages,
         hasMore,
       });

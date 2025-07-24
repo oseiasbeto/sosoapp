@@ -17,9 +17,11 @@
       <!-- Slot para conteúdo após a lista -->
 
       <template #after>
-        <div v-if="props?.pagination?.hasMore && !props.loadingLoadMore"
+        <div ref="loadTrigger" v-if="props?.pagination?.hasMore || props.loadingLoadMore && !props.loading"
           class="load-more-container flex justify-center my-4">
-          <div class="w-6 h-6 border-2 border-solid border-primary border-t-light-bg dark:border-t-dark-bg rounded-full animate-spin"></div>
+          <div
+            class="w-6 h-6 border-2 border-solid border-primary border-t-light-bg dark:border-t-dark-bg rounded-full animate-spin">
+          </div>
         </div>
       </template>
     </DynamicScroller>
@@ -33,6 +35,7 @@
 import { ref, computed, watch } from 'vue';
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 import PostCard from './PostCard.vue';
+import { useIntersectionObserver } from "@vueuse/core";
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 
 const props = defineProps({
@@ -47,7 +50,7 @@ const props = defineProps({
   },
   pagination: {
     type: Object,
-    default: () => ({ currentPage: 1, hasMore: false, totalPages: 1 }),
+    default: () => ({ page: 1, hasMore: false, totalPages: 1 }),
   },
   loading: {
     type: Boolean,
@@ -69,23 +72,30 @@ const props = defineProps({
 
 const emit = defineEmits(['loadMore']);
 const scroller = ref(null);
-const scrollPosition = ref(0);
-const currentPage = computed(() => props.pagination.currentPage);
-const totalPages = computed(() => props.pagination.totalPages);
+const loadTrigger = ref(null); // Elemento que acionará a API
+const currentPage = computed(() => props.isReplies ? props.pagination.currentPage : props.pagination.page);
 
 // Gerencia o carregamento de mais posts
-const handleUpdate = (startIndex, endIndex) => {
-  console.log("aki")
+const handleUpdate = () => {
   if (
-    endIndex >= props.posts.length - 3 &&
-    currentPage.value < totalPages.value &&
-    !props.loadingLoadMore &&
-    !props.loading
+    props?.pagination?.hasMore &&
+    !props?.loadingLoadMore &&
+    !props?.loading
   ) {
     const newPage = currentPage.value + 1;
     emit('loadMore', newPage);
   }
 };
+
+// Observa o último elemento da lista
+useIntersectionObserver(
+  loadTrigger,
+  ([{ isIntersecting }]) => {
+    if (isIntersecting) {
+      handleUpdate();
+    }
+  }
+);
 </script>
 
 <style scoped>

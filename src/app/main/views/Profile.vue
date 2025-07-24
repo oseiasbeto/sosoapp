@@ -1,15 +1,9 @@
 <template>
     <div class="relative">
         <!--start posts-->
-        <post-list 
-            :posts="profilePosts?.posts || []" :is-replies="false" 
-            :loading="loadingPosts"
-            :posts-module="`profile_${activeTab}_${profile?._id}`" 
-            :b-space="64" 
-            :loading-load-more="loadingPosts"
-            :pagination="profilePosts?.pagination" 
-            @load-more="handleLoadingMorePosts(activeTab)"
-            >
+        <post-list :posts="profilePosts?.posts || []" :is-replies="false" :loading="loadingPosts"
+            :posts-module="`profile_${activeTab}_${profile?._id}`" :b-space="64" :loading-load-more="loadingPosts"
+            :pagination="profilePosts?.pagination" @load-more="handleLoadingMorePosts">
             <template #before-content>
                 <div v-if="!loadingGetById" class="relative">
                     <!--start background image area-->
@@ -147,7 +141,8 @@
         <!--end posts-->
 
         <!--start footer-->
-        <btn-plus v-if="profile?._id && user?._id && profile._id === user._id" @on-press="goToPost(`profile_feed _${profile?._id}`)">
+        <btn-plus v-if="profile?._id && user?._id && profile._id === user._id"
+            @on-press="goToPost(`profile_feed _${profile?._id}`)">
             <svg viewBox="0 0 24 24" stroke="#fff" fill="none" width="29" height="29" class="r-jwli3a">
                 <path
                     d="M 20 9 L 20 16 C 20 18.209 18.209 20 16 20 L 8 20 C 5.791 20 4 18.209 4 16 L 4 8 C 4 5.791 5.791 4 8 4 L 15 4"
@@ -178,10 +173,8 @@ const {
     followUser, loading: loadingFollowUser
 } = useProfile();
 
-const {
-    getProfilePosts,
-    loading: loadingPosts,
-} = usePost()
+const { getProfilePosts, loading: loadingPosts } = usePost()
+const { loadMoreProfilePosts, loading: loadingLoadMore } = usePost()
 
 const route = useRoute();
 const router = useRouter()
@@ -230,8 +223,30 @@ const handleFollowUser = async (userId, isFollowBack = false) => {
     }
 };
 
-const handleLoadingMorePosts = async (module) => {
-    console.log(module)
+const handleLoadingMorePosts = async (nextPage) => {
+    try {
+        const newPosts = await loadMoreProfilePosts({
+            page: nextPage,
+            userId: profile?.value?._id,
+            limit: 10,
+            tab: activeTab.value
+        });
+
+        // Garante que profilePosts.value seja um array antes de usar spread
+        const currentPosts = Array.isArray(profilePosts.value) ? profilePosts.value : [];
+
+        // Filtra posts duplicados (opcional)
+        const uniqueNewPosts = newPosts.filter(newPost =>
+            !currentPosts.some(existingPost => existingPost._id === newPost._id)
+        );
+
+        // Atualiza reativamente
+        profilePosts.value = [...currentPosts, ...uniqueNewPosts];
+
+    } catch (error) {
+        console.error('Failed to load more posts:', error);
+        // Tratamento de erro adicional pode ser adicionado aqui
+    }
 }
 
 const goToPost = (postModule) => {
@@ -289,11 +304,6 @@ watch(() => route.params.user_id, async (newId, oldId) => {
     }
 })
 
-watch(() => route.name, async (newName, oldName) => {
-    if (!newName || newName === oldName) return;
-
-    console.log(newName, oldName)
-})
 
 onMounted(async () => {
     if (route.name !== 'My profile') {
