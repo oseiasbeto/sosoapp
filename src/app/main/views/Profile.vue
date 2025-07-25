@@ -3,8 +3,8 @@
         <!--start posts-->
         <post-list :posts="profilePosts?.posts || []" :is-replies="false" ref="postListComponent"
             @on-scroll="handleScroll" :loading="loadingPosts" :posts-module="`profile_${activeTab}_${profile?._id}`"
-            :b-space="64" :loading-load-more="loadingLoadMore" :pagination="profilePosts?.pagination"
-            @load-more="handleLoadingMorePosts">
+            :show-list="!loadingGetById" :b-space="64" :loading-load-more="loadingLoadMore"
+            :pagination="profilePosts?.pagination" @load-more="handleLoadingMorePosts">
 
             <template #before-content>
                 <div v-if="!loadingGetById" class="relative">
@@ -131,7 +131,7 @@
                     <!--end avatar area-->
 
                     <!--tabs start-->
-                    <Tabs v-model="activeTab" :tabs="tabs" />
+                    <Tabs ref="tabsComponent" v-model="activeTab" :tabs="tabs" />
                     <!--end start-->
                 </div>
                 <div v-else>
@@ -162,7 +162,7 @@ import Tabs from '@/components/base/Tabs.vue';
 import Avatar from '@/components/utilities/Avatar.vue';
 import { useProfile } from '@/hooks/profiles';
 import { usePost } from '@/hooks/posts';
-import { computed, onMounted, watch, ref } from 'vue';
+import { computed, onMounted, nextTick, watch, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import ProfileSkeleton from '../components/ProfileSkeleton.vue';
@@ -192,6 +192,7 @@ const tabs = ref([
 ])
 
 const postListComponent = ref(null)
+const tabsComponent = ref(null)
 
 // Computeds
 const userId = computed(() => route.params.user_id);
@@ -254,6 +255,15 @@ const handleLoadingMorePosts = async (nextPage) => {
     }
 }
 
+const setScrollPosition = async (position) => {
+    await nextTick(); // Espera a atualização do DOM
+    if (postListComponent.value?.setScrollTop) {
+        postListComponent.value.setScrollTop(position);
+    } else {
+        console.error('setScrollTop method not available on postListComponent');
+    }
+};
+
 const goToPost = (postModule) => {
     router.push({
         path: '/composer',
@@ -264,61 +274,72 @@ const goToPost = (postModule) => {
 }
 
 const handleScroll = (value) => {
-    console.log(value)
+    if (posts?.value?.length) {
+        const byId = `profile_${activeTab.value}_${profile?.value?._id}`
+        store.dispatch("setScrollTopFromPosts", {
+            byId,
+            value
+        })
+    } else return
 }
 
-
 watch(() => route.params.user_id, async (newId, oldId) => {
-    if (!newId || newId === oldId) return; // Evita chamadas se o ID for inválido ou repetido
+    if (!newId || newId === oldId) return;
 
-    const cachedProfile = profiles.value.find(p => p._id === newId) || null;
+    try {
+        // Check for cached profile
+        const cachedProfile = profiles.value.find(p => p._id === newId) || null;
 
-    if (!cachedProfile) {
-        if (profile?.value?._id !== newId) {
-            await getUserById(newId).then(async () => {
-                loadingPosts.value = true
-
-                const cachedPosts = posts.value.find(p => p.byId == `profile_${activeTab.value}_${newId}`) || null;
-
-                if (!cachedPosts) {
-                    await getProfilePosts({
-                        page: 1,
-                        userId: newId,
-                        limit: 10,
-                        tab: activeTab.value
-                    }).then((posts) => {
-                        profilePosts.value = posts
-                    })
-                } else {
-                    loadingPosts.value = false
-                    profilePosts.value = cachedPosts
-                }
-            });
-        } else return
-    } else {
-        store.dispatch('setProfile', cachedProfile)
-
-        if (cachedProfile?._id) {
-            const cachedPosts = posts.value.find(p => p.byId == `profile_${activeTab.value}_${cachedProfile?._id}`) || null;
-
-            if (!cachedPosts) {
-                await getProfilePosts({
-                    page: 1,
-                    userId: cachedProfile?._id,
-                    limit: 10,
-                    tab: activeTab.value
-                }).then((posts) => {
-                    profilePosts.value = posts
-                })
+        if (!cachedProfile) {
+            if (profile?.value?._id !== newId) {
+                await getUserById(newId);
             } else {
-                profilePosts.value = cachedPosts
+                return;
             }
+        } else {
+            store.dispatch('setProfile', cachedProfile);
         }
+
+        // Handle posts loading
+        loadingPosts.value = true;
+        const cacheKey = `profile_${activeTab.value}_${newId}`;
+        const cachedPosts = posts.value.find(p => p.byId === cacheKey) || null;
+
+        if (!cachedPosts) {
+            const loadedPosts = await getProfilePosts({
+                page: 1,
+                userId: newId,
+                limit: 10,
+                tab: activeTab.value
+            });
+            profilePosts.value = loadedPosts;
+            setScrollPosition(0)
+        } else {
+            profilePosts.value = cachedPosts;
+            const scrollTop = profilePosts?.value?.scroll_top || 0;
+
+            await nextTick();
+            setScrollPosition(scrollTop);
+        }
+    } catch (error) {
+        console.error('Error loading profile data:', error);
+        await setScrollPosition(0);
+    } finally {
+        loadingGetById.value = false
+        loadingPosts.value = false;
     }
-})
+}, { immediate: true });
 
 watch(() => activeTab.value, async (newTab, oldTab) => {
     if (!newTab || newTab === oldTab) return;
+    
+
+    const byId = `profile_${activeTab.value}_${profile?.value?._id}`
+
+    store.dispatch("setTabFromPosts", {
+        byId,
+        tab: newTab
+    })
 
     const cachedPosts = posts.value.find(p => p.byId == `profile_${newTab}_${profile?.value?._id}`) || null;
 
@@ -328,17 +349,22 @@ watch(() => activeTab.value, async (newTab, oldTab) => {
             userId: profile?.value?._id,
             limit: 10,
             tab: newTab
-        }).then((posts) => {
+        }).then(async (posts) => {
             profilePosts.value = posts
+            await nextTick()
+            setScrollPosition(0);
         })
     } else {
         profilePosts.value = cachedPosts
+        const scrollTop = profilePosts?.value?.scroll_top || 0
+
+        await nextTick()
+        setScrollPosition(scrollTop)
     }
 })
 
 
 onMounted(async () => {
-    console.log("aki")
     if (route.name !== 'My profile') {
         if (!profile.value?._id || profile.value?._id !== userId.value) {
             const cachedProfile = profiles.value.find(p => p._id === route.params.user_id) || null;

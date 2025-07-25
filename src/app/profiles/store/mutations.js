@@ -10,6 +10,22 @@ export default {
         profiles.push(newProfile)
     } else return
   },
+  UPDATE_DATA_FROM_PROFILES(state, { byId, scrollTop, tab }) {
+    if (!state.profiles) return;
+
+    const index = state.profiles.findIndex(
+      (p) => p?._id === byId
+    );
+    
+    if (index !== -1) {
+      const item = state.profiles[index];
+
+      item.scroll_top = scrollTop;
+      item.tab = tab
+
+      console.log(item)
+    }
+  },
   UPDATE_FOLLOW_STATE(state, { userId, profileId, isFollowing, isFollowedBy }) {
     if (state.user?._id === userId) {
       // Atualiza following do usuário

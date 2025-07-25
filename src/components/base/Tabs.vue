@@ -76,6 +76,11 @@ const scrollToTab = (index) => {
 onMounted(() => {
   scrollToTab(0)
 })
+
+// Expõe a função para o componente pai
+defineExpose({
+  selectTab
+});
 </script>
 
 <style>

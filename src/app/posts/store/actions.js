@@ -38,6 +38,12 @@ export default {
     setScrollTopRepliesStore({ commit }, { originalPostId, value }) {
         commit('SET_SCROLLTOP_REPLIES_STORE', { originalPostId, value });
     },
+    setScrollTopFromPosts({ commit }, { byId, value }) {
+        commit('SET_SCROLLTOP_FROM_POSTS', { byId, value });
+    },
+    setTabFromPosts({ commit }, { byId, tab }) {
+        commit('SET_TAB_FROM_POSTS', { byId, tab });
+    },
     incRepliesCountFromPosts({ commit }, { index, moduleIndex, isRepost, newReply }) {
         commit('INC_REPLIES_COUNT_FROM_POSTS', { index, moduleIndex, isRepost, newReply });
     },

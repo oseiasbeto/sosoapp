@@ -296,6 +296,7 @@ watch(() => route.params.id, async (newId, oldId) => {
         const scrollTop = originalPostStore?.scroll_top || 0
         setScrollPosition(scrollTop)
     } else {
+        await nextTick()
         setScrollPosition(0)
         if (!post.value?._id) {
             await getPostById(route.params.id).then(async () => {

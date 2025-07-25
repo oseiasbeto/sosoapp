@@ -17,7 +17,7 @@
         </div>
       </template>
 
-      <template v-if="!props.loading" v-slot="{ item, index, active }">
+      <template v-if="!props.loading && props.showList" v-slot="{ item, index, active }">
         <DynamicScrollerItem :item="item" :active="active"
           :size-dependencies="[item._id, item.updatedAt, item.likes?.length, item.reposts?.length]" :data-index="index"
           class="scroller-item">
@@ -64,6 +64,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  showList: {
+    type: Boolean,
+    default: true,
+  },
   loadingLoadMore: {
     type: Boolean,
     default: false,
@@ -99,7 +103,7 @@ const handleUpdate = () => {
 const handleScrollEvent = (event) => {
   const scrollElement = event.target;
 
-  if(scrollElement) {
+  if (scrollElement) {
     emit('onScroll', scrollElement.scrollTop)
   }
 };

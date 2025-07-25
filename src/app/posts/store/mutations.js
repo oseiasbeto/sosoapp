@@ -252,6 +252,30 @@ export default {
       item.scroll_top = value;
     }
   },
+  SET_SCROLLTOP_FROM_POSTS(state, { byId, value }) {
+    if (!state.posts) return;
+
+    const index = state.posts.findIndex(
+      (p) => p?.byId === byId
+    );
+    
+    if (index !== -1) {
+      const item = state.posts[index];
+      item.scroll_top = value;
+    }
+  },
+  SET_TAB_FROM_POSTS(state, { byId, tab }) {
+    if (!state.posts) return;
+
+    const index = state.posts.findIndex(
+      (p) => p?.byId === byId
+    );
+    
+    if (index !== -1) {
+      const item = state.posts[index];
+      item.tab = tab;
+    }
+  },
 
   TOGGLE_LIKE_POST(
     state,
