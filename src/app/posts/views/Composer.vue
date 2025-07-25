@@ -87,6 +87,7 @@ const replyTo = computed(() => route.query.replyto || null);
 const postModule = computed(() => route.query.post_module || null);
 const originalRepost = computed(() => route.query.original_repost || null);
 const originalRepostId = computed(() => route.query.original_repost_id || null);
+//const isRepost = computed(() => route.query.is_repost || null);
 const shouldAddReply = computed(() => route.query.should_add_reply_from_replies || false);
 const addReplyFrom = computed(() => route.query.add_reply_from || null);
 const canPost = computed(() => {
@@ -309,7 +310,7 @@ const handleSubmit = async () => {
     };
 
     if (postData.content || postData.media.length > 0) {
-        await createPost(postData).then(res => {
+        await createPost(postData).then(() => {
             resetForm();
             router.back()
         }).catch(err => {

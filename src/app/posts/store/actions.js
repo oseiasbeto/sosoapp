@@ -35,8 +35,8 @@ export default {
     addReplyFromRepliesStore({ commit }, { index, postModule, newReply }) {
         commit('ADD_REPLY_FROM_REPLIES_STORE', { index, postModule, newReply });
     },
-    incRepliesCountFromPosts({ commit }, { index, moduleIndex, newReply }) {
-        commit('INC_REPLIES_COUNT_FROM_POSTS', { index, moduleIndex, newReply });
+    incRepliesCountFromPosts({ commit }, { index, moduleIndex, isRepost, newReply }) {
+        commit('INC_REPLIES_COUNT_FROM_POSTS', { index, moduleIndex, isRepost, newReply });
     },
     incRepliesCountFromReplies({ commit }, { index, postModule, newReplyId }) {
         commit('INC_REPLIES_COUNT_FROM_REPLIES', { index, postModule, newReplyId });

@@ -37,7 +37,7 @@
                 <!--start footer post-->
                 <post-reactions :likes-count="likesCount" :replies-count="repliesCount" :reposts-count="repostsCount"
                     @like-post="handleLike(post?.is_repost ? post.original_post._id : post._id, post._id, post?.is_repost)"
-                    :loading-toggle-like="loadingToggleLike" @reply-post="goToReply(post, post.originalRepostId)"
+                    :loading-toggle-like="loadingToggleLike" @reply-post="goToReply(post, post?.is_repost)"
                     @repost="handleRepost(post?.is_repost ? post.original_post : post, post?.is_repost)"
                     @open-more="handleMoreOptions(post)" :has-liked="hasLiked" :has-reposted="hasReposted" />
                 <!--end footer post-->
@@ -147,12 +147,15 @@ const handleMoreOptions = (originalPost) => {
     })
 }
 
-const goToReply = (post, originalRepostId) => {
+const goToReply = (post, isRepost) => {
     store.dispatch("setOriginalPost", post)
     router.push({
         path: "/composer",
         query: {
             replyto: post._id,
+            ...(isRepost && {
+                is_repost: isRepost,
+            }),
             add_reply_from: props.isReply ? 'original_reply' : 'original_post',
             post_module: props.postModule
         }

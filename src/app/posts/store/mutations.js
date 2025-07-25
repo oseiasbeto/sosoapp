@@ -151,7 +151,7 @@ export default {
     }
   },
 
-  INC_REPLIES_COUNT_FROM_POSTS(state, { index, moduleIndex, newReply }) {
+  INC_REPLIES_COUNT_FROM_POSTS(state, { index, isRepost, moduleIndex, newReply }) {
     if (index === -1 || moduleIndex === -1) return;
 
     const module = state.posts[moduleIndex];

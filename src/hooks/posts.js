@@ -69,31 +69,62 @@ export function usePost() {
             if (moduleIndex === -1) return;
             const module = store.getters.posts[moduleIndex];
 
-            const index = module.posts.findIndex((post) =>
-              data.originalRepostId
-                ? post._id === data?.originalRepostId
-                : post._id === newReply.original_post._id
-            );
-
-            if (index !== -1) {
-              store.dispatch("incRepliesCountFromPosts", {
-                index,
-                moduleIndex,
-                postModule: data.postModule,
-                newReply,
-              });
-
-              let indexReply = -1;
-              indexReply = repliesStore.findIndex(
-                (r) => r.original_post?._id === newReply?.original_post?._id
+            if (!data.isRepost) {
+              const index = module.posts.findIndex((post) =>
+                data.originalRepostId
+                  ? post._id === data?.originalRepostId
+                  : post._id === newReply.original_post._id
               );
 
-              if (indexReply !== -1) {
-                store.dispatch("addReplyFromRepliesStore", {
-                  index: indexReply,
+              if (index !== -1) {
+                store.dispatch("incRepliesCountFromPosts", {
+                  index,
+                  moduleIndex,
+                  isRepost: data.isRepost,
                   postModule: data.postModule,
                   newReply,
                 });
+
+                let indexReply = -1;
+                indexReply = repliesStore.findIndex(
+                  (r) => r.original_post?._id === newReply?.original_post?._id
+                );
+
+                if (indexReply !== -1) {
+                  store.dispatch("addReplyFromRepliesStore", {
+                    index: indexReply,
+                    postModule: data.postModule,
+                    newReply,
+                  });
+                }
+              }
+            } else {
+              const index = module.posts.findIndex(
+                (post) =>
+                  post?.original_post?._id === newReply.original_post._id
+              );
+
+              if (index !== -1) {
+                store.dispatch("incRepliesCountFromPosts", {
+                  index,
+                  moduleIndex,
+                  isRepost: data.isRepost,
+                  postModule: data.postModule,
+                  newReply,
+                });
+
+                let indexReply = -1;
+                indexReply = repliesStore.findIndex(
+                  (r) => r.original_post?._id === newReply?.original_post?._id
+                );
+
+                if (indexReply !== -1) {
+                  store.dispatch("addReplyFromRepliesStore", {
+                    index: indexReply,
+                    postModule: data.postModule,
+                    newReply,
+                  });
+                }
               }
             }
           } else {
@@ -424,7 +455,7 @@ export function usePost() {
       };
 
       store.dispatch("setLoadPosts", newModule);
-      return newModule
+      return newModule;
     } catch (err) {
       console.error("Erro ao carregar as postagens:", err.message);
       throw err;
@@ -455,8 +486,6 @@ export function usePost() {
       loading.value = false;
     }
   };
-
-  
 
   // Retorna as funções e a variável reativa `loading` para serem usadas nos componentes Vue.
   return {

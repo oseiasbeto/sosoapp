@@ -1,18 +1,18 @@
 <template>
   <div v-if="author !== null" class="flex items-baseline min-w-0 w-full">
-    <div @click.stop @click="goToProfile(props.author)" :to="`/profile/${author?._id}`"
+    <div 
       class="flex items-baseline min-w-0 max-w-full group" :aria-label="`Perfil de ${author?.name}`">
       <!-- Container principal que fará o truncamento concatenado -->
       <div class="flex items-baseline min-w-0 max-w-full overflow-hidden"
         :class="isViewPost ? '!flex-col text-base leading-5' : 'text-sm'">
         <!-- Nome -->
-        <span class="font-semibold text-light-text-primary dark:text-dark-text-primary truncate text-ellipsis">
+        <span @click.stop @click="goToProfile(props.author)" class="font-semibold text-light-text-primary dark:text-dark-text-primary truncate text-ellipsis">
           {{ author?.name || 'Nome' }}
         </span>
 
         <!-- Versão mobile concatenada -->
         <span class="flex text-light-text-secondary dark:text-dark-text-light items-baseline min-w-0 overflow-hidden">
-          <span class="text-gray-500 truncate text-ellipsis" :class="{ 'ml-1': !isViewPost }">
+          <span @click.stop @click="goToProfile(props.author)" class="text-gray-500 truncate text-ellipsis" :class="{ 'ml-1': !isViewPost }">
             @{{ author?.username }}
           </span>
           <span v-show="showTime && postCreatedAt !== null" class="text-gray-500 whitespace-nowrap ml-1">
