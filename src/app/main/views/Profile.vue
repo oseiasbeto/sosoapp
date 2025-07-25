@@ -8,7 +8,9 @@
             :posts-module="`profile_${activeTab}_${profile?._id}`" 
             :b-space="64" 
             :loading-load-more="loadingLoadMore"
-            :pagination="profilePosts?.pagination" @load-more="handleLoadingMorePosts">
+            :pagination="profilePosts?.pagination" 
+            @load-more="handleLoadingMorePosts">
+            
             <template #before-content>
                 <div v-if="!loadingGetById" class="relative">
                     <!--start background image area-->

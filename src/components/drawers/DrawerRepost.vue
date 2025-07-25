@@ -27,7 +27,7 @@
 
                     <div class="space-y-4">
                         <button
-                            @click="handleReply(drawer?.data?.originalPost, drawer?.data?.isPost, drawer?.data?.isViewPage, drawer?.data?.postModule)"
+                            @click="handleReply(drawer?.data?.originalPost, drawer?.data?.isPost, drawer?.data?.isViewPage, drawer?.data?.postModule, drawer?.data?.isRepost)"
                             :disabled="loading" class="w-full rounded-full bg-gray-600 py-2 text-white font-medium 
                         hover:bg-gray-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors 
                         flex items-center justify-center">
@@ -76,8 +76,8 @@ const isOpen = computed(() => {
     else return false
 });
 
-const handleReply = async (originalPost, isPost, isViewPage, postModule) => {
-    await toggleRepost({ originalPost, isPost, isViewPage, postModule }).then(() => {
+const handleReply = async (originalPost, isPost, isViewPage, postModule, isRepost) => {
+    await toggleRepost({ originalPost, isPost, isViewPage, postModule, isRepost }).then(() => {
         closeDrawer()
     })
 }

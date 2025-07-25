@@ -480,31 +480,128 @@ export default {
     }
   },
 
-  TOGGLE_REPOST_POST(state, { postId, postModule, isViewPage, userId }) {
+  TOGGLE_REPOST_POST(
+    state,
+    { postId, isRepost, postModule, isViewPage, userId }
+  ) {
     if (!isViewPage) {
       const module = state.posts.find((m) => m.byId === postModule);
       if (!module) return;
 
-      const posts = module.posts;
+      if (!isRepost) {
+        const posts = module.posts;
 
-      console.log(state.posts)
+        const post = posts.find((p) => p?._id === postId);
 
-      const post = posts.find((p) => p._id === postId);
+        if (!post) return;
 
-      if (!post) return;
+        const index = post.reposts.indexOf(userId);
+        const repliesStore = state.repliesStore;
 
-      const index = post.reposts.indexOf(userId);
-      const repliesStore = state.repliesStore;
+        if (index === -1) {
+          post.reposts.push(userId);
 
-      if (index === -1) {
-        post.reposts.push(userId);
+          if (posts.length && post.reposts.length) {
+            posts.map((p) => {
+              if (post._id === p?.original_post?._id) {
+                p.original_post.reposts.push(userId);
+              }
+            });
+            if (repliesStore.length && post.is_reply) {
+              const indexStore = repliesStore.findIndex(
+                (r) =>
+                  r?.original_post?._id ===
+                  post?.original_post?.original_post?._id
+              );
 
-        if (posts.length && post.reposts.length) {
-          posts.map((p) => {
-            if (post._id === p?.original_post?._id) {
-              p.original_post.reposts.push(userId);
+              if (indexStore === -1) return;
+
+              const replies = repliesStore[indexStore].replies.data;
+
+              if (replies.length) {
+                replies.map((r) => {
+                  if (r._id === post?.original_post?._id) {
+                    r.reposts.push(userId);
+                  }
+                });
+              }
             }
-          });
+          }
+        } else {
+          post.reposts.splice(index, 1);
+
+          if (posts.length) {
+            const index = posts.findIndex(
+              (p) =>
+                p.is_repost &&
+                p.author._id === userId &&
+                p?.original_post._id === postId
+            );
+
+            if (index !== -1) {
+              posts.splice(index, 1);
+            }
+
+            posts.map((p) => {
+              if (p?.original_post?._id === post._id) {
+                const index = p.original_post.reposts.indexOf(userId);
+
+                if (index !== -1) {
+                  p.original_post.reposts.splice(index, 1);
+                }
+              }
+            });
+
+            if (repliesStore.length && post.is_reply) {
+              const indexStore = repliesStore.findIndex(
+                (r) =>
+                  r.original_post._id === post.original_post.original_post._id
+              );
+              if (indexStore === -1) return;
+
+              const replies = repliesStore[indexStore].replies.data;
+              if (replies.length) {
+                replies.map((r) => {
+                  if (r._id === post?.original_post?._id) {
+                    r.reposts.splice(index, 1);
+                  }
+                });
+              }
+            }
+          }
+        }
+      } else {
+        const module = state.posts.find((m) => m.byId === postModule);
+        if (!module) return;
+
+        const posts = module.posts;
+        const post = posts.find((p) => p?.original_post._id === postId);
+
+        const repliesStore = state.repliesStore;
+
+        if (!post) return;
+
+        const index = post.original_post.reposts.indexOf(userId);
+
+        if (index === -1) {
+          post.original_post.reposts.push(userId);
+          console.log(post);
+
+          if (post.original_post.reposts.length) {
+            posts.map((p) => {
+              if (
+                p?.original_post?._id === post?.original_post?._id &&
+                p._id !== post._id
+              ) {
+                p.original_post.reposts.push(userId);
+              }
+
+              if (p?._id === post?.original_post?._id) {
+                p.reposts.push(userId);
+              }
+            });
+          }
+
           if (repliesStore.length && post.is_reply) {
             const indexStore = repliesStore.findIndex(
               (r) =>
@@ -524,31 +621,19 @@ export default {
               });
             }
           }
-        }
-      } else {
-        post.reposts.splice(index, 1);
-
-        if (posts.length) {
-          const index = posts.findIndex(
-            (p) =>
-              p.is_repost &&
-              p.author._id === userId &&
-              p?.original_post._id === postId
-          );
-
-          if (index !== -1) {
-            posts.splice(index, 1);
-          }
-
-          posts.map((p) => {
-            if (p?.original_post?._id === post._id) {
-              const index = p.original_post.reposts.indexOf(userId);
-
-              if (index !== -1) {
+        } else {
+          post.original_post.likes.splice(index, 1);
+          if (post.original_post.reposts.length) {
+            posts.map((p) => {
+              if (p?.original_post?._id === post?.original_post?._id) {
                 p.original_post.reposts.splice(index, 1);
               }
-            }
-          });
+
+              if (p?._id === post?.original_post?._id) {
+                p.reposts.splice(index, 1);
+              }
+            });
+          }
 
           if (repliesStore.length && post.is_reply) {
             const indexStore = repliesStore.findIndex(

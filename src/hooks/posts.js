@@ -289,6 +289,7 @@ export function usePost() {
   const toggleRepost = async ({
     originalPost,
     postModule,
+    isRepost = false,
     isPost = false,
     isViewPage = false,
   }) => {
@@ -314,6 +315,7 @@ export function usePost() {
         store.dispatch("toggleRepostPost", {
           postId,
           postModule,
+          isRepost,
           userId,
           isViewPage,
         });
