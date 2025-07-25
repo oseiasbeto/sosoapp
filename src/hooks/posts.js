@@ -286,6 +286,47 @@ export function usePost() {
     }
   };
 
+  const toggleRepost = async ({
+    originalPost,
+    postModule,
+    isPost = false,
+    isViewPage = false,
+  }) => {
+    try {
+      loading.value = true;
+      const response = await api.put(`/posts/repost/${originalPost._id}`);
+
+      if (originalPost.is_reply) {
+        const replyId = originalPost._id;
+        const userId = store.getters.currentUser._id;
+
+        store.dispatch("toggleRepostReply", {
+          replyId,
+          postModule,
+          isPost,
+          userId,
+          isViewPage,
+        });
+      } else {
+        const postId = originalPost._id;
+        const userId = store.getters.currentUser._id;
+
+        store.dispatch("toggleRepostPost", {
+          postId,
+          postModule,
+          userId,
+          isViewPage,
+        });
+      }
+      return response;
+    } catch (err) {
+      console.error("Erro ao repostar:", err.message);
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   const getFeedPosts = async ({ page = 1, limit = 10 }) => {
     try {
       loading.value = true;
@@ -413,46 +454,7 @@ export function usePost() {
     }
   };
 
-  const toggleRepost = async ({
-    originalPost,
-    postModule,
-    isPost = false,
-    isViewPage = false,
-  }) => {
-    try {
-      loading.value = true;
-      const response = await api.put(`/posts/repost/${originalPost._id}`);
-
-      if (originalPost.is_reply) {
-        const replyId = originalPost._id;
-        const userId = store.getters.currentUser._id;
-
-        store.dispatch("toggleRepostReply", {
-          replyId,
-          postModule,
-          isPost,
-          userId,
-          isViewPage,
-        });
-      } else {
-        const postId = originalPost._id;
-        const userId = store.getters.currentUser._id;
-
-        store.dispatch("toggleRepostPost", {
-          postId,
-          postModule,
-          userId,
-          isViewPage,
-        });
-      }
-      return response;
-    } catch (err) {
-      console.error("Erro ao repostar:", err.message);
-      throw err;
-    } finally {
-      loading.value = false;
-    }
-  };
+  
 
   // Retorna as funções e a variável reativa `loading` para serem usadas nos componentes Vue.
   return {

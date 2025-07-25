@@ -1,5 +1,6 @@
 <template>
-    <div @click="goToDetails(post)" ref="postCardRef" class="p-4 pb-2.5 mb-0.5 shrink-0 border-b border-light-border dark:border-dark-border">
+    <div @click="goToDetails(post)" ref="postCardRef"
+        class="p-4 pb-2.5 mb-0.5 shrink-0 border-b border-light-border dark:border-dark-border">
         <!--start flags-->
         <!--start original repost author tag-->
         <tag-author-repost v-if="post?.is_repost" :author="post?.author" />
@@ -9,15 +10,16 @@
         <div class="flex">
             <div id="left-part" class="pl-1 pr-3">
                 <avatar
-                    :src="post?.is_repost ? post?.original_post?.author?.profile_image?.low : post.author?.profile_image?.low || null" 
-                    alt-text="Foto"
-                    />
+                    :src="post?.is_repost ? post?.original_post?.author?.profile_image?.low : post.author?.profile_image?.low || null"
+                    alt-text="Foto" />
             </div>
             <div id="right-part" class="min-w-0 flex-1 flex-shrink-0">
                 <!--start header-->
                 <div ref="parent" class="w-full min-w-0 max-w-full overflow-hidden flex-shrink-0">
                     <!--start author details-->
-                    <author-post-details :post-created-at="post?.is_repost ? post?.original_post?.created_at : post?.created_at" :author="post?.is_repost ? post?.original_post?.author : post?.author" />
+                    <author-post-details
+                        :post-created-at="post?.is_repost ? post?.original_post?.created_at : post?.created_at"
+                        :author="post?.is_repost ? post?.original_post?.author : post?.author" />
                     <!--end author details-->
                 </div>
                 <!--end header-->
@@ -33,18 +35,11 @@
                 <!--end body post-->
 
                 <!--start footer post-->
-                <post-reactions 
-                    :likes-count="likesCount" 
-                    :replies-count="repliesCount" 
-                    :reposts-count="repostsCount"
+                <post-reactions :likes-count="likesCount" :replies-count="repliesCount" :reposts-count="repostsCount"
                     @like-post="handleLike(post?.is_repost ? post.original_post._id : post._id, post._id, post?.is_repost)"
-                    :loading-toggle-like="loadingToggleLike"
-                    @post-reply="goToReply(post, post.originalRepostId)"
+                    :loading-toggle-like="loadingToggleLike" @reply-post="goToReply(post, post.originalRepostId)"
                     @repost="handleRepost(post?.is_repost ? post.original_post : post)"
-                    @open-more="handleMoreOptions(post)" 
-                    :has-liked="hasLiked"
-                    :has-reposted="hasReposted"
-                    />
+                    @open-more="handleMoreOptions(post)" :has-liked="hasLiked" :has-reposted="hasReposted" />
                 <!--end footer post-->
             </div>
         </div>
@@ -86,10 +81,13 @@ const parent = ref(null);
 const user = computed(() => store.getters.currentUser)
 
 const hasLiked = computed(() => props.post?.is_repost ? props.post.original_post.likes.includes(user.value._id) : props.post?.likes?.includes(user.value._id) || false);
+
 const hasReposted = computed(() => props.post?.is_repost ? props.post.original_post.reposts.includes(user.value._id) : props.post?.reposts?.includes(user.value._id) || false);
 
 const likesCount = computed(() => props.post?.is_repost ? props.post.original_post.likes.length : props.post?.likes?.length || 0);
+
 const repliesCount = computed(() => props.post?.is_repost ? props.post.original_post.replies.length : props.post?.replies?.length || 0);
+
 const repostsCount = computed(() => props.post?.is_repost ? props.post.original_post.reposts.length : props.post?.reposts?.length || 0);
 
 const goToDetails = (post) => {

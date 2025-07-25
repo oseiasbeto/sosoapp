@@ -1,8 +1,13 @@
 <template>
     <div class="relative">
         <!--start posts-->
-        <post-list :posts="profilePosts?.posts || []" :is-replies="false" :loading="loadingPosts"
-            :posts-module="`profile_${activeTab}_${profile?._id}`" :b-space="64" :loading-load-more="loadingPosts"
+        <post-list 
+            :posts="profilePosts?.posts || []" 
+            :is-replies="false" 
+            :loading="loadingPosts"
+            :posts-module="`profile_${activeTab}_${profile?._id}`" 
+            :b-space="64" 
+            :loading-load-more="loadingLoadMore"
             :pagination="profilePosts?.pagination" @load-more="handleLoadingMorePosts">
             <template #before-content>
                 <div v-if="!loadingGetById" class="relative">
@@ -123,9 +128,8 @@
                     <!--start avatar area-->
                     <div class="absolute top-[110px] left-[10px]">
                         <div class="border-[3px] rounded-full border-light-bg dark:border-dark-bg">
-                            <avatar :src="profile?.profile_image?.url || profile?.profile_image?.low" size="big" />
+                            <avatar :src="profile?.profile_image?.low || null" size="big" alt-text="Foto" />
                         </div>
-
                     </div>
                     <!--end avatar area-->
 
@@ -232,6 +236,8 @@ const handleLoadingMorePosts = async (nextPage) => {
             tab: activeTab.value
         });
 
+        if (!newPosts || !newPosts.length) return
+
         // Garante que profilePosts.value seja um array antes de usar spread
         const currentPosts = Array.isArray(profilePosts.value) ? profilePosts.value : [];
 
@@ -258,9 +264,13 @@ const goToPost = (postModule) => {
     })
 }
 
+const scrollOnTop = () => {
+    window.scrollTo(0, 0)
+}
+
 watch(() => route.params.user_id, async (newId, oldId) => {
     if (!newId || newId === oldId) return; // Evita chamadas se o ID for inválido ou repetido
-    activeTab.value = 'feed'
+    scrollOnTop()
     const cachedProfile = profiles.value.find(p => p._id === newId) || null;
 
     if (!cachedProfile) {
@@ -279,6 +289,7 @@ watch(() => route.params.user_id, async (newId, oldId) => {
                     profilePosts.value = posts
                 })
             } else {
+                loadingPosts.value = false
                 profilePosts.value = cachedPosts
             }
         });
@@ -301,6 +312,25 @@ watch(() => route.params.user_id, async (newId, oldId) => {
                 profilePosts.value = cachedPosts
             }
         }
+    }
+})
+
+watch(() => activeTab.value, async (newTab, oldTab) => {
+    if (!newTab || newTab === oldTab) return;
+
+    const cachedPosts = posts.value.find(p => p.byId == `profile_${newTab}_${profile?.value?._id}`) || null;
+
+    if (!cachedPosts) {
+        await getProfilePosts({
+            page: 1,
+            userId: profile?.value?._id,
+            limit: 10,
+            tab: newTab
+        }).then((posts) => {
+            profilePosts.value = posts
+        })
+    } else {
+        profilePosts.value = cachedPosts
     }
 })
 
@@ -327,6 +357,7 @@ onMounted(async () => {
                         })
                     } else {
                         profilePosts.value = cachedPosts
+                        loadingPosts.value = false
                     }
                 });
             } else {

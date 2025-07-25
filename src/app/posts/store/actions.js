@@ -50,8 +50,8 @@ export default {
     toggleLikeReply({ commit }, { replyId, userId, postModule, isOriginalPost, originalRepostId }) {
         commit('TOGGLE_LIKE_REPLY', { replyId, userId, postModule, isOriginalPost, originalRepostId });
     },
-    toggleRepostPost({ commit }, { postId, isViewPage, postModule, userId }) {
-        commit('TOGGLE_REPOST_POST', { postId, isViewPage, postModule, userId });
+    toggleRepostPost({ commit }, { postId, isViewPage, originalPostId, isRepost, postModule, userId }) {
+        commit('TOGGLE_REPOST_POST', {originalPostId, postId, isViewPage, isRepost, postModule, userId });
     },
     toggleRepostReply({ commit }, { replyId, userId, postModule, isPost, isViewPage }) {
         commit('TOGGLE_REPOST_REPLY', { replyId, userId, postModule, isPost, isViewPage });

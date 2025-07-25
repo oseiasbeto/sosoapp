@@ -5,6 +5,16 @@
       <!-- Slot para conteúdo ANTES da lista -->
       <template #before>
         <slot name="before-content"></slot>
+        <!--loading-->
+        <div v-if="props.loading">
+          <PostSkeleton />
+          <PostSkeleton />
+          <PostSkeleton />
+          <PostSkeleton />
+          <PostSkeleton />
+          <PostSkeleton />
+          <PostSkeleton />
+        </div>
       </template>
 
       <template v-if="!props.loading" v-slot="{ item, index, active }">
@@ -25,9 +35,6 @@
         </div>
       </template>
     </DynamicScroller>
-    <div v-if="props.loading" class="loading-container flex justify-center my-8">
-      <p class="loading-text">Carregando...</p>
-    </div>
   </div>
 </template>
 
@@ -37,6 +44,7 @@ import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 import PostCard from './PostCard.vue';
 import { useIntersectionObserver } from "@vueuse/core";
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
+import PostSkeleton from './PostSkeleton.vue';
 
 const props = defineProps({
   posts: {

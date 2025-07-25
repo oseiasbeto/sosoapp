@@ -117,13 +117,11 @@ export default {
   },
 
   ADD_REPLY_FROM_REPLIES(state, { newReply, postModule }) {
-    console.log("aki");
     const replies = state.replies;
     replies.data = [newReply, ...replies.data];
   },
 
   ADD_REPLY_FROM_REPLIES_STORE(state, { index, postModule, newReply }) {
-    console.log("aki");
     if (index === -1 || !state.repliesStore || !state.repliesStore[index])
       return;
     const repliesStore = state.repliesStore;
@@ -154,7 +152,6 @@ export default {
   },
 
   INC_REPLIES_COUNT_FROM_POSTS(state, { index, moduleIndex, newReply }) {
-    console.log("aki");
     if (index === -1 || moduleIndex === -1) return;
 
     const module = state.posts[moduleIndex];
@@ -197,7 +194,6 @@ export default {
   },
 
   INC_REPLIES_COUNT_FROM_REPLIES(state, { index, postModule, newReplyId }) {
-    console.log("aki");
     if (index === -1 || !state.replies || !state.replies.data[index]) return;
 
     const item = state.replies.data[index];
@@ -232,7 +228,6 @@ export default {
   },
 
   INC_REPLIES_COUNT_FROM_REPLIES_STORE(state, { index, newReplyId }) {
-    console.log("aki");
     if (index === -1 || !state.repliesStore || !state.repliesStore[index])
       return;
     const item = state.repliesStore[index];
@@ -491,6 +486,8 @@ export default {
       if (!module) return;
 
       const posts = module.posts;
+
+      console.log(state.posts)
 
       const post = posts.find((p) => p._id === postId);
 
