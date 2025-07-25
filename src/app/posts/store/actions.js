@@ -35,6 +35,9 @@ export default {
     addReplyFromRepliesStore({ commit }, { index, postModule, newReply }) {
         commit('ADD_REPLY_FROM_REPLIES_STORE', { index, postModule, newReply });
     },
+    setScrollTopRepliesStore({ commit }, { originalPostId, value }) {
+        commit('SET_SCROLLTOP_REPLIES_STORE', { originalPostId, value });
+    },
     incRepliesCountFromPosts({ commit }, { index, moduleIndex, isRepost, newReply }) {
         commit('INC_REPLIES_COUNT_FROM_POSTS', { index, moduleIndex, isRepost, newReply });
     },

@@ -4,8 +4,16 @@
 
 html,
 body {
-    overscroll-behavior-y: contain;
     touch-action: pan-x pan-y;
     -webkit-user-select: none;
     user-select: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }

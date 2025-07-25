@@ -151,7 +151,10 @@ export default {
     }
   },
 
-  INC_REPLIES_COUNT_FROM_POSTS(state, { index, isRepost, moduleIndex, newReply }) {
+  INC_REPLIES_COUNT_FROM_POSTS(
+    state,
+    { index, isRepost, moduleIndex, newReply }
+  ) {
     if (index === -1 || moduleIndex === -1) return;
 
     const module = state.posts[moduleIndex];
@@ -234,6 +237,20 @@ export default {
 
     // Adiciona o newReplyId apenas no repliesStore
     item.original_post.replies.push(newReplyId);
+  },
+
+  SET_SCROLLTOP_REPLIES_STORE(state, { originalPostId, value }) {
+    if (!state.repliesStore) return;
+
+    const index = state.repliesStore.findIndex(
+      (p) => p?.original_post?._id === originalPostId
+    );
+    
+    if (index !== -1) {
+      const item = state.repliesStore[index];
+
+      item.scroll_top = value;
+    }
   },
 
   TOGGLE_LIKE_POST(
@@ -531,6 +548,7 @@ export default {
           post.reposts.splice(index, 1);
 
           if (posts.length) {
+            /* 
             const index = posts.findIndex(
               (p) =>
                 p.is_repost &&
@@ -540,7 +558,7 @@ export default {
 
             if (index !== -1) {
               posts.splice(index, 1);
-            }
+            }*/
 
             posts.map((p) => {
               if (p?.original_post?._id === post._id) {

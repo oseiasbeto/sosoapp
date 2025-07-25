@@ -1,7 +1,7 @@
 <template>
   <div class="scroll-container">
-    <DynamicScroller ref="scroller" :items="props?.posts" :min-item-size="120" class="scroller "
-      :style="`padding-bottom: ${bSpace}px;`" :emit-update="true" key-field="_id">
+    <DynamicScroller @scroll="handleScrollEvent" ref="scroller" :items="props?.posts" :min-item-size="120"
+      class="scroller " :style="`padding-bottom: ${bSpace}px;`" :emit-update="true" key-field="_id">
       <!-- Slot para conteúdo ANTES da lista -->
       <template #before>
         <slot name="before-content"></slot>
@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 import PostCard from './PostCard.vue';
 import { useIntersectionObserver } from "@vueuse/core";
@@ -78,9 +78,10 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['loadMore']);
+const emit = defineEmits(['loadMore', 'onScroll']);
 const scroller = ref(null);
-const loadTrigger = ref(null); // Elemento que acionará a API
+const loadTrigger = ref(null);
+
 const currentPage = computed(() => props.isReplies ? props.pagination.currentPage : props.pagination.page);
 
 // Gerencia o carregamento de mais posts
@@ -95,6 +96,21 @@ const handleUpdate = () => {
   }
 };
 
+const handleScrollEvent = (event) => {
+  const scrollElement = event.target;
+
+  if(scrollElement) {
+    emit('onScroll', scrollElement.scrollTop)
+  }
+};
+
+const setScrollTop = (position) => {
+  const scrollElement = scroller.value?.$el;
+  if (scrollElement) {
+    scrollElement.scrollTop = position;
+  }
+};
+
 // Observa o último elemento da lista
 useIntersectionObserver(
   loadTrigger,
@@ -104,6 +120,11 @@ useIntersectionObserver(
     }
   }
 );
+
+// Expõe a função para o componente pai
+defineExpose({
+  setScrollTop
+});
 </script>
 
 <style scoped>

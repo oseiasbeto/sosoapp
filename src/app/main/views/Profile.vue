@@ -1,16 +1,11 @@
 <template>
     <div class="relative">
         <!--start posts-->
-        <post-list 
-            :posts="profilePosts?.posts || []" 
-            :is-replies="false" 
-            :loading="loadingPosts"
-            :posts-module="`profile_${activeTab}_${profile?._id}`" 
-            :b-space="64" 
-            :loading-load-more="loadingLoadMore"
-            :pagination="profilePosts?.pagination" 
+        <post-list :posts="profilePosts?.posts || []" :is-replies="false" ref="postListComponent"
+            @on-scroll="handleScroll" :loading="loadingPosts" :posts-module="`profile_${activeTab}_${profile?._id}`"
+            :b-space="64" :loading-load-more="loadingLoadMore" :pagination="profilePosts?.pagination"
             @load-more="handleLoadingMorePosts">
-            
+
             <template #before-content>
                 <div v-if="!loadingGetById" class="relative">
                     <!--start background image area-->
@@ -148,7 +143,7 @@
 
         <!--start footer-->
         <btn-plus v-if="profile?._id && user?._id && profile._id === user._id"
-            @on-press="goToPost(`profile_feed _${profile?._id}`)">
+            @on-press="goToPost(`profile_feed_${profile?._id}`)">
             <svg viewBox="0 0 24 24" stroke="#fff" fill="none" width="29" height="29" class="r-jwli3a">
                 <path
                     d="M 20 9 L 20 16 C 20 18.209 18.209 20 16 20 L 8 20 C 5.791 20 4 18.209 4 16 L 4 8 C 4 5.791 5.791 4 8 4 L 15 4"
@@ -195,6 +190,8 @@ const tabs = ref([
     { label: "Mídia", value: 'media' },
     { label: "Curtidas", value: 'liked' }
 ])
+
+const postListComponent = ref(null)
 
 // Computeds
 const userId = computed(() => route.params.user_id);
@@ -266,35 +263,38 @@ const goToPost = (postModule) => {
     })
 }
 
-const scrollOnTop = () => {
-    window.scrollTo(0, 0)
+const handleScroll = (value) => {
+    console.log(value)
 }
+
 
 watch(() => route.params.user_id, async (newId, oldId) => {
     if (!newId || newId === oldId) return; // Evita chamadas se o ID for inválido ou repetido
-    scrollOnTop()
+
     const cachedProfile = profiles.value.find(p => p._id === newId) || null;
 
     if (!cachedProfile) {
-        await getUserById(newId).then(async () => {
-            loadingPosts.value = true
+        if (profile?.value?._id !== newId) {
+            await getUserById(newId).then(async () => {
+                loadingPosts.value = true
 
-            const cachedPosts = posts.value.find(p => p.byId == `profile_${activeTab.value}_${newId}`) || null;
+                const cachedPosts = posts.value.find(p => p.byId == `profile_${activeTab.value}_${newId}`) || null;
 
-            if (!cachedPosts) {
-                await getProfilePosts({
-                    page: 1,
-                    userId: newId,
-                    limit: 10,
-                    tab: activeTab.value
-                }).then((posts) => {
-                    profilePosts.value = posts
-                })
-            } else {
-                loadingPosts.value = false
-                profilePosts.value = cachedPosts
-            }
-        });
+                if (!cachedPosts) {
+                    await getProfilePosts({
+                        page: 1,
+                        userId: newId,
+                        limit: 10,
+                        tab: activeTab.value
+                    }).then((posts) => {
+                        profilePosts.value = posts
+                    })
+                } else {
+                    loadingPosts.value = false
+                    profilePosts.value = cachedPosts
+                }
+            });
+        } else return
     } else {
         store.dispatch('setProfile', cachedProfile)
 
@@ -338,6 +338,7 @@ watch(() => activeTab.value, async (newTab, oldTab) => {
 
 
 onMounted(async () => {
+    console.log("aki")
     if (route.name !== 'My profile') {
         if (!profile.value?._id || profile.value?._id !== userId.value) {
             const cachedProfile = profiles.value.find(p => p._id === route.params.user_id) || null;

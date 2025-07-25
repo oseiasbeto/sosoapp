@@ -2,16 +2,15 @@
     <div>
         <!--end replies-->
         <div>
-            <post-list :b-space="110" :posts="replies?.data || []" :is-replies="true"       :loading="loadingGetReplies"
-                :post-module="postModule" 
-                :loading-load-more="loadingLoadMoreReplies" 
-                :pagination="replies.pagination"
-                @load-more="_loadMoreReplies">
+            <post-list :b-space="110" :posts="replies?.data || []" :is-replies="true" ref="postListComponent"
+                :loading="loadingGetReplies" :post-module="postModule" :loading-load-more="loadingLoadMoreReplies"
+                :pagination="replies.pagination" @load-more="_loadMoreReplies" @on-scroll="handleScroll">
 
                 <template #before-content>
                     <!--start header post-->
-                    <Navbar :title="'Postagem'" />
+                    <Navbar :title="post?.is_reply ? 'Resposta' : 'Postagem'" />
                     <!--end header post-->
+
 
                     <!--start body post-->
                     <!--start post details-->
@@ -56,7 +55,7 @@
                                         likesCount }} </span>
                                     <span>{{ likesCount === 1 ? 'Curtida' : 'Curtidas' }}</span>
                                 </div>
-                               
+
                             </div>
                             <!--end counts-->
 
@@ -70,7 +69,7 @@
                                         </path>
                                     </svg>
                                     <span v-show="repliesCount > 0" class="text-inherit text-[15px]">{{ repliesCount
-                                        }}</span>
+                                    }}</span>
                                 </button>
                                 <button
                                     class="flex items-center gap-1 p-[5px] text-light-text-secondary text-sm dark:text-dark-text-secondary"
@@ -81,7 +80,7 @@
                                         </path>
                                     </svg>
                                     <span v-show="repostsCount > 0" class="text-inherit text-[15px]">{{ repostsCount
-                                        }}</span>
+                                    }}</span>
                                 </button>
                                 <button
                                     class="flex items-center gap-1 p-[5px] text-light-text-secondary text-sm dark:text-dark-text-secondary"
@@ -99,7 +98,7 @@
                                         </path>
                                     </svg>
                                     <span v-show="likesCount > 0" class="text-inherit text-[15px]">{{ likesCount
-                                        }}</span>
+                                    }}</span>
                                 </button>
                                 <button
                                     class="flex items-center gap-1 p-[5px] text-light-text-secondary text-sm dark:text-dark-text-secondary">
@@ -137,7 +136,7 @@
 </template>
 
 <script setup>
-import { computed, watch, onMounted } from 'vue';
+import { computed, watch, onMounted, nextTick, ref } from 'vue';
 import { useStore } from 'vuex';
 import { usePost } from "@/hooks/posts";
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router';
@@ -153,7 +152,7 @@ import Avatar from '@/components/utilities/Avatar.vue';
 const { getPostById, loading: loadingGetPostId, } = usePost()
 const { getReplies, loading: loadingGetReplies } = usePost()
 const { toggleLike, loading: loadingToggleLike } = usePost()
-const { toggleRepost, loading: loadingToggleRepost } = usePost()
+
 const { loadMoreReplies, loading: loadingLoadMoreReplies } = usePost()
 loadingGetPostId.value = true
 const store = useStore()
@@ -169,13 +168,27 @@ const user = computed(() => {
     return store.getters.currentUser
 })
 
+const postListComponent = ref(null);
+
+const setScrollPosition = async (position) => {
+    await nextTick(); // Espera a atualização do DOM
+    if (postListComponent.value?.setScrollTop) {
+        postListComponent.value.setScrollTop(position);
+    } else {
+        console.error('setScrollTop method not available on postListComponent');
+    }
+};
+
 const replies = computed(() => {
     return store.getters.replies
 })
 
 const repliesStore = computed(() => store.getters.repliesStore)
+
 const postModule = computed(() => route.query.post_module)
+
 const hasLiked = computed(() => post.value?.is_repost ? post.value?.original_post.likes.includes(user.value._id) : post.value?.likes?.includes(user.value._id) || false);
+
 const hasReposted = computed(() => post.value?.is_repost ? post.value?.original_post.reposts.includes(user.value._id) : post.value?.reposts?.includes(user.value._id) || false);
 
 const likesCount = computed(() => post.value?.is_repost ? post.value?.original_post.likes.length : post.value?.likes?.length || 0);
@@ -237,6 +250,19 @@ const handleReply = async (post) => {
     })
 }
 
+const handleScroll = (value) => {
+    const id = route.params.id
+    const originalPostStore = getStoreOriginalPost(id) || null;
+
+    if (originalPostStore) {
+        const originalPostId = originalPostStore?.original_post?._id
+        store.dispatch("setScrollTopRepliesStore", {
+            originalPostId,
+            value
+        })
+    }
+}
+
 onBeforeRouteLeave((to) => {
     if (to.name !== 'Composer') {
         //store.dispatch("resetReplies")
@@ -247,7 +273,6 @@ onBeforeRouteLeave((to) => {
 watch(() => route.params.id, async (newId, oldId) => {
     if (!newId || newId === oldId) return; // Evita chamadas se o ID for inválido ou repetido
 
-    scrollOnTop(); // Rola para o topo ao carregar um novo post
     resetReplies()
 
     // Obtém o Original post armazenado localmente, se existir
@@ -259,9 +284,7 @@ watch(() => route.params.id, async (newId, oldId) => {
 
         const replies = originalPostStore.replies
 
-        console.log(replies)
         store.dispatch('setPost', post);
-
         store.dispatch("setReplies", {
             original_post: post,
             replies: replies.data,
@@ -269,7 +292,11 @@ watch(() => route.params.id, async (newId, oldId) => {
             totalPages: replies.pagination.totalPages,
             total: replies.pagination.total
         });
+
+        const scrollTop = originalPostStore?.scroll_top || 0
+        setScrollPosition(scrollTop)
     } else {
+        setScrollPosition(0)
         if (!post.value?._id) {
             await getPostById(route.params.id).then(async () => {
                 await getReplies({

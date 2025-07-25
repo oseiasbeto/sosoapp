@@ -98,6 +98,6 @@ const repost = () => {
     emit('repost')
 }
 const openMore = () => {
-    emit('openMore')
+    emit('open-more')
 }
 </script>
