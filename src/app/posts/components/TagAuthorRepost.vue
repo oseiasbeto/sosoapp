@@ -1,8 +1,8 @@
 <template>
-    <div class="text-[13px] font-semibold text-light-text-light dark:text-dark-text-light mb-0.5">
+    <div class="text-[13px] font-semibold mb-0.5">
 
         <div @click.stop @click="goToProfile(props.author?.name === user?.name ? user : props.author)"
-            class="flex gap-1 items-center w-min whitespace-nowrap">
+            class="flex gap-1 items-center w-min whitespace-nowrap text-light-text-secondary dark:text-dark-text-light">
             <div class="w-[38px]"></div>
             <svg fill="none" width="13" height="13" class="mr-[0.5px]" viewBox="0 0 24 24">
                 <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"

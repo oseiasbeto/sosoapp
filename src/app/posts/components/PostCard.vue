@@ -1,12 +1,15 @@
 <template>
     <div @click="goToDetails(post)" ref="postCardRef"
-        class="p-4 pb-2.5 mb-0.5 shrink-0 border-b border-light-border dark:border-dark-border">
+        class="p-4 pb-2.5 mb-0.5 shrink-0 border-b border-light-border dark:border-dark-border"
+        :class="{'!border-none': isLastPost}"
+        >
         <!--start flags-->
         <!--start original repost author tag-->
         <tag-author-repost v-if="post?.is_repost" :author="post?.author" />
         <!--end original repost author tag-->
         <!--end flags-->
-
+        {{ props.totalItems }}
+        {{ props?.index }}
         <div class="flex">
             <div id="left-part" class="pl-1 pr-3">
                 <avatar
@@ -69,6 +72,14 @@ const props = defineProps({
         type: Object,
         required: true
     },
+    index: {
+        type: Number,
+        required: true
+    },
+    totalItems: {
+        type: Number,
+        required: true
+    },
     postModule: String,
     isReply: {
         type: Boolean,
@@ -89,6 +100,11 @@ const likesCount = computed(() => props.post?.is_repost ? props.post.original_po
 const repliesCount = computed(() => props.post?.is_repost ? props.post.original_post.replies.length : props.post?.replies?.length || 0);
 
 const repostsCount = computed(() => props.post?.is_repost ? props.post.original_post.reposts.length : props.post?.reposts?.length || 0);
+
+const isLastPost = computed(() => {
+    // Supondo que você tenha acesso ao total de posts e ao índice atual
+    return props.index === props.totalItems - 1; // ou outra lógica para determinar o último
+});
 
 const goToDetails = (post) => {
     store.dispatch("setPost", post.is_repost ? {

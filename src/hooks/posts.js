@@ -364,13 +364,14 @@ export function usePost() {
     try {
       loading.value = true;
       const response = await api.get(`/posts/feed?page=${page}&limit=${limit}`);
-      const { posts, page: currentPage, hasMore, totalPages } = response.data;
+      const { posts, page: currentPage, total, hasMore, totalPages } = response.data;
 
       const newModule = {
         byId: "feed",
         posts,
         pagination: {
           page: currentPage,
+          total,
           hasMore,
           totalPages,
         },
@@ -404,7 +405,7 @@ export function usePost() {
       const response = await api.get(
         `/posts/profile/${tab}/${userId}?page=${page}&limit=${limit}`
       );
-      const { posts, page: currentPage, hasMore, totalPages } = response.data;
+      const { posts, page: currentPage, total, hasMore, totalPages } = response.data;
 
       const newModule = {
         byId: `profile_${tab}_${userId}`,
@@ -412,6 +413,7 @@ export function usePost() {
         pagination: {
           page: currentPage,
           hasMore,
+          total,
           totalPages,
         },
       };

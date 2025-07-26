@@ -26,7 +26,7 @@
                             <div class="flex flex-row gap-1 items-center"
                                 v-if="profile?._id && user?._id && profile?._id !== user?._id">
                                 <button
-                                    class="flex text-light-text-primary dark:text-dark-text-light bg-light-card dark:bg-dark-card text-sm font-semibold gap-2 justify-center items-center bg-light-dark rounded-full w-[34px] h-[34px]">
+                                    class="flex text-light-text-secondary dark:text-dark-text-light bg-light-card dark:bg-dark-card text-sm font-semibold gap-2 justify-center items-center bg-light-dark rounded-full w-[34px] h-[34px]">
                                     <svg v-if="true" fill="none" width="20" viewBox="0 0 24 24" height="20">
                                         <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
                                             d="M12 2a1 1 0 0 1 0 2 5.85 5.85 0 0 0-5.802 5.08L5.143 17h13.715l-.382-2.868-.01-.102a1 1 0 0 1 1.973-.262l.02.1.532 4a1 1 0 0 1-.99 1.132h-3.357c-.905 1.747-2.606 3-4.644 3s-3.74-1.253-4.643-3H4a1 1 0 0 1-.991-1.132l1.207-9.053A7.85 7.85 0 0 1 12 2ZM9.78 19c.61.637 1.397 1 2.22 1s1.611-.363 2.22-1H9.78ZM17 2.5a1 1 0 0 1 1 1V6h2.5a1 1 0 0 1 0 2H18v2.5a1 1 0 0 1-2 0V8h-2.5a1 1 0 1 1 0-2H16V3.5a1 1 0 0 1 1-1Z">
@@ -40,9 +40,9 @@
                                 </button>
                                 <button :disabled="loadingFollowUser"
                                     @click="handleFollowUser(userId, isFollowedBy && !isFollowing)"
-                                    class="flex text-sm border bg-primary border-primary text-white font-semibold gap-2 justify-center items-center bg-light-dark rounded-full py-1 px-5"
+                                    class="flex text-sm border bg-primary text-[#fff] border-primary font-semibold gap-2 justify-center items-center bg-light-dark rounded-full h-[34px] px-4"
                                     :class="{ 'border-transparent !text-primary bg-primary/10': isFollowing }">
-                                    <p class="mb-[3px]">
+                                    <p>
                                         <span v-if="isFollowing && isFollowedBy">Deixar de seguir</span>
                                         <span v-else-if="isFollowing">Deixar de seguir</span>
                                         <span v-else-if="isFollowedBy">Seguir de volta</span>
@@ -52,13 +52,13 @@
                             </div>
                             <div v-else>
                                 <router-link :to="'/profile/' + profile._id + '/setup'"
-                                    class="flex text-light-text-primary dark:text-dark-text-light bg-light-card dark:bg-dark-card text-[13px] font-semibold gap-2 justify-center items-center bg-light-dark rounded-full py-[7px] px-3">
+                                    class="flex text-light-text-secondary dark:text-dark-text-light bg-light-card dark:bg-dark-card text-[13px] font-semibold gap-2 justify-center items-center bg-light-dark rounded-full py-[7px] px-3">
                                     <p>Editar perfil</p>
                                 </router-link>
                             </div>
 
                             <button
-                                class="flex text-light-text-primary dark:text-dark-text-light bg-light-card dark:bg-dark-card active:brightness-100 text-sm font-semibold gap-2 justify-center items-center bg-light-dark rounded-full w-[34px] h-[34px]">
+                                class="flex text-light-text-secondary dark:text-dark-text-light bg-light-card dark:bg-dark-card active:brightness-100 text-sm font-semibold gap-2 justify-center items-center bg-light-dark rounded-full w-[34px] h-[34px]">
                                 <svg fill="none" width="16" viewBox="0 0 24 24" height="16">
                                     <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
                                         d="M2 12a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm16 0a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm-6-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z">
@@ -252,6 +252,7 @@ const handleLoadingMorePosts = async (nextPage) => {
         const pagination = {
             hasMore: newPosts.hasMore,
             page: newPosts.page,
+            total: newPosts.total,
             totalPages: newPosts.totalPages
         }
 
@@ -261,9 +262,11 @@ const handleLoadingMorePosts = async (nextPage) => {
         );
 
         // Atualiza reativamente
-        profilePosts.value.byId = byId
-        profilePosts.value.posts = [...currentPosts, ...uniqueNewPosts];
-        profilePosts.value.pagination = pagination
+        profilePosts.value = {
+            byId: byId,
+            posts: [...currentPosts, ...uniqueNewPosts],
+            pagination: pagination
+        }
     } catch (error) {
         console.error('Failed to load more posts:', error);
         // Tratamento de erro adicional pode ser adicionado aqui
@@ -403,7 +406,7 @@ onMounted(async () => {
                         }).then((posts) => {
 
                             profilePosts.value = posts
-                            console.log(profilePosts.value)
+                            console.log(posts.value)
                         })
                     } else {
                         profilePosts.value = cachedPosts
@@ -445,7 +448,6 @@ onMounted(async () => {
                     limit: 10,
                     tab: 'feed'
                 }).then((posts) => {
-                    console.log(posts)
                     profilePosts.value = posts
                 })
             } else {

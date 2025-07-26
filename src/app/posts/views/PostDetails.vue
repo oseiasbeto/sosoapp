@@ -37,14 +37,14 @@
                             <!--end post text-->
 
                             <!--start created at-->
-                            <div class="text-xs mt-[10px] text-light-text-secondary dark:text-dark-text-secondary">
+                            <div class="text-xs mt-[10px] text-[#6f869f]">
                                 <p>{{ formatFullDate(post?.created_at || Date.now()) }}</p>
                             </div>
                             <!--end created at-->
 
                             <!--start counts-->
                             <div
-                                class="flex items-center gap-4 text-sm text-light-text-secondary dark:text-dark-text-secondary border-y py-3 my-3 mb-2 border-light-border dark:border-dark-border">
+                                class="flex items-center gap-4 text-sm text-[#6f869f] border-y py-3 my-3 mb-2 border-light-border dark:border-dark-border">
                                 <div class="flex items-center gap-1.5">
                                     <span class="text-light-text-primary font-semibold dark:text-dark-text-primary"> {{
                                         repostsCount }} </span>
@@ -62,7 +62,7 @@
                             <!--start reactions btns-->
                             <div class="flex justify-between ml-[-3px] items-center gap-5">
                                 <button @click="handleReply(post)"
-                                    class="flex items-center gap-1 p-[5px] text-light-text-secondary text-sm dark:text-dark-text-secondary">
+                                    class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm">
                                     <svg fill="none" width="22" viewBox="0 0 24 24" height="22">
                                         <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
                                             d="M2.002 6a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H12.28l-4.762 2.858A1 1 0 0 1 6.002 21v-2h-1a3 3 0 0 1-3-3V6Zm3-1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h2a1 1 0 0 1 1 1v1.234l3.486-2.092a1 1 0 0 1 .514-.142h7a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-14Z">
@@ -72,8 +72,8 @@
                                     }}</span>
                                 </button>
                                 <button
-                                    class="flex items-center gap-1 p-[5px] text-light-text-secondary text-sm dark:text-dark-text-secondary"
-                                    :class="{ '!text-reposted': hasReposted }" @click="handleRepost(post, post._id)">
+                                    class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm"
+                                    :class="{ '!text-[#13c371] dark:!text-reposted': hasReposted }" @click="handleRepost(post, post._id)">
                                     <svg fill="none" width="22" viewBox="0 0 24 24" height="22">
                                         <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
                                             d="M17.957 2.293a1 1 0 1 0-1.414 1.414L17.836 5H6a3 3 0 0 0-3 3v3a1 1 0 1 0 2 0V8a1 1 0 0 1 1-1h11.836l-1.293 1.293a1 1 0 0 0 1.414 1.414l2.47-2.47a1.75 1.75 0 0 0 0-2.474l-2.47-2.47ZM20 12a1 1 0 0 1 1 1v3a3 3 0 0 1-3 3H6.164l1.293 1.293a1 1 0 1 1-1.414 1.414l-2.47-2.47a1.75 1.75 0 0 1 0-2.474l2.47-2.47a1 1 0 0 1 1.414 1.414L6.164 17H18a1 1 0 0 0 1-1v-3a1 1 0 0 1 1-1Z">
@@ -83,7 +83,7 @@
                                     }}</span>
                                 </button>
                                 <button
-                                    class="flex items-center gap-1 p-[5px] text-light-text-secondary text-sm dark:text-dark-text-secondary"
+                                    class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm"
                                     :class="{ '!text-liked': hasLiked }" :disabled="loadingToggleLike"
                                     @click="handleLike(post._id, post.originalRepostId)">
                                     <svg v-if="!hasLiked" fill="none" width="22" viewBox="0 0 24 24" height="22"
@@ -101,7 +101,7 @@
                                     }}</span>
                                 </button>
                                 <button
-                                    class="flex items-center gap-1 p-[5px] text-light-text-secondary text-sm dark:text-dark-text-secondary">
+                                    class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm">
                                     <svg fill="none" width="22" viewBox="0 0 24 24" height="22">
                                         <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
                                             d="M20 13.75a1 1 0 0 1 1 1V18a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-3.25a1 1 0 1 1 2 0V18a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.25a1 1 0 0 1 1-1ZM12 3a1 1 0 0 1 .707.293l4.5 4.5a1 1 0 1 1-1.414 1.414L13 6.414v8.836a1 1 0 1 1-2 0V6.414L8.207 9.207a1 1 0 1 1-1.414-1.414l4.5-4.5A1 1 0 0 1 12 3Z">
@@ -109,7 +109,7 @@
                                     </svg>
                                 </button>
                                 <button
-                                    class="flex items-center gap-1 p-[5px] text-light-text-secondary text-sm dark:text-dark-text-secondary">
+                                    class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm">
                                     <svg fill="none" width="22" viewBox="0 0 24 24" height="22">
                                         <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
                                             d="M2 12a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm16 0a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm-6-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z">

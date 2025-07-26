@@ -1,18 +1,19 @@
 <template>
-    <div  class="flex h-7 justify-between text-light-text-secondary text-sm dark:text-dark-text-secondary items-center gap-5">
-        <button class="flex ml-[-6px] flex-1 py-[3px] px-[5px] h-full rounded-full items-center gap-1.5" @click.stop @click="replyPost">
+    <div  class="flex h-7 justify-between text-sm items-center gap-5">
+        <button class="flex ml-[-6px] text-[#6f869f] flex-1 py-[3px] px-[5px] h-full rounded-full items-center gap-1.5" @click.stop @click="replyPost">
             <span class="flex items-center h-full" name="icon">
-                <svg fill="none" width="18" viewBox="0 0 24 24" height="18"
-                    style="color: rgb(120, 142, 165); pointer-events: none;">
-                    <path fill="hsl(211, 20%, 56%)" fill-rule="evenodd" clip-rule="evenodd"
+                <svg fill="currentColor" width="18" viewBox="0 0 24 24" height="18"
+                    style="pointer-events: none;">
+                    <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
                         d="M2.002 6a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H12.28l-4.762 2.858A1 1 0 0 1 6.002 21v-2h-1a3 3 0 0 1-3-3V6Zm3-1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h2a1 1 0 0 1 1 1v1.234l3.486-2.092a1 1 0 0 1 .514-.142h7a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-14Z">
                     </path>
                 </svg>
             </span>
             <span v-show="repliesCount > 0" class="flex mt-0.5" name="count">{{ repliesCount }}</span>
         </button>
-        <button class="flex flex-1 py-[3px] px-[5px] h-full rounded-full items-center gap-1.5" @click.stop
-            :class="{ 'text-reposted': hasReposted }" @click="repost">
+
+        <button class="flex flex-1 py-[3px] text-[#6f869f] px-[5px] h-full rounded-full items-center gap-1.5" @click.stop
+            :class="{ '!text-[#13c371] dark:!text-reposted': hasReposted }" @click="repost">
             <span class="flex items-center h-full" name="icon">
                 <svg fill="none" width="18" viewBox="0 0 24 24" height="18" style="pointer-events: none;">
                     <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
@@ -23,8 +24,8 @@
             <span v-show="repostsCount > 0" class="flex mt-0.5" name="count">{{ repostsCount }}</span>
         </button>
 
-        <button class="flex flex-1 py-[3px] px-[5px] h-full rounded-full items-center gap-1.5"
-            :disabled="loadingToggleLike" :class="{ 'text-liked': hasLiked }" @click.stop @click="likePost">
+        <button class="flex flex-1 py-[3px] px-[5px] text-[#6f869f] h-full rounded-full items-center gap-1.5"
+            :disabled="loadingToggleLike" :class="{ '!text-liked': hasLiked }" @click.stop @click="likePost">
             <span class="flex items-center h-full" name="icon">
                 <svg v-if="!hasLiked" fill="none" width="18" viewBox="0 0 24 24" height="18"
                     style="pointer-events: none;">
@@ -43,10 +44,10 @@
 
 
 
-        <button class="flex flex-1 py-[3px] px-[5px] h-full rounded-full" @click.stop @click="openMore()">
-            <svg fill="none" width="18" viewBox="0 0 24 24" height="18"
-                style="color: rgb(120, 142, 165); pointer-events: none;">
-                <path fill="hsl(211, 20%, 56%)" fill-rule="evenodd" clip-rule="evenodd"
+        <button class="flex flex-1 py-[3px] text-[#6f869f] px-[5px] h-full rounded-full" @click.stop @click="openMore()">
+            <svg fill="currentColor" width="18" viewBox="0 0 24 24" height="18"
+                style="pointer-events: none;">
+                <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
                     d="M2 12a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm16 0a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm-6-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z">
                 </path>
             </svg>

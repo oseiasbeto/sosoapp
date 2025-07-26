@@ -21,16 +21,16 @@
         <DynamicScrollerItem :item="item" :active="active"
           :size-dependencies="[item._id, item.updatedAt, item.likes?.length, item.reposts?.length]" :data-index="index"
           class="scroller-item">
-          <PostCard :post-module="props.postsModule" :is-reply="props.isReplies" :post="item" />
+          <PostCard :totalItems="props.pagination.total" :post-module="props.postsModule" :index="index" :is-reply="props.isReplies" :post="item" />
         </DynamicScrollerItem>
       </template>
       <!-- Slot para conteúdo após a lista -->
 
       <template #after>
         <div ref="loadTrigger" v-if="props?.pagination?.hasMore || props.loadingLoadMore && !props.loading"
-          class="load-more-container flex justify-center my-4">
+          class="load-more-container flex justify-center my-5">
           <div
-            class="w-6 h-6 border-2 border-solid border-primary border-t-light-bg dark:border-t-dark-bg rounded-full animate-spin">
+            class="w-5 h-5 border-2 border-solid border-primary border-t-light-bg dark:border-t-dark-bg rounded-full animate-spin">
           </div>
         </div>
       </template>

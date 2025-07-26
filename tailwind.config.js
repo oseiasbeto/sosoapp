@@ -10,11 +10,11 @@ module.exports = {
       // Core 
       'primary': 'rgb(32,139,254)',
       // Light Mode
-      'light-bg': '#F7F7F8',
-      'light-card': '#FFFFFF',
-      'light-border': '#E5E7EB',
-      'light-text-primary': '#1F2A44',
-      'light-text-secondary': '#6B7280',
+      'light-bg': '#fff',
+      'light-card': '#f1f3f5',
+      'light-border': '#d4dbe2',
+      'light-text-primary': '#0b0f14',
+      'light-text-secondary': '#42576c',
       'light-accent': '#1D6FF9',
       'light-accent-hover': '#1A5CDB',
       'light-error': '#EF4444',
