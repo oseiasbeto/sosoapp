@@ -13,7 +13,7 @@
             </button>
 
             <div class="flex flex-col">
-                <p class="text-base font-extrabold">{{ title }}</p>
+                <p class="text-base font-bold">{{ title }}</p>
                 <p>{{ subtitle }}</p>
             </div>
         </div>

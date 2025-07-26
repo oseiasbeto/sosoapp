@@ -4,8 +4,8 @@
         <div
             class="flex bg-light-card dark:bg-dark-card text-light-text-primary dark:text-dark-text-light items-center py-2 px-2 rounded-3xl w-full">
             <div class="flex items-center gap-2 text-sm">
-                <Avatar :src="user?.profile_image?.low" size="xs" />
-                <p> Escreva o seu comentario</p>
+                <Avatar :url="user?.profile_image?.low" size="xs" />
+                <p> Escreva a sua resposta</p>
             </div>
 
         </div>

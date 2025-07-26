@@ -19,7 +19,7 @@
                             <div
                                 class="w-full min-w-0 mb-3 flex items-center gap-2.5 max-w-full overflow-hidden flex-shrink-0">
                                 <!--start avatar-->
-                                <Avatar :src="post?.author?.profile_image?.low" alt-text="Foto" />
+                                <Avatar :url="post?.author?.profile_image?.low" alt-text="Foto" />
                                 <!--end avatar-->
 
                                 <!--start author details-->

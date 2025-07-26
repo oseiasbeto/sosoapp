@@ -10,20 +10,32 @@ export default {
         profiles.push(newProfile)
     } else return
   },
-  UPDATE_DATA_FROM_PROFILES(state, { byId, scrollTop, tab }) {
+  SET_TAB_FROM_PROFILE(state, { byId, tab }) {
     if (!state.profiles) return;
 
     const index = state.profiles.findIndex(
       (p) => p?._id === byId
     );
+
     
     if (index !== -1) {
       const item = state.profiles[index];
 
-      item.scroll_top = scrollTop;
       item.tab = tab
+      
+    }
+  },
+  SET_SCROLLTOP_FROM_PROFILE(state, { byId, scrollTop }) {
+    if (!state.profiles) return;
 
-      console.log(item)
+    const index = state.profiles.findIndex(
+      (p) => p?._id === byId
+    );
+
+    
+    if (index !== -1) {
+      const item = state.profiles[index];
+      item.scroll_top = scrollTop;
     }
   },
   UPDATE_FOLLOW_STATE(state, { userId, profileId, isFollowing, isFollowedBy }) {

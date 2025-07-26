@@ -10,7 +10,7 @@
         <div class="flex">
             <div id="left-part" class="pl-1 pr-3">
                 <avatar
-                    :src="post?.is_repost ? post?.original_post?.author?.profile_image?.low : post.author?.profile_image?.low || null"
+                    :url="post?.is_repost ? post?.original_post?.author?.profile_image?.low : post.author?.profile_image?.low || null"
                     alt-text="Foto" />
             </div>
             <div id="right-part" class="min-w-0 flex-1 flex-shrink-0">

@@ -7,17 +7,12 @@
             :pagination="profilePosts?.pagination" @load-more="handleLoadingMorePosts">
 
             <template #before-content>
+                <!--start navbar-->
+                <Navbar :title="profile?.name ? profile?.name : ''"/>
+                <!--end navbar-->
                 <div v-if="!loadingGetById" class="relative">
                     <!--start background image area-->
-                    <div class="w-full h-[150px] bg-light-card dark:bg-dark-card relative">
-                        <button @click="router.back()"
-                            class="absolute z-[11] flex justify-center text-muted items-center rounded-full w-[30px] h-[30px] top-[10px] left-[10px] bg-[#000]/[0.5]">
-                            <svg fill="none" viewBox="0 0 24 24" width="24" height="24">
-                                <path fill="white" fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M3 12a1 1 0 0 1 .293-.707l6-6a1 1 0 0 1 1.414 1.414L6.414 11H20a1 1 0 1 1 0 2H6.414l4.293 4.293a1 1 0 0 1-1.414 1.414l-6-6A1 1 0 0 1 3 12Z">
-                                </path>
-                            </svg>
-                        </button>
+                    <div class="w-full mt-14 h-[150px] bg-light-card dark:bg-dark-card relative">
                         <img class="w-full h-full z-[1px] pointer-events-none object-cover absolute top-0 right-0 left-0"
                             v-if="profile?.cover_photo?.url || profile?.cover_photo?.low"
                             v-lazy="profile?.cover_photo.url || profile?.cover_photo?.low">
@@ -29,7 +24,7 @@
                         <!--start actions area-->
                         <div class="pl-[90px] gap-1 flex flex-row items-center justify-end">
                             <div class="flex flex-row gap-1 items-center"
-                                v-if="profile?._id && user?._id && profile._id !== user._id">
+                                v-if="profile?._id && user?._id && profile?._id !== user?._id">
                                 <button
                                     class="flex text-light-text-primary dark:text-dark-text-light bg-light-card dark:bg-dark-card text-sm font-semibold gap-2 justify-center items-center bg-light-dark rounded-full w-[34px] h-[34px]">
                                     <svg v-if="true" fill="none" width="20" viewBox="0 0 24 24" height="20">
@@ -125,7 +120,7 @@
                     <!--start avatar area-->
                     <div class="absolute top-[110px] left-[10px]">
                         <div class="border-[3px] rounded-full border-light-bg dark:border-dark-bg">
-                            <avatar :src="profile?.profile_image?.low || null" size="big" alt-text="Foto" />
+                            <avatar :url="profile?.profile_image?.low || undefined" size="big" alt-text="Foto" />
                         </div>
                     </div>
                     <!--end avatar area-->
@@ -135,7 +130,10 @@
                     <!--end start-->
                 </div>
                 <div v-else>
-                    <ProfileSkeleton />
+                    <div class="mt-14">
+                      <ProfileSkeleton />  
+                    </div>
+                    
                 </div>
             </template>
         </post-list>
@@ -168,6 +166,7 @@ import { useStore } from 'vuex';
 import ProfileSkeleton from '../components/ProfileSkeleton.vue';
 import PostList from '@/app/posts/components/PostList.vue';
 import BtnPlus from '@/components/btns/BtnPlus.vue';
+import Navbar from '@/components/base/Navbar.vue';
 
 const {
     getUserById, loading: loadingGetById,
@@ -182,7 +181,11 @@ const router = useRouter()
 const store = useStore();
 
 const activeTab = ref('feed')
-const profilePosts = ref({})
+const profilePosts = ref({
+    byId: '',
+    pagination: {},
+    posts: []
+})
 
 const tabs = ref([
     { label: "Postagens", value: 'feed' },
@@ -193,6 +196,7 @@ const tabs = ref([
 
 const postListComponent = ref(null)
 const tabsComponent = ref(null)
+const lastProfileId = ref(null)
 
 // Computeds
 const userId = computed(() => route.params.user_id);
@@ -236,19 +240,30 @@ const handleLoadingMorePosts = async (nextPage) => {
             tab: activeTab.value
         });
 
-        if (!newPosts || !newPosts.length) return
+
+        if (!newPosts || !newPosts.posts.length) return
+
 
         // Garante que profilePosts.value seja um array antes de usar spread
-        const currentPosts = Array.isArray(profilePosts.value) ? profilePosts.value : [];
+        const currentPosts = profilePosts?.value.posts || [];
+
+        const byId = newPosts.byId
+
+        const pagination = {
+            hasMore: newPosts.hasMore,
+            page: newPosts.page,
+            totalPages: newPosts.totalPages
+        }
 
         // Filtra posts duplicados (opcional)
-        const uniqueNewPosts = newPosts.filter(newPost =>
+        const uniqueNewPosts = newPosts.posts.filter(newPost =>
             !currentPosts.some(existingPost => existingPost._id === newPost._id)
         );
 
         // Atualiza reativamente
-        profilePosts.value = [...currentPosts, ...uniqueNewPosts];
-
+        profilePosts.value.byId = byId
+        profilePosts.value.posts = [...currentPosts, ...uniqueNewPosts];
+        profilePosts.value.pagination = pagination
     } catch (error) {
         console.error('Failed to load more posts:', error);
         // Tratamento de erro adicional pode ser adicionado aqui
@@ -279,6 +294,10 @@ const handleScroll = (value) => {
         store.dispatch("setScrollTopFromPosts", {
             byId,
             value
+        })
+        store.dispatch("setScrollTopFromProfile", {
+            byId: profile?.value?._id,
+            scrollTop: value
         })
     } else return
 }
@@ -313,17 +332,12 @@ watch(() => route.params.user_id, async (newId, oldId) => {
                 tab: activeTab.value
             });
             profilePosts.value = loadedPosts;
-            setScrollPosition(0)
+
         } else {
             profilePosts.value = cachedPosts;
-            const scrollTop = profilePosts?.value?.scroll_top || 0;
-
-            await nextTick();
-            setScrollPosition(scrollTop);
         }
     } catch (error) {
         console.error('Error loading profile data:', error);
-        await setScrollPosition(0);
     } finally {
         loadingGetById.value = false
         loadingPosts.value = false;
@@ -332,12 +346,16 @@ watch(() => route.params.user_id, async (newId, oldId) => {
 
 watch(() => activeTab.value, async (newTab, oldTab) => {
     if (!newTab || newTab === oldTab) return;
-    
+
 
     const byId = `profile_${activeTab.value}_${profile?.value?._id}`
 
     store.dispatch("setTabFromPosts", {
         byId,
+        tab: newTab
+    })
+    store.dispatch("setScrollTabFromProfile", {
+        byId: profile?.value?._id,
         tab: newTab
     })
 
@@ -372,6 +390,7 @@ onMounted(async () => {
             if (!cachedProfile) {
                 await getUserById(userId.value).then(async () => {
                     loadingPosts.value = true
+                    lastProfileId.value = profile?.value?._id
 
                     const cachedPosts = posts.value.find(p => p.byId == `profile_${activeTab.value}_${profile?.value?._id}`) || null;
 
@@ -382,7 +401,9 @@ onMounted(async () => {
                             limit: 10,
                             tab: 'feed'
                         }).then((posts) => {
+
                             profilePosts.value = posts
+                            console.log(profilePosts.value)
                         })
                     } else {
                         profilePosts.value = cachedPosts
@@ -393,6 +414,7 @@ onMounted(async () => {
                 store.dispatch('setProfile', cachedProfile)
 
                 if (cachedProfile?._id) {
+                    lastProfileId.value = cachedProfile?._id
                     const cachedPosts = posts.value.find(p => p.byId == `profile_${activeTab.value}_${cachedProfile?._id}`) || null;
 
                     if (!cachedPosts) {
@@ -413,6 +435,7 @@ onMounted(async () => {
         } else {
             loadingGetById.value = false
 
+            lastProfileId.value = profile?.value?._id
             const cachedPosts = posts.value.find(p => p.byId == `profile_${activeTab.value}_${profile?.value?._id}`) || null;
 
             if (!cachedPosts) {

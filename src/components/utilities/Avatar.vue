@@ -1,7 +1,7 @@
 <template>
     <div class="bg-light-card dark:bg-dark-card shrink-0 relative overflow-hidden rounded-full border border-light-border dark:border-dark-border"
         :class="[sizeClasses]" role="img" :aria-label="`Avatar de ${altText || 'nome'}`">
-        <img v-lazy="props?.src" :alt="`Avatar de ${altText || 'nome'}`" class=" w-full h-full object-cover"
+        <img v-lazy="props?.url" :alt="`Avatar de ${altText || 'nome'}`" class=" w-full h-full object-cover"
             :class="[sizeClasses]" />
     </div>
 </template>
@@ -11,7 +11,7 @@ import { ref, computed } from 'vue';
 
 // Props
 const props = defineProps({
-    src: {
+    url: {
         type: String,
         required: true,
         default: '',
