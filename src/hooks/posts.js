@@ -195,6 +195,7 @@ export function usePost() {
         replies,
         page: currentPage,
         original_post,
+        hasMore,
         totalPages,
         total,
       });
@@ -215,7 +216,7 @@ export function usePost() {
     }
   };
 
-  const loadMoreReplies = async ({ original_post, page = 1, limit = 10 }) => {
+  const loadMoreReplies = async ({ original_post, isLoad = true, totalItems = 0, page = 1, limit = 10 }) => {
     try {
       loading.value = true;
 
@@ -224,7 +225,7 @@ export function usePost() {
           original_post.is_repost
             ? original_post.original_post._id
             : original_post._id
-        }?page=${page}&limit=${limit}`
+        }?page=${page}&limit=${limit}&is_load=${isLoad}&total=${totalItems}`
       );
       const {
         posts: replies,
@@ -239,7 +240,7 @@ export function usePost() {
         page: currentPage,
         totalPages,
         hasMore,
-        total,
+        total
       });
 
       store.dispatch("setRepliesStore", {

@@ -21,7 +21,7 @@ export default {
     const posts = state.posts;
     posts.push(postModule);
 
-    console.log(postModule)
+    console.log(postModule);
   },
 
   ADD_NEW_POST(state, { newPost, postModule }) {
@@ -44,7 +44,7 @@ export default {
     module.pagination.totalPages = Math.ceil(total / limit);
   },
 
-  SET_REPLIES(state, { replies, page, original_post, totalPages }) {
+  SET_REPLIES(state, { replies, page, total, original_post, totalPages }) {
     state.replies.data = replies;
     state.replies.lastRequest = {
       originalPostId: original_post._id,
@@ -52,19 +52,21 @@ export default {
     };
     state.replies.pagination.currentPage = page;
     state.replies.pagination.totalPages = totalPages;
+    state.replies.pagination.total = total;
     state.replies.pagination.hasMore = page < totalPages;
   },
 
-  SET_LOAD_REPLIES(state, { replies, page, totalPages, hasMore }) {
+  SET_LOAD_REPLIES(state, { replies, page, total, totalPages, hasMore }) {
     state.replies.data = [...state.replies.data, ...replies];
     state.replies.pagination.currentPage = page;
     state.replies.pagination.totalPages = totalPages;
+    state.replies.pagination.total = total;
     state.replies.pagination.hasMore = hasMore;
   },
 
   SET_REPLIES_STORE(
     state,
-    { original_post, replies, page: currentPage, totalPages, hasMore }
+    { original_post, total, replies, page: currentPage, totalPages, hasMore }
   ) {
     if (!original_post || !original_post._id) return;
 
@@ -82,6 +84,7 @@ export default {
             at: Date.now(),
           },
           pagination: {
+            total,
             currentPage,
             totalPages,
             hasMore,
@@ -98,8 +101,9 @@ export default {
             originalPostId: original_post._id,
             at: Date.now(),
           },
+          total,
           totalPages,
-          hasMore: currentPage < totalPages,
+          hasMore,
         },
       };
       state.repliesStore[existingPostIndex].replies.data = [
@@ -129,7 +133,13 @@ export default {
 
   ADD_REPLY_FROM_REPLIES(state, { newReply, postModule }) {
     const replies = state.replies;
+
+    const total = replies?.pagination?.total;
+    const limit = replies?.pagination?.limit || 10;
+
     replies.data = [newReply, ...replies.data];
+    replies.pagination.total = total + 1;
+    replies.pagination.totalPages = Math.ceil(total / limit);
   },
 
   ADD_REPLY_FROM_REPLIES_STORE(state, { index, postModule, newReply }) {
@@ -139,7 +149,12 @@ export default {
     const item = state.repliesStore[index];
 
     if (item?.replies && newReply) {
+      const total = item.replies?.pagination?.total;
+      const limit = item.replies?.pagination?.limit || 10;
+
       item.replies.data = [newReply, ...item.replies.data];
+      item.replies.pagination.total = total + 1;
+      item.replies.pagination.totalPages = Math.ceil(total / limit);
     }
 
     if (
@@ -156,7 +171,12 @@ export default {
         const itemTwo = repliesStore[indexStore];
 
         if (itemTwo?.original_post?._id !== item?.original_post?._id) {
+          const total = itemTwo.replies?.pagination?.total;
+          const limit = itemTwo.replies?.pagination?.limit || 10;
+
           itemTwo.replies.data = [newReply, ...itemTwo.replies.data];
+          itemTwo.replies.pagination.total = total + 1;
+          itemTwo.replies.pagination.totalPages = Math.ceil(total / limit);
         }
       }
     }

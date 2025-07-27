@@ -38,7 +38,7 @@
 
                             <!--start created at-->
                             <div class="text-xs mt-[10px] text-[#6f869f]">
-                                <p>{{ formatFullDate(post?.created_at || Date.now()) }}</p>
+                                <p>{{ formattedDate(post?.created_at || Date.now()) }}</p>
                             </div>
                             <!--end created at-->
 
@@ -69,21 +69,20 @@
                                         </path>
                                     </svg>
                                     <span v-show="repliesCount > 0" class="text-inherit text-[15px]">{{ repliesCount
-                                    }}</span>
+                                        }}</span>
                                 </button>
-                                <button
-                                    class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm"
-                                    :class="{ '!text-[#13c371] dark:!text-reposted': hasReposted }" @click="handleRepost(post, post._id)">
+                                <button class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm"
+                                    :class="{ '!text-[#13c371] dark:!text-reposted': hasReposted }"
+                                    @click="handleRepost(post, post._id)">
                                     <svg fill="none" width="22" viewBox="0 0 24 24" height="22">
                                         <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
                                             d="M17.957 2.293a1 1 0 1 0-1.414 1.414L17.836 5H6a3 3 0 0 0-3 3v3a1 1 0 1 0 2 0V8a1 1 0 0 1 1-1h11.836l-1.293 1.293a1 1 0 0 0 1.414 1.414l2.47-2.47a1.75 1.75 0 0 0 0-2.474l-2.47-2.47ZM20 12a1 1 0 0 1 1 1v3a3 3 0 0 1-3 3H6.164l1.293 1.293a1 1 0 1 1-1.414 1.414l-2.47-2.47a1.75 1.75 0 0 1 0-2.474l2.47-2.47a1 1 0 0 1 1.414 1.414L6.164 17H18a1 1 0 0 0 1-1v-3a1 1 0 0 1 1-1Z">
                                         </path>
                                     </svg>
                                     <span v-show="repostsCount > 0" class="text-inherit text-[15px]">{{ repostsCount
-                                    }}</span>
+                                        }}</span>
                                 </button>
-                                <button
-                                    class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm"
+                                <button class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm"
                                     :class="{ '!text-liked': hasLiked }" :disabled="loadingToggleLike"
                                     @click="handleLike(post._id, post.originalRepostId)">
                                     <svg v-if="!hasLiked" fill="none" width="22" viewBox="0 0 24 24" height="22"
@@ -98,18 +97,16 @@
                                         </path>
                                     </svg>
                                     <span v-show="likesCount > 0" class="text-inherit text-[15px]">{{ likesCount
-                                    }}</span>
+                                        }}</span>
                                 </button>
-                                <button
-                                    class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm">
+                                <button class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm">
                                     <svg fill="none" width="22" viewBox="0 0 24 24" height="22">
                                         <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
                                             d="M20 13.75a1 1 0 0 1 1 1V18a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-3.25a1 1 0 1 1 2 0V18a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.25a1 1 0 0 1 1-1ZM12 3a1 1 0 0 1 .707.293l4.5 4.5a1 1 0 1 1-1.414 1.414L13 6.414v8.836a1 1 0 1 1-2 0V6.414L8.207 9.207a1 1 0 1 1-1.414-1.414l4.5-4.5A1 1 0 0 1 12 3Z">
                                         </path>
                                     </svg>
                                 </button>
-                                <button
-                                    class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm">
+                                <button class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm">
                                     <svg fill="none" width="22" viewBox="0 0 24 24" height="22">
                                         <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
                                             d="M2 12a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm16 0a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm-6-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z">
@@ -140,7 +137,7 @@ import { computed, watch, onMounted, nextTick, ref } from 'vue';
 import { useStore } from 'vuex';
 import { usePost } from "@/hooks/posts";
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router';
-import { formatFullDate } from "../utils/dateFormatter";
+import formattedDate from "@/utils/formatted-date";
 import PostList from '../components/PostList.vue';
 import CreateReplyTrigger from '../components/CreateReplyTrigger.vue';
 import TagAuthorReply from '../components/TagAuthorReply.vue';
@@ -210,6 +207,7 @@ const _loadMoreReplies = async (newPage) => {
     await loadMoreReplies({
         original_post: post.value,
         page: newPage,
+        totalItems: replies?.value?.pagination?.total,
         isLoad: true,
         limit: 10
     })
