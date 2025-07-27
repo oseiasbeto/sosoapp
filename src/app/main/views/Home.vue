@@ -3,14 +3,15 @@
         <!--start post list-->
         <post-list 
             :posts="homePosts?.posts || []" 
-            :is-replies="false" :loading="loadingPosts" 
+            :is-replies="false" 
+            :loading="loadingPosts" 
             :posts-module="activeTab"
-            :b-space="64" :loading-load-more="loadingLoadMorePosts" 
+            :b-space="64" 
+            :loading-load-more="loadingLoadMorePosts" 
             :pagination="homePosts?.pagination"
             @load-more="_loadMorePosts" 
-            ref="postListComponent"
-            @on-scroll="handleScroll" 
-            >
+            ref="postListComponent" 
+            @on-scroll="handleScroll">
 
             <template #before-content>
                 <div class="h-[90px]">
@@ -75,57 +76,38 @@ const router = useRouter()
 const { getPosts, loading: loadingPosts } = usePost();
 const { loadMorePosts, loading: loadingLoadMorePosts } = usePost();
 
-const user = computed(() => store.getters.currentUser)
-const posts = computed(() => store.getters.posts)
-
-const homePosts = ref({
-    byId: '',
-    pagination: {},
-    posts: []
-})
-
-const tabsComponent = ref(null)
-const postListComponent = ref(null)
-
 const activeTab = ref('feed')
 const tabs = ref([
     { label: "Descobrir", value: 'feed' },
     { label: "Seguindo", value: 'following' },
 ])
 
+
+const user = computed(() => store.getters.currentUser)
+const posts = computed(() => store.getters.posts)
+
+const homePosts = computed(() => {
+  const allPosts = store.getters.posts || []
+  const currentTab = activeTab.value
+  
+  return currentTab 
+    ? allPosts.find(p => p.byId === currentTab) || null 
+    : null
+})
+
+const tabsComponent = ref(null)
+const postListComponent = ref(null)
+
+
+
 const _loadMorePosts = async (newPage) => {
     try {
-        const newPosts = await loadMorePosts({
+        await loadMorePosts({
             page: newPage,
             tab: activeTab.value,
             totalItems: homePosts?.value?.pagination?.total,
             limit: 10
         })
-
-        if (!newPosts || !newPosts.posts.length) return
-
-        const currentPosts = homePosts?.value?.posts || [];
-
-        const byId = newPosts.byId
-
-        const pagination = {
-            hasMore: newPosts.hasMore,
-            page: newPosts.page,
-            total: newPosts.total,
-            totalPages: newPosts.totalPages
-        }
-
-        // Filtra posts duplicados (opcional)
-        const uniqueNewPosts = newPosts.posts.filter(newPost =>
-            !currentPosts.some(existingPost => existingPost._id === newPost._id)
-        );
-
-        // Atualiza reativamente
-        homePosts.value = {
-            byId: byId,
-            posts: [...currentPosts, ...uniqueNewPosts],
-            pagination: pagination
-        }
     } catch (err) {
         console.error('Failed to load more posts:', err);
         // Tratamento de erro adicional pode ser adicionado aqui
@@ -173,7 +155,7 @@ watch(() => activeTab.value, async (newTab, oldTab) => {
             limit: 10,
             tab: newTab
         }).then(async (posts) => {
-            homePosts.value = posts
+            // homePosts.value = posts
             await nextTick()
             setScrollPosition(0);
         })
@@ -188,12 +170,13 @@ watch(() => activeTab.value, async (newTab, oldTab) => {
 
 
 onMounted(async () => {
-    if (!homePosts.value.posts.length) {
+    console.log(homePosts.value)
+    if (!homePosts.value) {
         await getPosts({
             page: 1,
             limit: 10
         }).then(posts => {
-            homePosts.value = posts
+            //  homePosts.value = posts
         })
     }
 })

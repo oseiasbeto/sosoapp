@@ -478,6 +478,8 @@ export function usePost() {
       const response = await api.get(
         `/posts/${tab}?page=${page}&limit=${limit}&is_load=true&total=${totalItems}`
       );
+
+      console.log(totalItems)
       const {
         posts,
         page: currentPage,
@@ -485,6 +487,7 @@ export function usePost() {
         totalPages,
         hasMore,
       } = response.data;
+      
       const newModule = {
         posts,
         page: currentPage,

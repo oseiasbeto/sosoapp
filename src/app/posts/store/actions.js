@@ -5,8 +5,8 @@ export default {
     setOriginalPost({ commit }, originalPost) {
         commit('SET_ORIGINAL_POST', originalPost);
     },
-    setLoadPosts({ commit }, { posts, byId, page, totalPages, total }) {
-        commit('SET_LOAD_POSTS', { posts, page, byId, totalPages, total });
+    setLoadPosts({ commit }, { posts, byId, page, hasMore, totalPages, total }) {
+        commit('SET_LOAD_POSTS', { posts, page, byId, hasMore, totalPages, total });
     },
     addPostFromModules({ commit }, { postModule }) {
         commit('ADD_POST_FROM_MODULES', { postModule });

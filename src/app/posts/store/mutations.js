@@ -12,16 +12,15 @@ export default {
     const cachedPosts = state.posts[index];
 
     cachedPosts.posts = [...cachedPosts.posts, ...posts];
-    cachedPosts.pagination.currentPage = page;
+    cachedPosts.pagination.page = page;
     cachedPosts.pagination.totalPages = totalPages;
     cachedPosts.pagination.hasMore = hasMore;
+    console.log(cachedPosts)
   },
 
   ADD_POST_FROM_MODULES(state, { postModule }) {
     const posts = state.posts;
     posts.push(postModule);
-
-    console.log(postModule);
   },
 
   ADD_NEW_POST(state, { newPost, postModule }) {

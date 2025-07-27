@@ -99,6 +99,7 @@ const handleUpdate = () => {
     !props?.loading
   ) {
     const newPage = currentPage.value + 1;
+    console.log( currentPage.value)
     emit('loadMore', newPage);
   }
 };
