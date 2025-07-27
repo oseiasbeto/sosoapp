@@ -360,14 +360,20 @@ export function usePost() {
     }
   };
 
-  const getFeedPosts = async ({ page = 1, limit = 10 }) => {
+  const getPosts = async ({ page = 1, tab = 'feed', limit = 10 }) => {
     try {
       loading.value = true;
-      const response = await api.get(`/posts/feed?page=${page}&limit=${limit}`);
-      const { posts, page: currentPage, total, hasMore, totalPages } = response.data;
+      const response = await api.get(`/posts/${tab}?page=${page}&limit=${limit}`);
+      const {
+        posts,
+        page: currentPage,
+        total,
+        hasMore,
+        totalPages,
+      } = response.data;
 
       const newModule = {
-        byId: "feed",
+        byId: tab,
         posts,
         pagination: {
           page: currentPage,
@@ -378,14 +384,7 @@ export function usePost() {
       };
 
       store.dispatch("addPostFromModules", { postModule: newModule });
-
-      /* 
-            store.dispatch('setLoadPosts', {
-                posts,
-                page: currentPage,
-                totalPages,
-                total
-            });*/
+      return newModule;
     } catch (err) {
       console.error("Erro ao carregar as postagens:", err.message);
       throw err;
@@ -405,7 +404,13 @@ export function usePost() {
       const response = await api.get(
         `/posts/profile/${tab}/${userId}?page=${page}&limit=${limit}`
       );
-      const { posts, page: currentPage, total, hasMore, totalPages } = response.data;
+      const {
+        posts,
+        page: currentPage,
+        total,
+        hasMore,
+        totalPages,
+      } = response.data;
 
       const newModule = {
         byId: `profile_${tab}_${userId}`,
@@ -466,21 +471,29 @@ export function usePost() {
     }
   };
 
-  const loadMorePosts = async ({ page = 1, tab = "feed", limit = 10 }) => {
+  const loadMorePosts = async ({ page = 1, totalItems = 0, tab = "feed", limit = 10 }) => {
     try {
       loading.value = true;
       const response = await api.get(
-        `/posts/${tab}?page=${page}&limit=${limit}`
+        `/posts/${tab}?page=${page}&limit=${limit}&is_load=true&total=${totalItems}`
       );
-      const { posts, page: currentPage, totalPages, hasMore } = response.data;
-
-      store.dispatch("setLoadPosts", {
+      const {
         posts,
         page: currentPage,
-        byId: `${tab}`,
+        total,
         totalPages,
         hasMore,
-      });
+      } = response.data;
+      const newModule = {
+        posts,
+        page: currentPage,
+        byId: tab,
+        total,
+        totalPages,
+        hasMore,
+      };
+      store.dispatch("setLoadPosts", newModule);
+      return newModule;
     } catch (err) {
       console.error("Erro ao carregar as postagens:", err.message);
       throw err;
@@ -500,7 +513,7 @@ export function usePost() {
     loadMoreProfilePosts,
     loadMoreReplies,
     loadMorePosts,
-    getFeedPosts,
+    getPosts,
     getPostById,
   };
 }

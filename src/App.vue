@@ -47,7 +47,7 @@ onMounted(async () => {
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
     isDark.value = true;
-    document.documentElement.classList.add('light');
+    document.documentElement.classList.add('dark');
   } else {
     isDark.value = false;
     document.documentElement.classList.remove('dark');

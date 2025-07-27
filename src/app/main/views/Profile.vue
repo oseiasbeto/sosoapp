@@ -1,10 +1,17 @@
 <template>
     <div class="relative">
         <!--start posts-->
-        <post-list :posts="profilePosts?.posts || []" :is-replies="false" ref="postListComponent"
-            @on-scroll="handleScroll" :loading="loadingPosts" :posts-module="`profile_${activeTab}_${profile?._id}`"
-            :show-list="!loadingGetById" :b-space="64" :loading-load-more="loadingLoadMore"
-            :pagination="profilePosts?.pagination" @load-more="handleLoadingMorePosts">
+        <post-list 
+            :posts="profilePosts?.posts || []" 
+            :is-replies="false" ref="postListComponent"
+            @on-scroll="handleScroll" 
+            :loading="loadingPosts" 
+            :posts-module="`profile_${activeTab}_${profile?._id}`"
+            :show-list="!loadingGetById" 
+            :b-space="64" 
+            :loading-load-more="loadingLoadMore"
+            :pagination="profilePosts?.pagination" 
+            @load-more="handleLoadingMorePosts">
 
             <template #before-content>
                 <!--start navbar-->
@@ -245,7 +252,7 @@ const handleLoadingMorePosts = async (nextPage) => {
 
 
         // Garante que profilePosts.value seja um array antes de usar spread
-        const currentPosts = profilePosts?.value.posts || [];
+        const currentPosts = profilePosts?.value?.posts || [];
 
         const byId = newPosts.byId
 

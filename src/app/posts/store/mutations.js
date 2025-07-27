@@ -18,19 +18,41 @@ export default {
   },
 
   ADD_POST_FROM_MODULES(state, { postModule }) {
-    state.posts.push(postModule);
+    const posts = state.posts;
+    if (posts.length) {
+      const moduleIndex = posts.findIndex((m) => m.byId === postModule?.byId);
+      if (moduleIndex === -1) {
+        posts.push(postModule);
+      } else {
+        const currentModule = posts[moduleIndex];
+        if (currentModule) {
+          currentModule.posts = [...currentModule.posts, ...postModule.posts];
+          currentModule.pagination = postModule.pagination;
+        }
+      }
+    } else {
+      posts.push(postModule);
+    }
   },
 
   ADD_NEW_POST(state, { newPost, postModule }) {
+    console.log(postModule)
     const moduleIndex = state.posts.findIndex((m) => m.byId === postModule);
 
     if (moduleIndex === -1) return;
     const module = state.posts[moduleIndex];
 
+    console.log(module)
     module.posts = [
       newPost,
       ...(Array.isArray(module.posts) ? module.posts : []),
     ];
+
+    const total = module?.pagination?.total
+    const limit = module?.pagination?.limit || 10
+
+    module.pagination.total = total + 1
+    module.pagination.totalPages = Math.ceil(total / limit)
   },
 
   SET_REPLIES(state, { replies, page, original_post, totalPages }) {
@@ -245,7 +267,7 @@ export default {
     const index = state.repliesStore.findIndex(
       (p) => p?.original_post?._id === originalPostId
     );
-    
+
     if (index !== -1) {
       const item = state.repliesStore[index];
 
@@ -255,10 +277,8 @@ export default {
   SET_SCROLLTOP_FROM_POSTS(state, { byId, value }) {
     if (!state.posts) return;
 
-    const index = state.posts.findIndex(
-      (p) => p?.byId === byId
-    );
-    
+    const index = state.posts.findIndex((p) => p?.byId === byId);
+
     if (index !== -1) {
       const item = state.posts[index];
       item.scroll_top = value;
@@ -267,10 +287,8 @@ export default {
   SET_TAB_FROM_POSTS(state, { byId, tab }) {
     if (!state.posts) return;
 
-    const index = state.posts.findIndex(
-      (p) => p?.byId === byId
-    );
-    
+    const index = state.posts.findIndex((p) => p?.byId === byId);
+
     if (index !== -1) {
       const item = state.posts[index];
       item.tab = tab;
