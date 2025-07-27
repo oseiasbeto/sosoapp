@@ -17,10 +17,13 @@
         </div>
       </template>
 
-      <template v-if="!props.loading && props.showList" v-slot="{ item, index, active }">
-        <DynamicScrollerItem :item="item" :active="active"
-          :size-dependencies="[item._id, item.updatedAt, item.likes?.length, item.reposts?.length]" :data-index="index"
-          class="scroller-item">
+      <template v-if="!props.loading && props.posts.length && props.showList " v-slot="{ item, index, active }">
+        <DynamicScrollerItem 
+         :item="item" 
+         :active="active"
+         :size-dependencies="[item._id, item.updatedAt, item.likes?.length, item.reposts?.length]" 
+         :data-index="index"
+         class="scroller-item">
           <PostCard :totalItems="props.pagination.total" :post-module="props.postsModule" :index="index" :is-reply="props.isReplies" :post="item" />
         </DynamicScrollerItem>
       </template>

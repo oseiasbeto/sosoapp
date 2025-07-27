@@ -157,8 +157,6 @@ const handleScroll = (value) => {
             byId,
             value
         })
-
-        console.log(posts?.value)
     } else return
 }
 
@@ -181,9 +179,8 @@ watch(() => activeTab.value, async (newTab, oldTab) => {
         })
     } else {
         homePosts.value = cachedPosts
-        const scrollTop = cachedPosts?.scroll_top
+        const scrollTop = cachedPosts?.scroll_top || 0
 
-        console.log(scrollTop)
         await nextTick()
         setScrollPosition(scrollTop)
     }

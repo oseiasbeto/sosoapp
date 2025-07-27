@@ -1,8 +1,7 @@
 <template>
     <div @click="goToDetails(post)" ref="postCardRef"
         class="p-4 pb-2.5 mb-0.5 shrink-0 border-b border-light-border dark:border-dark-border"
-        :class="{'!border-none': isLastPost}"
-        >
+        :class="{ '!border-none': isLastPost }">
         <!--start flags-->
         <!--start original repost author tag-->
         <tag-author-repost v-if="post?.is_repost" :author="post?.author" />
@@ -74,7 +73,7 @@ const props = defineProps({
     },
     index: {
         type: Number,
-        required: true
+        default: -1
     },
     totalItems: {
         type: Number,

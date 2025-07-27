@@ -352,7 +352,7 @@ watch(() => route.params.user_id, async (newId, oldId) => {
         loadingGetById.value = false
         loadingPosts.value = false;
     }
-}, { immediate: true });
+});
 
 watch(() => activeTab.value, async (newTab, oldTab) => {
     if (!newTab || newTab === oldTab) return;
@@ -411,9 +411,7 @@ onMounted(async () => {
                             limit: 10,
                             tab: 'feed'
                         }).then((posts) => {
-
                             profilePosts.value = posts
-                            console.log(posts.value)
                         })
                     } else {
                         profilePosts.value = cachedPosts

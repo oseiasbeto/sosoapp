@@ -19,40 +19,29 @@ export default {
 
   ADD_POST_FROM_MODULES(state, { postModule }) {
     const posts = state.posts;
-    if (posts.length) {
-      const moduleIndex = posts.findIndex((m) => m.byId === postModule?.byId);
-      if (moduleIndex === -1) {
-        posts.push(postModule);
-      } else {
-        const currentModule = posts[moduleIndex];
-        if (currentModule) {
-          currentModule.posts = [...currentModule.posts, ...postModule.posts];
-          currentModule.pagination = postModule.pagination;
-        }
-      }
-    } else {
-      posts.push(postModule);
-    }
+    posts.push(postModule);
+
+    console.log(postModule)
   },
 
   ADD_NEW_POST(state, { newPost, postModule }) {
-    console.log(postModule)
+    console.log(postModule);
     const moduleIndex = state.posts.findIndex((m) => m.byId === postModule);
 
     if (moduleIndex === -1) return;
     const module = state.posts[moduleIndex];
 
-    console.log(module)
+    console.log(module);
     module.posts = [
       newPost,
       ...(Array.isArray(module.posts) ? module.posts : []),
     ];
 
-    const total = module?.pagination?.total
-    const limit = module?.pagination?.limit || 10
+    const total = module?.pagination?.total;
+    const limit = module?.pagination?.limit || 10;
 
-    module.pagination.total = total + 1
-    module.pagination.totalPages = Math.ceil(total / limit)
+    module.pagination.total = total + 1;
+    module.pagination.totalPages = Math.ceil(total / limit);
   },
 
   SET_REPLIES(state, { replies, page, original_post, totalPages }) {
