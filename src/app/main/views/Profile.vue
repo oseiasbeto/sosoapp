@@ -1,21 +1,14 @@
 <template>
     <div class="relative">
         <!--start posts-->
-        <post-list 
-            :posts="profilePosts?.posts || []" 
-            :is-replies="false" ref="postListComponent"
-            @on-scroll="handleScroll" 
-            :loading="loadingPosts" 
-            :posts-module="`profile_${activeTab}_${profile?._id}`"
-            :show-list="!loadingGetById" 
-            :b-space="64" 
-            :loading-load-more="loadingLoadMore"
-            :pagination="profilePosts?.pagination" 
-            @load-more="handleLoadingMorePosts">
+        <post-list :posts="profilePosts?.posts || []" :is-replies="false" ref="postListComponent"
+            @on-scroll="handleScroll" :loading="loadingPosts" :posts-module="`profile_${activeTab}_${profile?._id}`"
+            :show-list="!loadingGetById" :b-space="64" :loading-load-more="loadingLoadMore"
+            :pagination="profilePosts?.pagination" @load-more="handleLoadingMorePosts">
 
             <template #before-content>
                 <!--start navbar-->
-                <Navbar :title="profile?.name ? profile?.name : ''"/>
+                <Navbar :title="profile?.name ? profile?.name : ''" />
                 <!--end navbar-->
                 <div v-if="!loadingGetById" class="relative">
                     <!--start background image area-->
@@ -138,9 +131,9 @@
                 </div>
                 <div v-else>
                     <div class="mt-14">
-                      <ProfileSkeleton />  
+                        <ProfileSkeleton />
                     </div>
-                    
+
                 </div>
             </template>
         </post-list>
@@ -188,11 +181,6 @@ const router = useRouter()
 const store = useStore();
 
 const activeTab = ref('feed')
-const profilePosts = ref({
-    byId: '',
-    pagination: {},
-    posts: []
-})
 
 const tabs = ref([
     { label: "Postagens", value: 'feed' },
@@ -211,6 +199,8 @@ const profile = computed(() => store.getters.currentProfile);
 const profiles = computed(() => store.getters.profiles);
 const user = computed(() => store.getters.currentUser);
 const posts = computed(() => store.getters.posts)
+
+const profilePosts = computed(() => posts?.value?.find(p => p.byId === `profile_${activeTab.value}_${profile?.value?._id}`) || null)
 
 // Verifica se o usuário atual segue o perfil
 const isFollowing = computed(() => {
@@ -240,40 +230,14 @@ const handleFollowUser = async (userId, isFollowBack = false) => {
 
 const handleLoadingMorePosts = async (nextPage) => {
     try {
-        const newPosts = await loadMoreProfilePosts({
+        await loadMoreProfilePosts({
             page: nextPage,
             userId: profile?.value?._id,
             limit: 10,
+            totalItems: profilePosts.value?.pagination?.total,
             tab: activeTab.value
         });
 
-
-        if (!newPosts || !newPosts.posts.length) return
-
-
-        // Garante que profilePosts.value seja um array antes de usar spread
-        const currentPosts = profilePosts?.value?.posts || [];
-
-        const byId = newPosts.byId
-
-        const pagination = {
-            hasMore: newPosts.hasMore,
-            page: newPosts.page,
-            total: newPosts.total,
-            totalPages: newPosts.totalPages
-        }
-
-        // Filtra posts duplicados (opcional)
-        const uniqueNewPosts = newPosts.posts.filter(newPost =>
-            !currentPosts.some(existingPost => existingPost._id === newPost._id)
-        );
-
-        // Atualiza reativamente
-        profilePosts.value = {
-            byId: byId,
-            posts: [...currentPosts, ...uniqueNewPosts],
-            pagination: pagination
-        }
     } catch (error) {
         console.error('Failed to load more posts:', error);
         // Tratamento de erro adicional pode ser adicionado aqui
@@ -331,20 +295,16 @@ watch(() => route.params.user_id, async (newId, oldId) => {
 
         // Handle posts loading
         loadingPosts.value = true;
-        const cacheKey = `profile_${activeTab.value}_${newId}`;
-        const cachedPosts = posts.value.find(p => p.byId === cacheKey) || null;
+
+        const cachedPosts = profilePosts.value;
 
         if (!cachedPosts) {
-            const loadedPosts = await getProfilePosts({
+            await getProfilePosts({
                 page: 1,
                 userId: newId,
                 limit: 10,
                 tab: activeTab.value
             });
-            profilePosts.value = loadedPosts;
-
-        } else {
-            profilePosts.value = cachedPosts;
         }
     } catch (error) {
         console.error('Error loading profile data:', error);
@@ -357,7 +317,6 @@ watch(() => route.params.user_id, async (newId, oldId) => {
 watch(() => activeTab.value, async (newTab, oldTab) => {
     if (!newTab || newTab === oldTab) return;
 
-
     const byId = `profile_${activeTab.value}_${profile?.value?._id}`
 
     store.dispatch("setTabFromPosts", {
@@ -369,7 +328,7 @@ watch(() => activeTab.value, async (newTab, oldTab) => {
         tab: newTab
     })
 
-    const cachedPosts = posts.value.find(p => p.byId == `profile_${newTab}_${profile?.value?._id}`) || null;
+    const cachedPosts = profilePosts.value;
 
     if (!cachedPosts) {
         await getProfilePosts({
@@ -377,13 +336,11 @@ watch(() => activeTab.value, async (newTab, oldTab) => {
             userId: profile?.value?._id,
             limit: 10,
             tab: newTab
-        }).then(async (posts) => {
-            profilePosts.value = posts
+        }).then(async () => {
             await nextTick()
             setScrollPosition(0);
         })
     } else {
-        profilePosts.value = cachedPosts
         const scrollTop = profilePosts?.value?.scroll_top || 0
 
         await nextTick()
@@ -402,7 +359,7 @@ onMounted(async () => {
                     loadingPosts.value = true
                     lastProfileId.value = profile?.value?._id
 
-                    const cachedPosts = posts.value.find(p => p.byId == `profile_${activeTab.value}_${profile?.value?._id}`) || null;
+                    const cachedPosts = profilePosts.value;
 
                     if (!cachedPosts) {
                         await getProfilePosts({
@@ -410,11 +367,8 @@ onMounted(async () => {
                             userId: profile?.value?._id,
                             limit: 10,
                             tab: 'feed'
-                        }).then((posts) => {
-                            profilePosts.value = posts
                         })
                     } else {
-                        profilePosts.value = cachedPosts
                         loadingPosts.value = false
                     }
                 });
@@ -423,7 +377,7 @@ onMounted(async () => {
 
                 if (cachedProfile?._id) {
                     lastProfileId.value = cachedProfile?._id
-                    const cachedPosts = posts.value.find(p => p.byId == `profile_${activeTab.value}_${cachedProfile?._id}`) || null;
+                    const cachedPosts = profilePosts.value;
 
                     if (!cachedPosts) {
                         await getProfilePosts({
@@ -431,11 +385,7 @@ onMounted(async () => {
                             userId: cachedProfile?._id,
                             limit: 10,
                             tab: 'feed'
-                        }).then((posts) => {
-                            profilePosts.value = posts
                         })
-                    } else {
-                        profilePosts.value = cachedPosts
                     }
                 }
 
@@ -444,7 +394,7 @@ onMounted(async () => {
             loadingGetById.value = false
 
             lastProfileId.value = profile?.value?._id
-            const cachedPosts = posts.value.find(p => p.byId == `profile_${activeTab.value}_${profile?.value?._id}`) || null;
+            const cachedPosts = profilePosts.value
 
             if (!cachedPosts) {
                 await getProfilePosts({
@@ -452,17 +402,13 @@ onMounted(async () => {
                     userId: profile?.value?._id,
                     limit: 10,
                     tab: 'feed'
-                }).then((posts) => {
-                    profilePosts.value = posts
                 })
-            } else {
-                profilePosts.value = cachedPosts
             }
         }
     } else {
         loadingGetById.value = false
         store.dispatch("setProfile", user?.value)
-        const cachedPosts = posts.value.find(p => p.byId == `profile_${activeTab.value}_${user?.value?._id}`) || null;
+        const cachedPosts = profilePosts.value
 
         if (!cachedPosts) {
             await getProfilePosts({
@@ -470,11 +416,7 @@ onMounted(async () => {
                 userId: user?.value?._id,
                 limit: 10,
                 tab: 'feed'
-            }).then((posts) => {
-                profilePosts.value = posts
             })
-        } else {
-            profilePosts.value = cachedPosts
         }
     }
 });

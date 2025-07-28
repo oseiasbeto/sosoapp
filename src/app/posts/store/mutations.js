@@ -7,40 +7,53 @@ export default {
     state.originalPost = originalPost;
   },
 
-  SET_LOAD_POSTS(state, { posts, page, totalPages, byId, hasMore }) {
-    const index = state.posts.findIndex((m) => m.byId === byId);
-    const cachedPosts = state.posts[index];
-
-    cachedPosts.posts = [...cachedPosts.posts, ...posts];
-    cachedPosts.pagination.page = page;
-    cachedPosts.pagination.totalPages = totalPages;
-    cachedPosts.pagination.hasMore = hasMore;
-    console.log(cachedPosts)
-  },
-
-  ADD_POST_FROM_MODULES(state, { postModule }) {
-    const posts = state.posts;
-    posts.push(postModule);
-  },
-
   ADD_NEW_POST(state, { newPost, postModule }) {
-    console.log(postModule);
-    const moduleIndex = state.posts.findIndex((m) => m.byId === postModule);
 
+    console.log(postModule)
+    const moduleIndex = state.posts.findIndex((m) => m.byId === postModule);
     if (moduleIndex === -1) return;
+
     const module = state.posts[moduleIndex];
 
-    console.log(module);
     module.posts = [
       newPost,
       ...(Array.isArray(module.posts) ? module.posts : []),
     ];
 
-    const total = module?.pagination?.total;
-    const limit = module?.pagination?.limit || 10;
+    // Atualiza paginação sem conflitos
+    module.pagination.total += 1;
+    module.pagination.totalPages = Math.ceil(
+      module.pagination.total / module.pagination.limit || 10
+    );
+  },
 
-    module.pagination.total = total + 1;
-    module.pagination.totalPages = Math.ceil(total / limit);
+  SET_LOAD_POSTS(state, { posts, page, totalPages, byId, hasMore }) {
+    const index = state.posts.findIndex((m) => m.byId === byId);
+
+    if (index !== -1) {
+      const _cachedPosts = state.posts[index];
+
+    
+      // Filtra os novos posts para remover quaisquer que já existam no cache
+      const uniqueNewPosts = posts.filter(
+        (newPost) =>
+          !_cachedPosts.posts.some(
+            (existingPost) => existingPost._id === newPost._id
+          )
+      );
+
+       console.log(uniqueNewPosts)
+
+      _cachedPosts.posts = [..._cachedPosts.posts, ...uniqueNewPosts];
+      _cachedPosts.pagination.page = page;
+      _cachedPosts.pagination.totalPages = totalPages;
+      _cachedPosts.pagination.hasMore = hasMore;
+    }
+  },
+
+  ADD_POST_FROM_MODULES(state, { postModule }) {
+    const posts = state.posts;
+    posts.push(postModule);
   },
 
   SET_REPLIES(state, { replies, page, total, original_post, totalPages }) {
@@ -292,6 +305,7 @@ export default {
       item.scroll_top = value;
     }
   },
+
   SET_TAB_FROM_POSTS(state, { byId, tab }) {
     if (!state.posts) return;
 

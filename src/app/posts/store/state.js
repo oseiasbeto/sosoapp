@@ -1,14 +1,14 @@
 export default {
-    post: {},
-    originalPost: {},
-    posts: [],
-    replies: {
-        data: [],
-        lastRequest: {
-            originalPost: {},
-            at: null
-        },
-        pagination: {}
+  post: {},
+  originalPost: {},
+  posts: [],
+  replies: {
+    data: [],
+    lastRequest: {
+      originalPost: {},
+      at: null,
     },
-    repliesStore: []
+    pagination: {},
+  },
+  repliesStore: [],
 };

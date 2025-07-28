@@ -1,17 +1,9 @@
 <template>
     <div class="mb-14 overflow-hidden">
         <!--start post list-->
-        <post-list 
-            :posts="homePosts?.posts || []" 
-            :is-replies="false" 
-            :loading="loadingPosts" 
-            :posts-module="activeTab"
-            :b-space="64" 
-            :loading-load-more="loadingLoadMorePosts" 
-            :pagination="homePosts?.pagination"
-            @load-more="_loadMorePosts" 
-            ref="postListComponent" 
-            @on-scroll="handleScroll">
+        <post-list :posts="homePosts?.posts || []" :is-replies="false" :loading="loadingPosts" :posts-module="activeTab"
+            :b-space="64" :loading-load-more="loadingLoadMorePosts" :pagination="homePosts?.pagination"
+            @load-more="_loadMorePosts" ref="postListComponent" @on-scroll="handleScroll">
 
             <template #before-content>
                 <div class="h-[90px]">
@@ -40,6 +32,7 @@
                         </div>
                         <Tabs ref="tabsComponent" v-model="activeTab" :tabs="tabs" />
                     </div>
+                    <button @click="openModal('create-post')">Postar</button>
                 </div>
             </template>
         </post-list>
@@ -86,19 +79,10 @@ const tabs = ref([
 const user = computed(() => store.getters.currentUser)
 const posts = computed(() => store.getters.posts)
 
-const homePosts = computed(() => {
-  const allPosts = store.getters.posts || []
-  const currentTab = activeTab.value
-  
-  return currentTab 
-    ? allPosts.find(p => p.byId === currentTab) || null 
-    : null
-})
+const homePosts = computed(() => store.getters.getPostsByTab(activeTab.value));
 
 const tabsComponent = ref(null)
 const postListComponent = ref(null)
-
-
 
 const _loadMorePosts = async (newPage) => {
     try {
@@ -108,6 +92,7 @@ const _loadMorePosts = async (newPage) => {
             totalItems: homePosts?.value?.pagination?.total,
             limit: 10
         })
+        await nextTick()
     } catch (err) {
         console.error('Failed to load more posts:', err);
         // Tratamento de erro adicional pode ser adicionado aqui
@@ -142,42 +127,34 @@ const handleScroll = (value) => {
     } else return
 }
 
+const openModal = (name, data) => {
+    store.dispatch("openModal", {
+        show: true,
+        name,
+        data
+    })
+}
+
 watch(() => activeTab.value, async (newTab, oldTab) => {
-    if (!newTab || newTab === oldTab) return;
+    if (newTab === oldTab) return;
 
-    const byId = activeTab.value
-
-    const cachedPosts = posts.value.find(p => p.byId == byId || null);
-
-    if (!cachedPosts) {
-        await getPosts({
-            page: 1,
-            limit: 10,
-            tab: newTab
-        }).then(async (posts) => {
-            // homePosts.value = posts
-            await nextTick()
-            setScrollPosition(0);
-        })
+    const cachedPosts = posts.value.find(p => p.byId === newTab);
+    if (cachedPosts) {
+        // Dados já em cache, apenas ajusta o scroll
+        await nextTick();
+        setScrollPosition(cachedPosts.scroll_top || 0);
     } else {
-        homePosts.value = cachedPosts
-        const scrollTop = cachedPosts?.scroll_top || 0
-
-        await nextTick()
-        setScrollPosition(scrollTop)
+        // Se não há cache, busca os posts
+        await getPosts({ page: 1, limit: 10, tab: newTab });
+        setScrollPosition(0); // Reseta o scroll
     }
-})
+});
 
 
 onMounted(async () => {
-    console.log(homePosts.value)
-    if (!homePosts.value) {
-        await getPosts({
-            page: 1,
-            limit: 10
-        }).then(posts => {
-            //  homePosts.value = posts
-        })
-    }
+    await Promise.all([
+        getPosts({ page: 1, limit: 10, tab: 'feed' }),
+        getPosts({ page: 1, limit: 10, tab: 'following' })
+    ]);
 })
 </script>

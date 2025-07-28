@@ -1,7 +1,12 @@
 <template>
   <div class="scroll-container">
-    <DynamicScroller @scroll="handleScrollEvent" ref="scroller" :items="props?.posts" :min-item-size="120"
-      class="scroller " :style="`padding-bottom: ${bSpace}px;`" :emit-update="true" key-field="_id">
+    <DynamicScroller @scroll="handleScrollEvent" 
+      ref="scroller" 
+      :items="props?.posts" 
+      :min-item-size="120"
+      class="scroller " 
+      :style="`padding-bottom: ${bSpace}px;`" 
+      key-field="_id">
       <!-- Slot para conteúdo ANTES da lista -->
       <template #before>
         <slot name="before-content"></slot>
@@ -99,7 +104,6 @@ const handleUpdate = () => {
     !props?.loading
   ) {
     const newPage = currentPage.value + 1;
-    console.log( currentPage.value)
     emit('loadMore', newPage);
   }
 };

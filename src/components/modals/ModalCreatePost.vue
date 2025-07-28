@@ -4,17 +4,6 @@ import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { usePost } from "@/hooks/posts";
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/vue';
-import 'emoji-picker-element';
-
-// Define the custom element only once, outside the component
-if (!customElements.get('emoji-picker')) {
-  customElements.define('emoji-picker', class extends HTMLElement {
-    connectedCallback() {
-      this.attachShadow({ mode: 'open' });
-      this.shadowRoot.innerHTML = '<slot></slot>';
-    }
-  });
-}
 
 const props = defineProps({
   modal: {
@@ -41,8 +30,6 @@ const privacy = ref("public");
 const privacyMenuRef = ref(null);
 const showPrivacyMenu = ref(false);
 const showEmojiPicker = ref(false);
-const emojiPickerRef = ref(null);
-const emojiButtonRef = ref(null);
 
 const privacyOptions = [
   {
@@ -124,27 +111,6 @@ const selectPrivacy = (option) => {
   showPrivacyMenu.value = false;
 };
 
-const toggleEmojiPicker = () => {
-  showEmojiPicker.value = !showEmojiPicker.value;
-};
-
-const handleEmojiSelect = (event) => {
-  if (remainingChars.value > 0) {
-    postContent.value += event.detail.unicode;
-    adjustTextareaHeight();
-    showEmojiPicker.value = false; // Close picker after selection
-  }
-};
-
-const handleClickOutside = (event) => {
-  if (privacyMenuRef.value && !privacyMenuRef.value.contains(event.target)) {
-    showPrivacyMenu.value = false;
-  }
-  if (emojiPickerRef.value && !emojiPickerRef.value.contains(event.target) && 
-      emojiButtonRef.value && !emojiButtonRef.value.contains(event.target)) {
-    showEmojiPicker.value = false;
-  }
-};
 
 const handleImageUpload = (e) => {
   const files = Array.from(e.target.files || []);
@@ -337,23 +303,11 @@ const handleSubmit = async () => {
 
 // Lifecycle hooks
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside);
-  if (emojiPickerRef.value) {
-    emojiPickerRef.value.addEventListener('emoji-click', handleEmojiSelect);
-  }
   nextTick(adjustTextareaHeight);
 });
 
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside);
-  if (emojiPickerRef.value) {
-    emojiPickerRef.value.removeEventListener('emoji-click', handleEmojiSelect);
-  }
-});
 
-watch(postContent, () => {
-  nextTick(adjustTextareaHeight);
-});
+
 </script>
 
 <template>
@@ -496,16 +450,6 @@ watch(postContent, () => {
                   </path>
                 </svg>
               </button>
-
-              <button ref="emojiButtonRef" type="button" @click="toggleEmojiPicker"
-                class="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-full"
-                title="Adicionar emoji">
-                <svg fill="none" class="w-5 h-5" viewBox="0 0 24 24">
-                  <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
-                    d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16ZM2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm8-5a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0V8a1 1 0 0 1 1-1Zm4 0a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0V8a1 1 0 0 1 1-1Zm-5.894 7.803a1 1 0 0 1 1.341-.447c1.719.859 3.387.859 5.106 0a1 1 0 1 1 .894 1.788c-2.281 1.141-4.613 1.141-6.894 0a1 1 0 0 1-.447-1.341Z">
-                  </path>
-                </svg>
-              </button>
             </div>
 
             <div class="flex items-center space-x-3">
@@ -521,12 +465,6 @@ watch(postContent, () => {
                 <span v-else>{{ replyTo ? 'Responder' : 'Postar' }}</span>
               </button>
             </div>
-          </div>
-
-          <!-- Emoji Picker -->
-          <div v-if="showEmojiPicker" ref="emojiPickerRef"
-            class="absolute bottom-20 left-4 z-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
-            <emoji-picker class="light"></emoji-picker>
           </div>
         </div>
       </DialogPanel>

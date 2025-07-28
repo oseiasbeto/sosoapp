@@ -25,23 +25,6 @@
             class="w-full bg-transparent resize-none outline-none text-white placeholder-gray-500 mb-3"
             @input="adjustTextareaHeight">
         </textarea>
-
-        <div>
-              <button 
-      @click="openPrivacyDialog"
-      class="bg-blue-500 text-white px-4 py-2 rounded"
-    >
-      Configurar privacidade
-    </button>
-
-    <PrivacyDialog
-      :isOpen="isPrivacyDialogOpen"
-      :initialPrivacy="postPrivacy"
-      :initialAllowComments="allowComments"
-      @close="handleClose"
-      @save="handleSave"
-    />
-        </div>
     </label>
     <!--end body-->
 
@@ -56,7 +39,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { usePost } from "@/hooks/posts";
 import { useStore } from 'vuex';
 import ReplyToOriginalPost from '../components/ReplyToOriginalPost.vue';
-import PrivacyDialog from '../components/PrivacyDialog.vue'
+
 const { createPost, loading: loadingCreatePost } = usePost();
 const { getPostById, loading: loadingGetPostById } = usePost();
 
@@ -110,13 +93,6 @@ const resetForm = () => {
     error.value = null
 };
 
-const openPrivacyDialog = () => {
-  isPrivacyDialogOpen.value = true
-}
-
-const handleClose = () => {
-  isPrivacyDialogOpen.value = false
-}
 
 const handleSave = (settings) => {
   postPrivacy.value = settings.privacy

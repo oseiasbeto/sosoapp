@@ -19,7 +19,7 @@ export function usePost() {
     try {
       loading.value = true;
 
-      const response = await api.post("/posts", {
+      const response = await api.post("/posts/new-post", {
         ...data,
         originalPost: data.isRepost ? data.originalRepost : data.originalPost,
       });
@@ -216,7 +216,13 @@ export function usePost() {
     }
   };
 
-  const loadMoreReplies = async ({ original_post, isLoad = true, totalItems = 0, page = 1, limit = 10 }) => {
+  const loadMoreReplies = async ({
+    original_post,
+    isLoad = true,
+    totalItems = 0,
+    page = 1,
+    limit = 10,
+  }) => {
     try {
       loading.value = true;
 
@@ -240,7 +246,7 @@ export function usePost() {
         page: currentPage,
         totalPages,
         hasMore,
-        total
+        total,
       });
 
       store.dispatch("setRepliesStore", {
@@ -361,10 +367,12 @@ export function usePost() {
     }
   };
 
-  const getPosts = async ({ page = 1, tab = 'feed', limit = 10 }) => {
+  const getPosts = async ({ page = 1, tab = "feed", limit = 10 }) => {
     try {
       loading.value = true;
-      const response = await api.get(`/posts/${tab}?page=${page}&limit=${limit}`);
+      const response = await api.get(
+        `/posts/${tab}?page=${page}&limit=${limit}`
+      );
       const {
         posts,
         page: currentPage,
@@ -438,12 +446,14 @@ export function usePost() {
     page = 1,
     tab = "feed",
     userId,
+    isLoad = true,
+    totalItems = 0,
     limit = 10,
   }) => {
     try {
       loading.value = true;
       const response = await api.get(
-        `/posts/profile/${tab}/${userId}?page=${page}&limit=${limit}`
+        `/posts/profile/${tab}/${userId}?page=${page}&limit=${limit}&is_load=${isLoad}&total=${totalItems}`
       );
       const {
         posts,
@@ -463,7 +473,6 @@ export function usePost() {
       };
 
       store.dispatch("setLoadPosts", newModule);
-      return newModule;
     } catch (err) {
       console.error("Erro ao carregar as postagens:", err.message);
       throw err;
@@ -472,14 +481,18 @@ export function usePost() {
     }
   };
 
-  const loadMorePosts = async ({ page = 1, totalItems = 0, tab = "feed", limit = 10 }) => {
+  const loadMorePosts = async ({
+    page = 1,
+    totalItems = 0,
+    tab = "feed",
+    limit = 10,
+  }) => {
     try {
       loading.value = true;
       const response = await api.get(
         `/posts/${tab}?page=${page}&limit=${limit}&is_load=true&total=${totalItems}`
       );
 
-      console.log(totalItems)
       const {
         posts,
         page: currentPage,
@@ -487,7 +500,7 @@ export function usePost() {
         totalPages,
         hasMore,
       } = response.data;
-      
+
       const newModule = {
         posts,
         page: currentPage,
@@ -497,7 +510,6 @@ export function usePost() {
         hasMore,
       };
       store.dispatch("setLoadPosts", newModule);
-      return newModule;
     } catch (err) {
       console.error("Erro ao carregar as postagens:", err.message);
       throw err;
