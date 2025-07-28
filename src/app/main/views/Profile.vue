@@ -189,6 +189,10 @@ const tabs = ref([
     { label: "Curtidas", value: 'liked' }
 ])
 
+const tabIndices = ref({
+    feed: null
+})
+
 const postListComponent = ref(null)
 const tabsComponent = ref(null)
 const lastProfileId = ref(null)
@@ -200,7 +204,18 @@ const profiles = computed(() => store.getters.profiles);
 const user = computed(() => store.getters.currentUser);
 const posts = computed(() => store.getters.posts)
 
-const profilePosts = computed(() => posts?.value?.find(p => p.byId === `profile_${activeTab.value}_${profile?.value?._id}`) || null)
+// Crie um computed para o profileId que lida com todos os casos
+const profileId = computed(() => {
+    return profile.value?._id || user.value?._id || route.params.user_id;
+});
+
+// Atualize a computed profilePosts para usar o profileId
+const profilePosts = computed(() => {
+    if (!profileId.value) return null;
+
+    const index = tabIndices.value[activeTab.value];
+    return index !== undefined ? posts.value[index] : null;
+});
 
 // Verifica se o usuário atual segue o perfil
 const isFollowing = computed(() => {
@@ -262,6 +277,17 @@ const goToPost = (postModule) => {
     })
 }
 
+// Função para atualizar os índices
+const updateTabIndices = () => {
+    if (!profileId.value) return;
+
+    tabs.value.forEach(tab => {
+        const tabId = `profile_${tab.value}_${profileId.value}`;
+        const index = posts.value.findIndex(p => p.byId === tabId);
+        tabIndices.value[tab.value] = index !== -1 ? index : null;
+    });
+};
+
 const handleScroll = (value) => {
     if (posts?.value?.length) {
         const byId = `profile_${activeTab.value}_${profile?.value?._id}`
@@ -304,7 +330,8 @@ watch(() => route.params.user_id, async (newId, oldId) => {
                 userId: newId,
                 limit: 10,
                 tab: activeTab.value
-            });
+            })
+            updateTabIndices();
         }
     } catch (error) {
         console.error('Error loading profile data:', error);
@@ -337,6 +364,7 @@ watch(() => activeTab.value, async (newTab, oldTab) => {
             limit: 10,
             tab: newTab
         }).then(async () => {
+            updateTabIndices();
             await nextTick()
             setScrollPosition(0);
         })
@@ -368,6 +396,7 @@ onMounted(async () => {
                             limit: 10,
                             tab: 'feed'
                         })
+                        updateTabIndices();
                     } else {
                         loadingPosts.value = false
                     }
@@ -386,6 +415,7 @@ onMounted(async () => {
                             limit: 10,
                             tab: 'feed'
                         })
+                        updateTabIndices();
                     }
                 }
 
@@ -403,6 +433,7 @@ onMounted(async () => {
                     limit: 10,
                     tab: 'feed'
                 })
+                updateTabIndices();
             }
         }
     } else {
@@ -417,6 +448,7 @@ onMounted(async () => {
                 limit: 10,
                 tab: 'feed'
             })
+            updateTabIndices();
         }
     }
 });

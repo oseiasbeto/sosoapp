@@ -1,19 +1,22 @@
 <template>
     <div class="mb-14 overflow-hidden">
         <!--start post list-->
-        <post-list :posts="homePosts?.posts || []" :is-replies="false" :loading="loadingPosts" :posts-module="activeTab"
-            :b-space="64" :loading-load-more="loadingLoadMorePosts" :pagination="homePosts?.pagination"
-            @load-more="_loadMorePosts" ref="postListComponent" @on-scroll="handleScroll">
+        <post-list :posts="homePosts?.posts || []" :is-replies="false" :loading="loadingPosts || loadingPostsGlobal"
+            :posts-module="activeTab" :b-space="64" :loading-load-more="loadingLoadMorePosts"
+            :pagination="homePosts?.pagination" @load-more="_loadMorePosts" ref="postListComponent"
+            @on-scroll="handleScroll">
 
             <template #before-content>
                 <div class="h-[90px]">
-                    <div class="bg-light-bg z-[999] w-full fixed top-0 dark:bg-dark-bg">
+                    <div class="bg-light-bg z-[999] w-full fixed transition-transform top-0 dark:bg-dark-bg"
+                    :class="{'translate-y-[-92px]': hideHeader}"
+                    >
                         <div class="flex relative py-2 pt-3 px-4 justify-between items-center">
                             <div class="absolute">
                                 <Avatar :url="user?.profile_image?.low || undefined" size="sm" />
                             </div>
 
-                            <div class="mx-auto">
+                            <div @click="handleHideHeader()" class="mx-auto">
                                 <Logo />
                             </div>
 
@@ -32,7 +35,6 @@
                         </div>
                         <Tabs ref="tabsComponent" v-model="activeTab" :tabs="tabs" />
                     </div>
-                    <button @click="openModal('create-post')">Postar</button>
                 </div>
             </template>
         </post-list>
@@ -70,19 +72,35 @@ const { getPosts, loading: loadingPosts } = usePost();
 const { loadMorePosts, loading: loadingLoadMorePosts } = usePost();
 
 const activeTab = ref('feed')
+const hideHeader = ref(false)
+
 const tabs = ref([
     { label: "Descobrir", value: 'feed' },
     { label: "Seguindo", value: 'following' },
 ])
 
+// Cache de índices para melhor performance
+const tabIndices = ref({
+    feed: null,
+    following: null
+})
 
 const user = computed(() => store.getters.currentUser)
 const posts = computed(() => store.getters.posts)
 
-const homePosts = computed(() => store.getters.getPostsByTab(activeTab.value));
+const homePosts = computed(() => {
+    const index = tabIndices.value[activeTab.value]
+    return index !== null ? posts.value[index] : null
+})
 
 const tabsComponent = ref(null)
 const postListComponent = ref(null)
+const loadingPostsGlobal = ref(true)
+
+const updateTabIndices = () => {
+    tabIndices.value.feed = store.getters.posts.findIndex(p => p.byId === 'feed')
+    tabIndices.value.following = store.getters.posts.findIndex(p => p.byId === 'following')
+}
 
 const _loadMorePosts = async (newPage) => {
     try {
@@ -97,6 +115,10 @@ const _loadMorePosts = async (newPage) => {
         console.error('Failed to load more posts:', err);
         // Tratamento de erro adicional pode ser adicionado aqui
     }
+}
+
+const handleHideHeader = () => {
+    hideHeader.value = true
 }
 
 const setScrollPosition = async (position) => {
@@ -118,6 +140,13 @@ const goToPost = (postModule) => {
 }
 
 const handleScroll = (value) => {
+
+    if(value > 130) {
+        hideHeader.value = true
+    } else {
+        hideHeader.value = false
+    }
+
     if (posts?.value?.length) {
         const byId = activeTab.value
         store.dispatch("setScrollTopFromPosts", {
@@ -127,16 +156,8 @@ const handleScroll = (value) => {
     } else return
 }
 
-const openModal = (name, data) => {
-    store.dispatch("openModal", {
-        show: true,
-        name,
-        data
-    })
-}
-
 watch(() => activeTab.value, async (newTab, oldTab) => {
-    if (newTab === oldTab) return;
+    if (newTab === oldTab || loadingPostsGlobal.value) return;
 
     const cachedPosts = posts.value.find(p => p.byId === newTab);
     if (cachedPosts) {
@@ -152,9 +173,16 @@ watch(() => activeTab.value, async (newTab, oldTab) => {
 
 
 onMounted(async () => {
-    await Promise.all([
-        getPosts({ page: 1, limit: 10, tab: 'feed' }),
-        getPosts({ page: 1, limit: 10, tab: 'following' })
-    ]);
+    try {
+        await Promise.all([
+            getPosts({ page: 1, limit: 10, tab: 'feed' }),
+            getPosts({ page: 1, limit: 10, tab: 'following' })
+        ])
+        updateTabIndices() // Atualiza índices após carregar mais posts
+    } catch (error) {
+        console.error('Error loading posts:', error)
+    } finally {
+        loadingPostsGlobal.value = false // Garante que o loading seja desativado mesmo se houver erro
+    }
 })
 </script>

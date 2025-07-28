@@ -1,11 +1,14 @@
 <template>
-  <div class="scroll-container">
+  <div class="scroll-container overflow-hidden">
     <DynamicScroller @scroll="handleScrollEvent" 
       ref="scroller" 
       :items="props?.posts" 
       :min-item-size="120"
-      class="scroller " 
-      :style="`padding-bottom: ${bSpace}px;`" 
+      class="scroller" 
+      :style="{
+        'padding-bottom': `${bSpace}px`,
+        'overflow': props.loading ? 'hidden' : 'auto'
+      } " 
       key-field="_id">
       <!-- Slot para conteúdo ANTES da lista -->
       <template #before>

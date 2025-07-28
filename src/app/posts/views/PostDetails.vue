@@ -2,7 +2,9 @@
     <div>
         <!--end replies-->
         <div>
-            <post-list :b-space="110" :posts="replies?.data || []" :is-replies="true" ref="postListComponent"
+            <post-list 
+                :b-space="110" :posts="replies?.data || []" 
+                :is-replies="true" ref="postListComponent"
                 :loading="loadingGetReplies" :post-module="postModule" :loading-load-more="loadingLoadMoreReplies"
                 :pagination="replies.pagination" @load-more="_loadMoreReplies" @on-scroll="handleScroll">
 
@@ -14,7 +16,7 @@
 
                     <!--start body post-->
                     <!--start post details-->
-                    <div class="p-4 pb-[10px] mt-14 border-b border-light-border dark:border-dark-border">
+                    <div class="p-4 pb-[10px] mt-14 border-b border-light-border dark:border-dark-border" :class="{'border-none': loadingGetPostId}">
                         <div v-if="!loadingGetPostId">
                             <div
                                 class="w-full min-w-0 mb-3 flex items-center gap-2.5 max-w-full overflow-hidden flex-shrink-0">
@@ -69,7 +71,7 @@
                                         </path>
                                     </svg>
                                     <span v-show="repliesCount > 0" class="text-inherit text-[15px]">{{ repliesCount
-                                        }}</span>
+                                    }}</span>
                                 </button>
                                 <button class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm"
                                     :class="{ '!text-[#13c371] dark:!text-reposted': hasReposted }"
@@ -80,7 +82,7 @@
                                         </path>
                                     </svg>
                                     <span v-show="repostsCount > 0" class="text-inherit text-[15px]">{{ repostsCount
-                                        }}</span>
+                                    }}</span>
                                 </button>
                                 <button class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm"
                                     :class="{ '!text-liked': hasLiked }" :disabled="loadingToggleLike"
@@ -97,7 +99,7 @@
                                         </path>
                                     </svg>
                                     <span v-show="likesCount > 0" class="text-inherit text-[15px]">{{ likesCount
-                                        }}</span>
+                                    }}</span>
                                 </button>
                                 <button class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm">
                                     <svg fill="none" width="22" viewBox="0 0 24 24" height="22">
@@ -117,7 +119,7 @@
                             <!--end reactions btns-->
                         </div>
                         <div v-else>
-                            <p>Carregando...</p>
+                            <PostLoader/>
                         </div>
                     </div>
                 </template>
@@ -145,6 +147,7 @@ import AuthorPostDetails from '../components/PostAuthorDetails.vue';
 import PostText from '../components/PostText.vue';
 import Navbar from '@/components/base/Navbar.vue';
 import Avatar from '@/components/utilities/Avatar.vue';
+import PostLoader from '../components/PostLoader.vue';
 
 const { getPostById, loading: loadingGetPostId, } = usePost()
 const { getReplies, loading: loadingGetReplies } = usePost()
@@ -325,8 +328,11 @@ watch(() => route.params.id, async (newId, oldId) => {
 })
 
 onMounted(async () => {
-    scrollOnTop()
-    if (!post.value?._id) {
+    if (!post.value?._id || post?.value?._id !== route.params.id) {
+        await nextTick()
+        setScrollPosition(0)
+        loadingGetPostId.value = true
+
         await getPostById(route.params.id).then(async () => {
             await getReplies({
                 original_post: post.value,

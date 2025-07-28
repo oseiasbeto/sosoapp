@@ -42,8 +42,6 @@ export default {
           )
       );
 
-       console.log(uniqueNewPosts)
-
       _cachedPosts.posts = [..._cachedPosts.posts, ...uniqueNewPosts];
       _cachedPosts.pagination.page = page;
       _cachedPosts.pagination.totalPages = totalPages;

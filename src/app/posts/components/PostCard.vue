@@ -102,7 +102,7 @@ const repostsCount = computed(() => props.post?.is_repost ? props.post.original_
 
 const isLastPost = computed(() => {
     // Supondo que você tenha acesso ao total de posts e ao índice atual
-    return props.index === props.totalItems - 1; // ou outra lógica para determinar o último
+    return props.index === props.totalItems - 1 && props.totalItems  > 1; // ou outra lógica para determinar o último
 });
 
 const goToDetails = (post) => {
