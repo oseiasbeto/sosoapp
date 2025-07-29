@@ -1028,7 +1028,7 @@ export default {
   REPLACE_REPLIES_STORE(state, { originalPostId }) {
     console.log(originalPostId);
   },
-  DELETE_POST_FROM_POSTS(state, { postId, postModule }) {
+  DELETE_POST_FROM_POSTS(state, { postId, postModule, isViewPage }) {
     const module = state.posts.find((m) => m.byId === postModule);
     if (!module) return;
 
@@ -1049,9 +1049,27 @@ export default {
       }
     });
 
+
+    if (isViewPage) {
+      const index = state.repliesStore.findIndex(
+        (p) => p?.original_post?._id === postId
+      );
+      
+      if (index !== -1) {
+        state.repliesStore.splice(index, 1);
+        state.post = {}
+      }
+    }
+
     // Atualiza os metadados do módulo uma única vez
-    module.pagination.total = Math.max(0, module.pagination.total - postsToRemove.length);
-    module.pagination.totalPages = Math.ceil(module.pagination.total / (module.pagination.limit || 10));
-    module.pagination.hasMore = module.pagination.page < module.pagination.totalPages;
+    module.pagination.total = Math.max(
+      0,
+      module.pagination.total - postsToRemove.length
+    );
+    module.pagination.totalPages = Math.ceil(
+      module.pagination.total / (module.pagination.limit || 10)
+    );
+    module.pagination.hasMore =
+      module.pagination.page < module.pagination.totalPages;
   },
 };

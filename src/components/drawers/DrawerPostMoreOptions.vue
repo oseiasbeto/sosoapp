@@ -40,7 +40,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'; // Importa funções do Vue 3
+import { ref, watch, computed, nextTick } from 'vue'; // Importa funções do Vue 3
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/vue'; // Importa componentes do Headless UI
 import { useRouter, useRoute } from 'vue-router';
 import { useStore } from 'vuex';
@@ -76,20 +76,22 @@ const isOpen = computed(() => {
 
 const emit = defineEmits(['onPostDeleted'])
 
-const handleDeletePost = async (postId) => {
-    await deletePost({
-        postId,
+const handleDeletePost = (post) => {
+    deletePost({
+        postId: post?._id,
         postModule: postModule?.value,
-        isReply: originalPost.value?.is_reply
-    }).then(() => {
-        closeDrawer()
-        emit('onPostDeleted')
+        isViewPage: route.params.id === post?._id,
+        isReply: post?.is_reply
     })
+    closeDrawer()
+    if (route.name === 'Post details' && route.params.id === post._id) {
+        router.back()
+    }
 }
 
 const confirmDeletePost = (value) => {
     if (value) {
-        handleDeletePost(originalPost?.value?.is_repost ? originalPost.value?.original_post?._id : originalPost?.value?._id)
+        handleDeletePost(originalPost?.value?.is_repost ? originalPost.value?.original_post : originalPost?.value)
     } else {
         showDeletePostDialog.value = false
     }

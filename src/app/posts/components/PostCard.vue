@@ -36,11 +36,15 @@
                 <!--end body post-->
 
                 <!--start footer post-->
-                <post-reactions :likes-count="likesCount" :replies-count="repliesCount" :reposts-count="repostsCount"
+                <post-reactions 
+                    :likes-count="likesCount" 
+                    :replies-count="repliesCount" :reposts-count="repostsCount"
                     @like-post="handleLike(post?.is_repost ? post.original_post._id : post._id, post._id, post?.is_repost)"
                     :loading-toggle-like="loadingToggleLike" @reply-post="goToReply(post, post?.is_repost)"
                     @repost="handleRepost(post?.is_repost ? post.original_post : post, post?.is_repost)"
-                    @open-more="handleMoreOptions(post)" :has-liked="hasLiked" :has-reposted="hasReposted" />
+                    @open-more="handleMoreOptions(post)" 
+                    :has-liked="hasLiked" 
+                    :has-reposted="hasReposted" />
                 <!--end footer post-->
             </div>
         </div>
@@ -89,15 +93,15 @@ const emit = defineEmits(['update:height']);
 const parent = ref(null);
 const user = computed(() => store.getters.currentUser)
 
-const hasLiked = computed(() => props.post?.is_repost ? props.post.original_post.likes.includes(user.value._id) : props.post?.likes?.includes(user.value._id) || false);
+const hasLiked = computed(() => props.post?.is_repost ? props.post?.original_post?.likes.includes(user.value._id) : props?.post?.likes?.includes(user.value._id) || false);
 
-const hasReposted = computed(() => props.post?.is_repost ? props.post.original_post.reposts.includes(user.value._id) : props.post?.reposts?.includes(user.value._id) || false);
+const hasReposted = computed(() => props.post?.is_repost ? props?.post?.original_post?.reposts.includes(user.value._id) : props.post?.reposts?.includes(user.value._id) || false);
 
-const likesCount = computed(() => props.post?.is_repost ? props.post.original_post.likes.length : props.post?.likes?.length || 0);
+const likesCount = computed(() => props.post?.is_repost ? props.post?.original_post?.likes?.length : props.post?.likes?.length || 0);
 
-const repliesCount = computed(() => props.post?.is_repost ? props.post.original_post.replies.length : props.post?.replies?.length || 0);
+const repliesCount = computed(() => props.post?.is_repost ? props?.post.original_post?.replies?.length : props.post?.replies?.length || 0);
 
-const repostsCount = computed(() => props.post?.is_repost ? props.post.original_post.reposts.length : props.post?.reposts?.length || 0);
+const repostsCount = computed(() => props.post?.is_repost ? props?.post?.original_post?.reposts.length : props.post?.reposts?.length || 0);
 
 /* 
 const isLastPost = computed(() => {

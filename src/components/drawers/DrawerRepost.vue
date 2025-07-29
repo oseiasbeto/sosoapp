@@ -77,9 +77,8 @@ const isOpen = computed(() => {
 });
 
 const handleReply = async (originalPost, isPost, isViewPage, postModule, isRepost) => {
-    await toggleRepost({ originalPost, isPost, isViewPage, postModule, isRepost }).then(() => {
-        closeDrawer()
-    })
+    toggleRepost({ originalPost, isPost, isViewPage, postModule, isRepost })
+    closeDrawer()
 }
 
 // Fecha o modal

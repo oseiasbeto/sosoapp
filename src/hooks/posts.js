@@ -518,13 +518,13 @@ export function usePost() {
     }
   };
 
-  const deletePost = async ({ postId, postModule, isReply }) => {
+  const deletePost = async ({ postId, postModule, isViewPage = false, isReply }) => {
     try {
       loading.value = true;
       const response = await api.delete(`/posts/${postId}`);
 
       if (!isReply) {
-        store.dispatch("deletePostFromPosts", { postId, postModule });
+        store.dispatch("deletePostFromPosts", { postId, postModule, isViewPage });
       }
       return response;
     } catch (err) {

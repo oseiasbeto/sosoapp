@@ -95,10 +95,10 @@ const resetForm = () => {
 
 
 const handleSave = (settings) => {
-  postPrivacy.value = settings.privacy
-  allowComments.value = settings.allowComments
-  isPrivacyDialogOpen.value = false
-  // Aqui você pode adicionar lógica para salvar no backend
+    postPrivacy.value = settings.privacy
+    allowComments.value = settings.allowComments
+    isPrivacyDialogOpen.value = false
+    // Aqui você pode adicionar lógica para salvar no backend
 }
 
 const handleVideoUpload = (e) => {
@@ -255,6 +255,7 @@ const adjustTextareaHeight = () => {
 
 const handleSubmit = async () => {
     if (!canPost.value) return;
+
     const mediaUploads = mediaPreviews.value.map(media => uploadMedia(media));
     const uploadedMedia = (await Promise.all(mediaUploads)).filter(Boolean);
     const validMedia = uploadedMedia.filter(m => m !== null);
@@ -286,12 +287,16 @@ const handleSubmit = async () => {
     };
 
     if (postData.content || postData.media.length > 0) {
-        await createPost(postData).then(() => {
+        
+        try {
+            await createPost(postData)
             resetForm();
             router.back()
-        }).catch(err => {
-            error.value = err.response?.data?.message || 'Erro ao criar post';
-        });
+        } catch (error) {
+            resetForm();
+            router.back()
+            console.log(error)
+        }
     }
 }
 

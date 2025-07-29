@@ -1,22 +1,21 @@
 <template>
     <div>
-        <!--end replies-->
+        <!--start body post-->
         <div>
-            <post-list 
-                :b-space="110" :posts="replies?.data || []" 
-                :is-replies="true" ref="postListComponent"
-                :loading="loadingGetReplies" :post-module="postModule" :loading-load-more="loadingLoadMoreReplies"
-                :pagination="replies.pagination" @load-more="_loadMoreReplies" @on-scroll="handleScroll">
+            <post-list :b-space="110" :posts="replies?.data || []" :is-replies="true" ref="postListComponent"
+                :loading="loadingGetReplies" :show-list="!hasError" :post-module="postModule"
+                :loading-load-more="loadingLoadMoreReplies" :pagination="replies.pagination"
+                @load-more="_loadMoreReplies" @on-scroll="handleScroll">
 
                 <template #before-content>
                     <!--start header post-->
                     <Navbar :title="post?.is_reply ? 'Resposta' : 'Postagem'" />
                     <!--end header post-->
 
-
-                    <!--start body post-->
                     <!--start post details-->
-                    <div class="p-4 pb-[10px] mt-14 border-b border-light-border dark:border-dark-border" :class="{'border-none': loadingGetPostId}">
+                    <div v-if="!hasError"
+                        class="p-4 pb-[10px] mt-14 border-b border-light-border dark:border-dark-border"
+                        :class="{ 'border-none': loadingGetPostId }">
                         <div v-if="!loadingGetPostId">
                             <div
                                 class="w-full min-w-0 mb-3 flex items-center gap-2.5 max-w-full overflow-hidden flex-shrink-0">
@@ -108,7 +107,8 @@
                                         </path>
                                     </svg>
                                 </button>
-                                <button class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm">
+                                <button @click="handleMoreOptions(post)"
+                                    class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm">
                                     <svg fill="none" width="22" viewBox="0 0 24 24" height="22">
                                         <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
                                             d="M2 12a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm16 0a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm-6-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z">
@@ -119,17 +119,24 @@
                             <!--end reactions btns-->
                         </div>
                         <div v-else>
-                            <PostLoader/>
+                            <PostLoader />
                         </div>
                     </div>
+                    <div class="mt-14 px-4 py-4" v-else>
+                        <div
+                            class="bg-light-card text-light-text-secondary dark:text-dark-text-light  rounded-lg font-semibold dark:bg-dark-card p-4">
+                            <h1>Postagem não encontrada</h1>
+                        </div>
+                    </div>
+                    <!--end post details-->
                 </template>
             </post-list>
+
+            <!--start create reply trigger-->
+            <create-reply-trigger :show="!hasError" :original-post="post" :post-module="postModule" />
+            <!--end create reply trigger-->
         </div>
         <!--end body post-->
-
-        <!--start create reply trigger-->
-        <create-reply-trigger :original-post="post" :post-module="postModule" />
-        <!--end create reply trigger-->
     </div>
 
 </template>
@@ -138,7 +145,7 @@
 import { computed, watch, onMounted, nextTick, ref } from 'vue';
 import { useStore } from 'vuex';
 import { usePost } from "@/hooks/posts";
-import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import formattedDate from "@/utils/formatted-date";
 import PostList from '../components/PostList.vue';
 import CreateReplyTrigger from '../components/CreateReplyTrigger.vue';
@@ -169,6 +176,7 @@ const user = computed(() => {
 })
 
 const postListComponent = ref(null);
+const hasError = ref(false)
 
 const setScrollPosition = async (position) => {
     await nextTick(); // Espera a atualização do DOM
@@ -194,9 +202,7 @@ const hasReposted = computed(() => post.value?.is_repost ? post.value?.original_
 const likesCount = computed(() => post.value?.is_repost ? post.value?.original_post.likes.length : post.value?.likes?.length || 0);
 const repliesCount = computed(() => post.value?.is_repost ? post.value?.original_post.replies.length : post.value?.replies?.length || 0);
 const repostsCount = computed(() => post.value?.is_repost ? post.value?.original_post.reposts.length : post.value?.reposts?.length || 0);
-const scrollOnTop = () => {
-    window.scrollTo(0, 0)
-}
+
 
 const resetReplies = () => {
     store.dispatch("resetReplies")
@@ -213,6 +219,18 @@ const _loadMoreReplies = async (newPage) => {
         totalItems: replies?.value?.pagination?.total,
         isLoad: true,
         limit: 10
+    })
+}
+
+const handleMoreOptions = (originalPost) => {
+    router.push({ query: { drawer_show: 'post_more_options' } })
+    store.dispatch("openDrawer", {
+        name: "post_more_options",
+        show: true,
+        data: {
+            originalPost,
+            postModule: postModule.value
+        }
     })
 }
 
@@ -264,17 +282,11 @@ const handleScroll = (value) => {
     }
 }
 
-onBeforeRouteLeave((to) => {
-    if (to.name !== 'Composer') {
-        //store.dispatch("resetReplies")
-        //store.dispatch("resetRepliesStore")
-    }
-})
-
 watch(() => route.params.id, async (newId, oldId) => {
     if (!newId || newId === oldId) return; // Evita chamadas se o ID for inválido ou repetido
 
     resetReplies()
+    hasError.value = false
 
     // Obtém o Original post armazenado localmente, se existir
     const originalPostStore = getStoreOriginalPost(newId) || null;
@@ -306,6 +318,8 @@ watch(() => route.params.id, async (newId, oldId) => {
                     page: 1,
                     limit: 10
                 })
+            }).catch(err => {
+                hasError.value = true
             })
         } else {
             if (post.value?._id !== route.params.id) {
@@ -315,6 +329,8 @@ watch(() => route.params.id, async (newId, oldId) => {
                         page: 1,
                         limit: 10
                     })
+                }).catch(err => {
+                    hasError.value = true
                 })
             } else {
                 await getReplies({
@@ -339,6 +355,8 @@ onMounted(async () => {
                 page: 1,
                 limit: 10
             })
+        }).catch(err => {
+            hasError.value = true
         })
     } else {
         loadingGetPostId.value = false

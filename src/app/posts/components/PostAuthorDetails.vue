@@ -11,7 +11,7 @@
           >
           {{ author?.name || 'Nome' }}
 
-          <div v-if="isViewPost" class="flex flex-initial"
+          <div v-if="isViewPost && author?.verified" class="flex flex-initial"
             style="padding-left: 4px; align-self: center; margin-top: -1px;">
             <svg fill="none" width="15" viewBox="0 0 24 24" height="15">
               <circle cx="12" cy="12" r="11.5" fill="hsl(211, 99%, 56%)"></circle>
@@ -22,7 +22,7 @@
           </div>
         </span>
 
-        <div v-if="!isViewPost" class="flex flex-initial"
+        <div v-if="!isViewPost && author?.verified" class="flex flex-initial"
           style="padding-left: 2px; align-self: center; margin-top: -1px;">
           <svg fill="none" width="14" viewBox="0 0 24 24" height="14">
             <circle cx="12" cy="12" r="11.5" fill="hsl(211, 99%, 56%)"></circle>

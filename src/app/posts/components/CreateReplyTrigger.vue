@@ -1,5 +1,5 @@
 <template>
-    <div class="fixed flex items-center w-full border-t border-light-border dark:border-dark-border p-2 px-2 bg-light-bg dark:bg-dark-bg bottom-[56px] h-14"
+    <div v-show="props.show" class="fixed flex items-center w-full border-t border-light-border dark:border-dark-border p-2 px-2 bg-light-bg dark:bg-dark-bg bottom-[56px] h-14"
         @click="goToReply(props.originalPost)">
         <div
             class="flex bg-light-card dark:bg-dark-card text-light-text-secondary dark:text-dark-text-light items-center py-2 px-2 rounded-3xl w-full">
@@ -23,6 +23,10 @@ const props = defineProps(({
     originalPost: {
         type: Object,
         required: true
+    },
+    show: {
+        type: Boolean,
+        default: false
     },
     postModule: {
         type: String,

@@ -2,9 +2,9 @@
     <div class="text-xs text-gray-500 mb-2">
         <div class="flex gap-1 items-center">
             <p>Em resposta a:</p>
-            <router-link v-if="props.author?._id !== user?._id" class="text-blue-400" :to="'/profile/' + props.author?._id">@{{ props.author?.username }}
+            <router-link v-if="props.author?._id !== user?._id" class="text-primary" :to="'/profile/' + props.author?._id">@{{ props.author?.username }}
             </router-link>
-            <span v-else>Voce</span>
+            <span v-else>você</span>
         </div>
     </div>
 </template>
