@@ -518,6 +518,23 @@ export function usePost() {
     }
   };
 
+  const deletePost = async ({ postId, postModule, isReply }) => {
+    try {
+      loading.value = true;
+      const response = await api.delete(`/posts/${postId}`);
+
+      if (!isReply) {
+        store.dispatch("deletePostFromPosts", { postId, postModule });
+      }
+      return response;
+    } catch (err) {
+      console.error("Erro ao repostar:", err.message);
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   // Retorna as funções e a variável reativa `loading` para serem usadas nos componentes Vue.
   return {
     loading,
@@ -528,6 +545,7 @@ export function usePost() {
     getProfilePosts,
     loadMoreProfilePosts,
     loadMoreReplies,
+    deletePost,
     loadMorePosts,
     getPosts,
     getPostById,

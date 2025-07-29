@@ -1,7 +1,6 @@
 <template>
     <div @click="goToDetails(post)" ref="postCardRef"
-        class="p-4 pb-2.5 mb-0.5 shrink-0 border-b border-light-border dark:border-dark-border"
-        :class="{ '!border-none': isLastPost }">
+        class="p-4 pb-2.5 mb-0.5 shrink-0 border-b border-light-border dark:border-dark-border">
         <!--start flags-->
         <!--start original repost author tag-->
         <tag-author-repost v-if="post?.is_repost" :author="post?.author" />
@@ -100,10 +99,11 @@ const repliesCount = computed(() => props.post?.is_repost ? props.post.original_
 
 const repostsCount = computed(() => props.post?.is_repost ? props.post.original_post.reposts.length : props.post?.reposts?.length || 0);
 
+/* 
 const isLastPost = computed(() => {
     // Supondo que você tenha acesso ao total de posts e ao índice atual
     return props.index === props.totalItems - 1 && props.totalItems  > 1; // ou outra lógica para determinar o último
-});
+});*/
 
 const goToDetails = (post) => {
     store.dispatch("setPost", post.is_repost ? {

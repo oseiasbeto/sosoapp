@@ -8,8 +8,6 @@ export default {
   },
 
   ADD_NEW_POST(state, { newPost, postModule }) {
-
-    console.log(postModule)
     const moduleIndex = state.posts.findIndex((m) => m.byId === postModule);
     if (moduleIndex === -1) return;
 
@@ -33,7 +31,6 @@ export default {
     if (index !== -1) {
       const _cachedPosts = state.posts[index];
 
-    
       // Filtra os novos posts para remover quaisquer que já existam no cache
       const uniqueNewPosts = posts.filter(
         (newPost) =>
@@ -1030,5 +1027,31 @@ export default {
 
   REPLACE_REPLIES_STORE(state, { originalPostId }) {
     console.log(originalPostId);
+  },
+  DELETE_POST_FROM_POSTS(state, { postId, postModule }) {
+    const module = state.posts.find((m) => m.byId === postModule);
+    if (!module) return;
+
+    // Encontra todos os posts para remover (original + reposts)
+    const postsToRemove = module.posts.filter(
+      (post) =>
+        post._id === postId ||
+        (post.is_repost && post.original_post?._id === postId)
+    );
+
+    if (postsToRemove.length === 0) return;
+
+    // Remove os posts e atualiza os totais de uma só vez
+    postsToRemove.forEach((post) => {
+      const index = module.posts.findIndex((p) => p._id === post._id);
+      if (index !== -1) {
+        module.posts.splice(index, 1);
+      }
+    });
+
+    // Atualiza os metadados do módulo uma única vez
+    module.pagination.total = Math.max(0, module.pagination.total - postsToRemove.length);
+    module.pagination.totalPages = Math.ceil(module.pagination.total / (module.pagination.limit || 10));
+    module.pagination.hasMore = module.pagination.page < module.pagination.totalPages;
   },
 };

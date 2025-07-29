@@ -26,33 +26,47 @@
                         <li>
                             <button class="p-1 w-max">Nao quero ver isto</button>
                         </li>
-                        <li v-if="isAuthor">
-                            <button @click="deletePost(originalPost._id)" class="p-1 w-max">Eliminar
+                        <li v-if="isAuthor && isAuthorFromOriginalPost">
+                            <button @click="showDeletePostDialog = true" class="p-1 w-max">Eliminar
                                 postagem</button>
                         </li>
                     </ul>
                 </div>
             </DialogPanel>
         </div>
+
+        <ModalDeletePost :show="showDeletePostDialog && isOpen" @on-change="confirmDeletePost" />
     </Dialog>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'; // Importa funções do Vue 3
+import { ref, watch, computed } from 'vue'; // Importa funções do Vue 3
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/vue'; // Importa componentes do Headless UI
 import { useRouter, useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import { usePost } from "@/hooks/posts";
-const { toggleRepost, loading } = usePost()
+import ModalDeletePost from '../modals/ModalDeletePost.vue';
+const { deletePost, loading: loadingDeletePost } = usePost()
 
 const store = useStore()
 const router = useRouter()
 const route = useRoute()
 
+const showDeletePostDialog = ref(false)
+
 const user = computed(() => store.getters.currentUser)
 const drawer = computed(() => store.getters.drawerContent)
 const originalPost = computed(() => drawer.value.data?.originalPost)
+const postModule = computed(() => drawer.value.data?.postModule)
 const isAuthor = computed(() => originalPost.value?.author?._id === user.value?._id)
+
+const isAuthorFromOriginalPost = computed(() => {
+    if (!originalPost.value?.is_repost) return true
+    else {
+        return originalPost.value?.original_post.author?._id === user.value?._id
+    }
+})
+
 const drawerName = 'post_more_options'
 
 const isOpen = computed(() => {
@@ -60,8 +74,25 @@ const isOpen = computed(() => {
     else return false
 });
 
-const deletePost = (postId) => {
-    console.log(postId)
+const emit = defineEmits(['onPostDeleted'])
+
+const handleDeletePost = async (postId) => {
+    await deletePost({
+        postId,
+        postModule: postModule?.value,
+        isReply: originalPost.value?.is_reply
+    }).then(() => {
+        closeDrawer()
+        emit('onPostDeleted')
+    })
+}
+
+const confirmDeletePost = (value) => {
+    if (value) {
+        handleDeletePost(originalPost?.value?.is_repost ? originalPost.value?.original_post?._id : originalPost?.value?._id)
+    } else {
+        showDeletePostDialog.value = false
+    }
 }
 
 // Fecha o modal
@@ -69,6 +100,12 @@ const closeDrawer = () => {
     router.back()
     store.dispatch("closeDrawer")
 };
+
+watch(() => isOpen.value, async (newValue, oldValue) => {
+    if (!newValue) {
+        showDeletePostDialog.value = false
+    }
+});
 
 </script>
 

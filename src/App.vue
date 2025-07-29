@@ -53,7 +53,7 @@ onMounted(async () => {
     isDark.value = false;
     document.documentElement.classList.remove('dark');
   }
-  if (sessionId) {
+  if (sessionId && !isAuthenticated.value) {
     await refreshToken(sessionId).then(() => {
       const socket = getSocket();
 

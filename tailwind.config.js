@@ -8,6 +8,7 @@ module.exports = {
   theme: {
     colors: {
       // Core 
+      'danger': '#f52958',
       'primary': 'rgb(32,139,254)',
       // Light Mode
       'light-bg': '#fff',

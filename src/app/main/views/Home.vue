@@ -2,14 +2,14 @@
     <div class="mb-14 overflow-hidden">
         <!--start post list-->
         <post-list :posts="homePosts?.posts || []" :is-replies="false" :loading="loadingPosts || loadingPostsGlobal"
-            :posts-module="activeTab" :b-space="64" :loading-load-more="loadingLoadMorePosts"
+            :posts-module="activeTab" :b-space="140" :loading-load-more="loadingLoadMorePosts"
             :pagination="homePosts?.pagination" @load-more="_loadMorePosts" ref="postListComponent"
             @on-scroll="handleScroll">
 
             <template #before-content>
                 <div class="h-[90px]">
-                    <div class="bg-light-bg z-[999] w-full fixed transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] top-0 dark:bg-dark-bg"
-                        :class="{ 'translate-y-[-92px]': hideHeader }">
+                    <div class="bg-light-bg z-[999] w-full fixed transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] top-0 opacity-100 dark:bg-dark-bg"
+                        :class="{ '-translate-y-full opacity-0': hideHeader }">
                         <div class="flex relative py-2 pt-3 px-4 justify-between items-center">
                             <div class="absolute">
                                 <Avatar :url="user?.profile_image?.low || undefined" size="sm" />

@@ -3,8 +3,9 @@
         <!--start posts-->
         <post-list :posts="profilePosts?.posts || []" :is-replies="false" ref="postListComponent"
             @on-scroll="handleScroll" :loading="loadingPosts" :posts-module="`profile_${activeTab}_${profile?._id}`"
-            :show-list="!loadingGetById" :b-space="64" :loading-load-more="loadingLoadMore"
-            :pagination="profilePosts?.pagination" @load-more="handleLoadingMorePosts">
+            :show-list="!loadingGetById" :b-space="profile?._id && user?._id && profile._id === user._id ? 140 : 54"
+            :loading-load-more="loadingLoadMore" :pagination="profilePosts?.pagination"
+            @load-more="handleLoadingMorePosts">
 
             <template #before-content>
                 <!--start navbar-->
@@ -189,10 +190,6 @@ const tabs = ref([
     { label: "Curtidas", value: 'liked' }
 ])
 
-const tabIndices = ref({
-    feed: null
-})
-
 const postListComponent = ref(null)
 const tabsComponent = ref(null)
 const lastProfileId = ref(null)
@@ -213,8 +210,7 @@ const profileId = computed(() => {
 const profilePosts = computed(() => {
     if (!profileId.value) return null;
 
-    const index = tabIndices.value[activeTab.value];
-    return index !== undefined ? posts.value[index] : null;
+    return posts.value.find(p => p.byId === `profile_${activeTab.value}_${profileId.value}`) || null;
 });
 
 // Verifica se o usuário atual segue o perfil
@@ -277,16 +273,6 @@ const goToPost = (postModule) => {
     })
 }
 
-// Função para atualizar os índices
-const updateTabIndices = () => {
-    if (!profileId.value) return;
-
-    tabs.value.forEach(tab => {
-        const tabId = `profile_${tab.value}_${profileId.value}`;
-        const index = posts.value.findIndex(p => p.byId === tabId);
-        tabIndices.value[tab.value] = index !== -1 ? index : null;
-    });
-};
 
 const handleScroll = (value) => {
     if (posts?.value?.length) {
@@ -305,6 +291,11 @@ const handleScroll = (value) => {
 watch(() => route.params.user_id, async (newId, oldId) => {
     if (!newId || newId === oldId) return;
 
+    if (oldId && newId !== oldId) {
+        await nextTick()
+        tabsComponent?.value?.setTab(0, 'feed')
+        setScrollPosition(0);
+    }
     try {
         // Check for cached profile
         const cachedProfile = profiles.value.find(p => p._id === newId) || null;
@@ -331,7 +322,6 @@ watch(() => route.params.user_id, async (newId, oldId) => {
                 limit: 10,
                 tab: activeTab.value
             })
-            updateTabIndices();
         }
     } catch (error) {
         console.error('Error loading profile data:', error);
@@ -364,13 +354,11 @@ watch(() => activeTab.value, async (newTab, oldTab) => {
             limit: 10,
             tab: newTab
         }).then(async () => {
-            updateTabIndices();
             await nextTick()
             setScrollPosition(0);
         })
     } else {
         const scrollTop = profilePosts?.value?.scroll_top || 0
-
         await nextTick()
         setScrollPosition(scrollTop)
     }
@@ -378,11 +366,19 @@ watch(() => activeTab.value, async (newTab, oldTab) => {
 
 
 onMounted(async () => {
-    if (route.name !== 'My profile') {
-        if (!profile.value?._id || profile.value?._id !== userId.value) {
-            const cachedProfile = profiles.value.find(p => p._id === route.params.user_id) || null;
+    if (!profile.value?._id || profile.value?._id !== userId.value) {
+        const cachedProfile = profiles.value.find(p => p._id === route.params.user_id) || null;
 
-            if (!cachedProfile) {
+        if (!cachedProfile) {
+            if (user?.value?._id) {
+                store.dispatch('setProfile', user.value)
+                await getProfilePosts({
+                    page: 1,
+                    userId: user.value?._id,
+                    limit: 10,
+                    tab: 'feed'
+                })
+            } else {
                 await getUserById(userId.value).then(async () => {
                     loadingPosts.value = true
                     lastProfileId.value = profile?.value?._id
@@ -396,59 +392,44 @@ onMounted(async () => {
                             limit: 10,
                             tab: 'feed'
                         })
-                        updateTabIndices();
+
                     } else {
                         loadingPosts.value = false
                     }
                 });
-            } else {
-                store.dispatch('setProfile', cachedProfile)
-
-                if (cachedProfile?._id) {
-                    lastProfileId.value = cachedProfile?._id
-                    const cachedPosts = profilePosts.value;
-
-                    if (!cachedPosts) {
-                        await getProfilePosts({
-                            page: 1,
-                            userId: cachedProfile?._id,
-                            limit: 10,
-                            tab: 'feed'
-                        })
-                        updateTabIndices();
-                    }
-                }
-
             }
         } else {
-            loadingGetById.value = false
+            store.dispatch('setProfile', cachedProfile)
 
-            lastProfileId.value = profile?.value?._id
-            const cachedPosts = profilePosts.value
+            if (cachedProfile?._id) {
+                lastProfileId.value = cachedProfile?._id
+                const cachedPosts = profilePosts.value;
 
-            if (!cachedPosts) {
-                await getProfilePosts({
-                    page: 1,
-                    userId: profile?.value?._id,
-                    limit: 10,
-                    tab: 'feed'
-                })
-                updateTabIndices();
+                if (!cachedPosts) {
+                    await getProfilePosts({
+                        page: 1,
+                        userId: cachedProfile?._id,
+                        limit: 10,
+                        tab: 'feed'
+                    })
+
+                }
             }
+
         }
     } else {
         loadingGetById.value = false
-        store.dispatch("setProfile", user?.value)
+
+        lastProfileId.value = profile?.value?._id
         const cachedPosts = profilePosts.value
 
         if (!cachedPosts) {
             await getProfilePosts({
                 page: 1,
-                userId: user?.value?._id,
+                userId: profile?.value?._id,
                 limit: 10,
                 tab: 'feed'
             })
-            updateTabIndices();
         }
     }
 });

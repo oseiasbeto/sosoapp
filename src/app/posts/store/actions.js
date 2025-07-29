@@ -67,5 +67,8 @@ export default {
     },
     replaceRepliesStore({ commit }, { originalPostId }) {
         commit('REPLACE_REPLIES_STORE', { originalPostId });
+    },
+    deletePostFromPosts({ commit }, { postId, postModule }) {
+        commit('DELETE_POST_FROM_POSTS', { postId, postModule });
     }
 };
