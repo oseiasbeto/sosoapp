@@ -8,9 +8,8 @@
 
             <template #before-content>
                 <div class="h-[90px]">
-                    <div class="bg-light-bg z-[999] w-full fixed transition-transform top-0 dark:bg-dark-bg"
-                    :class="{'translate-y-[-92px]': hideHeader}"
-                    >
+                    <div class="bg-light-bg z-[999] w-full fixed transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] top-0 dark:bg-dark-bg"
+                        :class="{ 'translate-y-[-92px]': hideHeader }">
                         <div class="flex relative py-2 pt-3 px-4 justify-between items-center">
                             <div class="absolute">
                                 <Avatar :url="user?.profile_image?.low || undefined" size="sm" />
@@ -96,6 +95,9 @@ const homePosts = computed(() => {
 const tabsComponent = ref(null)
 const postListComponent = ref(null)
 const loadingPostsGlobal = ref(true)
+const isTabSwitching = ref(false);
+const SCROLL_THRESHOLD = ref(150)
+const lastScrollPosition = ref(0)
 
 const updateTabIndices = () => {
     tabIndices.value.feed = store.getters.posts.findIndex(p => p.byId === 'feed')
@@ -140,12 +142,25 @@ const goToPost = (postModule) => {
 }
 
 const handleScroll = (value) => {
+    // Ignora o scroll durante troca de aba
+    if (isTabSwitching.value) return;
 
-    if(value > 130) {
-        hideHeader.value = true
-    } else {
-        hideHeader.value = false
+    // Detecta a direção do scroll
+    const isScrollingDown = value > lastScrollPosition.value;
+
+    // Se estiver no topo, sempre mostra o header
+    if (value <= SCROLL_THRESHOLD.value) {
+        hideHeader.value = false;
     }
+    // Se estiver rolando para baixo, esconde o header
+    else if (isScrollingDown) {
+        hideHeader.value = true;
+    }
+    // Se estiver rolando para cima, mostra o header
+    else {
+        hideHeader.value = false;
+    }
+    lastScrollPosition.value = value;
 
     if (posts?.value?.length) {
         const byId = activeTab.value
@@ -159,6 +174,8 @@ const handleScroll = (value) => {
 watch(() => activeTab.value, async (newTab, oldTab) => {
     if (newTab === oldTab || loadingPostsGlobal.value) return;
 
+    isTabSwitching.value = true; // Bloqueia a lógica de scroll durante a troca
+
     const cachedPosts = posts.value.find(p => p.byId === newTab);
     if (cachedPosts) {
         // Dados já em cache, apenas ajusta o scroll
@@ -169,6 +186,10 @@ watch(() => activeTab.value, async (newTab, oldTab) => {
         await getPosts({ page: 1, limit: 10, tab: newTab });
         setScrollPosition(0); // Reseta o scroll
     }
+    // Restaura a lógica de scroll após um pequeno delay
+    setTimeout(() => {
+        isTabSwitching.value = false;
+    }, 100);
 });
 
 
