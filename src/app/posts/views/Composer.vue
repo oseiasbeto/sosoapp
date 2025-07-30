@@ -1,44 +1,84 @@
 <template>
-    <!--start header-->
-    <div class="flex items-center justify-between">
-        <div>
-            <button @click="router.back()">Voltar</button>
-        </div>
-        <div>
-            <button @click="handleSubmit" :disabled="!canPost">
-                {{ loadingCreatePost ? 'Postando...' : 'Postar' }}
+    <div class="relative w-screen overflow-y-auto box-border flex flex-col"
+        :style="{ height: `calc(${viewportHeight}px - 50px)` }">
+        <!--start header-->
+        <div class="flex fixed top-0 w-full z-[100] h-14 p-2 bg-light-bg dark:bg-dark-bg items-center justify-between">
+            <button
+                class="py-1.5 px-2.5 text-sm hover:bg-primary/30 text-light-link dark:text-dark-link rounded-full font-semibold flex items-center"
+                @click="router.back()">Cancelar</button>
+            <button
+                class="py-1.5 px-3 text-sm rounded-full text-light-bg disabled:text-light-bg/80 disabled:opacity-80 disabled:pointer-events-none font-semibold bg-primary"
+                @click="handleSubmit" :disabled="!canPost">
+                {{ loadingCreatePost ? `${replyTo ? 'Respondendo...' : 'Postando'}` : `${replyTo ? 'Responder' :
+                    'Postar'}` }}
             </button>
         </div>
+        <!--end header-->
+
+        <!--start body-->
+        <div class="flex-1 max-h-full justify-between flex-col mt-14 overflow-y-auto"
+            :style="{ transform: contentTransform }">
+
+            {{ viewportHeight }}
+            {{ isKeyboardOpen }}
+            <div class="mb-4">
+                <label for="quillText">
+                    <!--start reply to-->
+                    <reply-to-original-post
+                        :original-post="originalPost.is_repost ? originalPost.original_post : originalPost"
+                        v-if="!loadingGetPostById && replyTo && originalPost?._id" />
+                    <!--end reply to-->
+
+                    <div class="px-4 flex flex-row">
+                        <div>
+                            <Avatar :url="user?.profile_image?.low" />
+                        </div>
+                        <div class="flex-1">
+                            <textarea id="quillText" maxlength="280" v-model="postContent" ref="textAreaRef"
+                                :placeholder="replyTo ? 'Escrever a resposta...' : 'Mekie?'"
+                                class="w-full placeholder:text-light-text-secondary placeholder:dark:text-dark-text-light text-base ml-2 p-1.5 bg-light-bg dark:bg-dark-bg leading-5 min-h-[140px] text-light-text-primary dark:text-dark-text-primary resize-none outline-none text-white placeholder-gray-500 mb-3"
+                                @input="adjustTextareaHeight">
+                            </textarea>
+                        </div>
+                    </div>
+                </label>
+            </div>
+
+
+        </div>
+        <!--end body-->
+
+        <!--start footer-->
+        <div class="border-t fixed bottom-0 w-full border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg p-2"
+            :style="{ transform: footerTransform }">
+            <!-- Adicione aqui os controles do footer (emoji, mídia, etc) -->
+            <div class="flex items-center justify-between">
+                <!-- Exemplo de controles -->
+                <button class="p-2 text-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div class="text-xs text-light-text-secondary dark:text-dark-text-light">
+                    {{ remainingChars }}
+                </div>
+            </div>
+        </div>
+        <!--end footer-->
     </div>
-    <!--end header-->
-
-
-    <!--start body-->
-    <label for="quillText">
-        <!--start reply to-->
-        <reply-to-original-post :original-post="originalPost.is_repost ? originalPost.original_post : originalPost"
-            v-if="!loadingGetPostById && replyTo && originalPost?._id" />
-        <!--end reply to-->
-
-        <textarea id="quillText" maxlength="280" v-model="postContent" ref="textAreaRef"
-            :placeholder="replyTo ? 'Escrever a resposta...' : 'O que está acontecendo?'"
-            class="w-full bg-transparent resize-none outline-none text-white placeholder-gray-500 mb-3"
-            @input="adjustTextareaHeight">
-        </textarea>
-    </label>
-    <!--end body-->
-
-    <!--start footer-->
-    <!--end footer-->
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
 import { usePost } from "@/hooks/posts";
 import { useStore } from 'vuex';
 import ReplyToOriginalPost from '../components/ReplyToOriginalPost.vue';
+import { useWindowScroll } from '@vueuse/core'
+import Avatar from '@/components/utilities/Avatar.vue';
 
 const { createPost, loading: loadingCreatePost } = usePost();
 const { getPostById, loading: loadingGetPostById } = usePost();
@@ -47,9 +87,6 @@ const router = useRouter()
 const route = useRoute()
 const store = useStore()
 
-const isPrivacyDialogOpen = ref(false)
-const postPrivacy = ref('public')
-const allowComments = ref(true)
 const textAreaRef = ref(null);
 const postContent = ref('');
 const mediaPreviews = ref([]);
@@ -57,6 +94,9 @@ const uploadProgress = ref({});
 const privacy = ref("public");
 const cancelTokens = ref({});
 const error = ref(null);
+
+const isKeyboardOpen = ref(false)
+const viewportHeight = ref(window.visualViewport.height)
 
 // Constants
 const MAX_CHARS = 280;
@@ -70,7 +110,6 @@ const replyTo = computed(() => route.query.replyto || null);
 const postModule = computed(() => route.query.post_module || null);
 const originalRepost = computed(() => route.query.original_repost || null);
 const originalRepostId = computed(() => route.query.original_repost_id || null);
-//const isRepost = computed(() => route.query.is_repost || null);
 const shouldAddReply = computed(() => route.query.should_add_reply_from_replies || false);
 const addReplyFrom = computed(() => route.query.add_reply_from || null);
 const canPost = computed(() => {
@@ -84,6 +123,31 @@ const originalPost = computed(() => {
     return store.getters.originalPost
 })
 
+
+// Ajuste de posicionamento
+const { y: scrollY } = useWindowScroll()
+
+
+const contentTransform = computed(() =>
+    isKeyboardOpen.value ? `translateY(-${scrollY.value}px)` : ''
+)
+
+const footerTransform = computed(() =>
+    isKeyboardOpen.value ? `translateY(-${window.innerHeight - visualViewport.height}px)` : ''
+)
+
+// Detecta teclado
+const handleViewportResize = () => {
+    viewportHeight.value = window.visualViewport.height
+    isKeyboardOpen.value = (window.visualViewport.height < window.innerHeight * 0.8)
+
+    if (isKeyboardOpen.value && textAreaRef.value) {
+        setTimeout(() => {
+            textAreaRef.value.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }, 300)
+    }
+}
+
 const resetForm = () => {
     postContent.value = '';
     mediaPreviews.value = [];
@@ -93,13 +157,6 @@ const resetForm = () => {
     error.value = null
 };
 
-
-const handleSave = (settings) => {
-    postPrivacy.value = settings.privacy
-    allowComments.value = settings.allowComments
-    isPrivacyDialogOpen.value = false
-    // Aqui você pode adicionar lógica para salvar no backend
-}
 
 const handleVideoUpload = (e) => {
     const file = e.target.files?.[0];
@@ -250,6 +307,15 @@ const adjustTextareaHeight = () => {
     if (textAreaRef.value) {
         textAreaRef.value.style.height = 'auto';
         textAreaRef.value.style.height = `${textAreaRef.value.scrollHeight}px`;
+
+        // Rolagem automática para o cursor
+        nextTick(() => {
+            textAreaRef.value.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'nearest'
+            });
+        });
     }
 };
 
@@ -287,7 +353,6 @@ const handleSubmit = async () => {
     };
 
     if (postData.content || postData.media.length > 0) {
-        
         try {
             await createPost(postData)
             resetForm();
@@ -301,10 +366,19 @@ const handleSubmit = async () => {
 }
 
 onMounted(async () => {
+    window.visualViewport.addEventListener('resize', handleViewportResize)
     textAreaRef.value.focus()
 
     if (!originalPost.value?._id && route?.query?.replyto) {
         await getPostById(route?.query?.replyto)
     }
+
+    // Ajusta a altura inicial do textarea
+    adjustTextareaHeight();
 })
+
+onUnmounted(() => {
+    window.visualViewport.removeEventListener('resize', handleViewportResize)
+})
+
 </script>

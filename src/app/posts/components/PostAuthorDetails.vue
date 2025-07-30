@@ -50,7 +50,6 @@
 import formattedTime from '@/utils/formatted-time';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
-import { computed } from 'vue';
 
 const props = defineProps({
   author: {

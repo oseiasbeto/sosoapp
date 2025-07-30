@@ -9,7 +9,7 @@
 
                 <template #before-content>
                     <!--start header post-->
-                    <Navbar :title="post?.is_reply ? 'Resposta' : 'Postagem'" />
+                    <Navbar :title="hasError ? 'Erro' : post?.is_reply ? 'Resposta' : 'Postagem'" />
                     <!--end header post-->
 
                     <!--start post details-->
@@ -70,7 +70,7 @@
                                         </path>
                                     </svg>
                                     <span v-show="repliesCount > 0" class="text-inherit text-[15px]">{{ repliesCount
-                                    }}</span>
+                                        }}</span>
                                 </button>
                                 <button class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm"
                                     :class="{ '!text-[#13c371] dark:!text-reposted': hasReposted }"
@@ -81,7 +81,7 @@
                                         </path>
                                     </svg>
                                     <span v-show="repostsCount > 0" class="text-inherit text-[15px]">{{ repostsCount
-                                    }}</span>
+                                        }}</span>
                                 </button>
                                 <button class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm"
                                     :class="{ '!text-liked': hasLiked }" :disabled="loadingToggleLike"
@@ -98,7 +98,7 @@
                                         </path>
                                     </svg>
                                     <span v-show="likesCount > 0" class="text-inherit text-[15px]">{{ likesCount
-                                    }}</span>
+                                        }}</span>
                                 </button>
                                 <button class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm">
                                     <svg fill="none" width="22" viewBox="0 0 24 24" height="22">
@@ -317,6 +317,8 @@ watch(() => route.params.id, async (newId, oldId) => {
                     original_post: post.value,
                     page: 1,
                     limit: 10
+                }).catch(err => {
+                    hasError.value = true
                 })
             }).catch(err => {
                 hasError.value = true
@@ -375,6 +377,8 @@ onMounted(async () => {
                 page: 1,
                 limit: 10,
                 rafs: true
+            }).catch(err => {
+                hasError.value = true
             })
         } else {
             store.dispatch("setReplies", {
