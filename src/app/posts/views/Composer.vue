@@ -18,9 +18,6 @@
         <!--start body-->
         <div class="flex-1 max-h-full justify-between flex-col mt-14 overflow-y-auto"
             :style="{ transform: contentTransform }">
-
-            {{ viewportHeight }}
-            {{ isKeyboardOpen }}
             <div class="mb-4">
                 <label for="quillText">
                     <!--start reply to-->
@@ -43,8 +40,6 @@
                     </div>
                 </label>
             </div>
-
-
         </div>
         <!--end body-->
 
@@ -54,16 +49,44 @@
             <!-- Adicione aqui os controles do footer (emoji, mídia, etc) -->
             <div class="flex items-center justify-between">
                 <!-- Exemplo de controles -->
-                <button class="p-2 text-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z"
-                            clip-rule="evenodd" />
-                    </svg>
-                </button>
-                <div class="text-xs text-light-text-secondary dark:text-dark-text-light">
-                    {{ remainingChars }}
+                <div class="flex items-center">
+                    <button
+                        class="flex hover:bg-primary/25 items-center justify-center w-[39px] h-[39px] rounded-full text-primary">
+                        <svg fill="none" viewBox="0 0 24 24" width="24" height="24">
+                            <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
+                                d="M3 4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4Zm2 1v7.213l1.246-.932.044-.03a3 3 0 0 1 3.863.454c1.468 1.58 2.941 2.749 4.847 2.749 1.703 0 2.855-.555 4-1.618V5H5Zm14 10.357c-1.112.697-2.386 1.097-4 1.097-2.81 0-4.796-1.755-6.313-3.388a1 1 0 0 0-1.269-.164L5 14.712V19h14v-3.643ZM15 8a1 1 0 1 0 0 2 1 1 0 0 0 0-2Zm-3 1a3 3 0 1 1 6 0 3 3 0 0 1-6 0Z">
+                            </path>
+                        </svg>
+                    </button>
+
+                    <button
+                        class="flex hover:bg-primary/25 items-center justify-center w-[39px] h-[39px] rounded-full text-primary">
+                        <svg fill="none" viewBox="0 0 24 24" width="24" height="24">
+                            <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
+                                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1V4Zm2 1v2h2V5H5Zm4 0v6h6V5H9Zm8 0v2h2V5h-2Zm2 4h-2v2h2V9Zm0 4h-2v2h2V13Zm0 4h-2V19h2ZM15 19v-6H9v6h6Zm-8 0v-2H5v2h2Zm-2-4h2v-2H5v2Zm0-4h2V9H5v2Z">
+                            </path>
+                        </svg>
+                    </button>
                 </div>
+
+                <div class="flex items-center gap-3">
+                    <p class="text-sm font-normal text-light-text-primary dark:text-dark-text-primary">
+                        {{ remainingChars }}
+                    </p>
+
+                    <svg width="30" height="30" fill="none">
+                        <!-- Círculo de fundo -->
+                        <path d="M15 0.5
+           a14.5 14.5 0 0 1 0 29
+           a14.5 14.5 0 0 1 0 -29" stroke-linecap="butt" stroke-width="1" class="text-[hsl(211,20%,85.89999999999999%)] dark:text-[hsl(211,28%,25.2%)]" stroke="currentColor" />
+                        <!-- Círculo de progresso -->
+                        <path :stroke-dasharray="dashArray" d="M15 2.5
+           a12.5 12.5 0 0 1 0 25
+           a12.5 12.5 0 0 1 0 -25" stroke-linecap="butt" stroke-width="3" stroke="hsl(211, 99%, 56%)" />
+                    </svg>
+                </div>
+
+
             </div>
         </div>
         <!--end footer-->
@@ -119,6 +142,20 @@ const canPost = computed(() => {
     ) && remainingChars.value >= 0;
 });
 const user = computed(() => store.getters.currentUser)
+
+// Calcula a porcentagem de progresso (inverso, pois o círculo preenche quando remainingChars diminui)
+const progressChars = computed(() => {
+    const percentage = ((MAX_CHARS - remainingChars.value) / MAX_CHARS) * 100;
+    return Math.min(Math.max(percentage, 0), 100); // Limita entre 0 e 100
+});
+
+// Calcula o stroke-dasharray para o círculo de progresso
+const dashArray = computed(() => {
+    const circumference = 2 * Math.PI * 12.5; // Circunferência do círculo de raio 12.5
+    const dash = (progressChars.value / 100) * circumference;
+    return `${dash} ${circumference - dash}`;
+});
+
 const originalPost = computed(() => {
     return store.getters.originalPost
 })
@@ -143,7 +180,7 @@ const handleViewportResize = () => {
 
     if (isKeyboardOpen.value && textAreaRef.value) {
         setTimeout(() => {
-            textAreaRef.value.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            textAreaRef?.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
         }, 300)
     }
 }
@@ -308,13 +345,8 @@ const adjustTextareaHeight = () => {
         textAreaRef.value.style.height = 'auto';
         textAreaRef.value.style.height = `${textAreaRef.value.scrollHeight}px`;
 
-        // Rolagem automática para o cursor
         nextTick(() => {
-            textAreaRef.value.scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest',
-                inline: 'nearest'
-            });
+            textAreaRef?.value?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         });
     }
 };
