@@ -6,8 +6,8 @@
         <tag-author-repost v-if="post?.is_repost" :author="post?.author" />
         <!--end original repost author tag-->
         <!--end flags-->
-        {{ props.totalItems }}
-        {{ props?.index }}
+        <!--<p>{{ props.totalItems }}{{ props?.index }}</p>-->
+    
         <div class="flex">
             <div id="left-part" class="pl-1 pr-3">
                 <avatar
@@ -32,19 +32,19 @@
                         <post-text :text="post.is_repost ? post?.original_post?.content : post?.content" />
                     </div>
                     <!--end content post-->
+
+                    <!--start media-->
+                    <PostCardMedia :media="post?.media" />
+                    <!--end media-->
                 </div>
                 <!--end body post-->
 
                 <!--start footer post-->
-                <post-reactions 
-                    :likes-count="likesCount" 
-                    :replies-count="repliesCount" :reposts-count="repostsCount"
+                <post-reactions :likes-count="likesCount" :replies-count="repliesCount" :reposts-count="repostsCount"
                     @like-post="handleLike(post?.is_repost ? post.original_post._id : post._id, post._id, post?.is_repost)"
                     :loading-toggle-like="loadingToggleLike" @reply-post="goToReply(post, post?.is_repost)"
                     @repost="handleRepost(post?.is_repost ? post.original_post : post, post?.is_repost)"
-                    @open-more="handleMoreOptions(post)" 
-                    :has-liked="hasLiked" 
-                    :has-reposted="hasReposted" />
+                    @open-more="handleMoreOptions(post)" :has-liked="hasLiked" :has-reposted="hasReposted" />
                 <!--end footer post-->
             </div>
         </div>
@@ -62,6 +62,7 @@ import AuthorPostDetails from './PostAuthorDetails.vue';
 import PostText from './PostText.vue';
 import PostReactions from './PostReactions.vue';
 import Avatar from '@/components/utilities/Avatar.vue';
+import PostCardMedia from '../../media/components/PostCardMedia.vue';
 
 const router = useRouter()
 const route = useRoute()

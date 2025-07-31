@@ -14,7 +14,7 @@ module.exports = {
       'light-bg': '#fff',
       'light-card': '#f1f3f5',
       'light-border': '#d4dbe2',
-      'light-link': '#4ca2fe',
+      'light-link': 'rgb(32,139,254)',
       'light-text-primary': '#0b0f14',
       'light-text-secondary': '#42576c',
       'light-accent': '#1D6FF9',

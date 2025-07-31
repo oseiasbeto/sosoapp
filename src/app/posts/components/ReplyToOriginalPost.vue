@@ -7,7 +7,7 @@
 
         <div class="w-full ml-3 mr-2 min-w-0 flex-1 flex-shrink-0">
             <!--start header-->
-            <div class="flex flex-1  gap-0.5 items-baseline min-w-0 max-w-full overflow-hidden">
+            <div class="flex flex-1 gap-0.5 items-baseline min-w-0 max-w-full overflow-hidden">
                 <div class="min-w-0 overflow-hidden">
                     <p
                         class="text-light-text-primary flex-1 mb-0.5 truncate text-ellipsis font-semibold dark:text-dark-text-primary">

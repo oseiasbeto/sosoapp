@@ -11,25 +11,8 @@
                     <div class="bg-light-bg z-[999] w-full fixed transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] top-0 opacity-100 dark:bg-dark-bg"
                         :class="{ '-translate-y-full opacity-0': hideHeader }">
                         <div class="flex relative py-2 pt-3 px-4 justify-between items-center">
-                            <div class="absolute">
-                                <Avatar :url="user?.profile_image?.low || undefined" size="sm" />
-                            </div>
-
                             <div @click="handleHideHeader()" class="mx-auto">
                                 <Logo />
-                            </div>
-
-                            <div class="absolute right-4">
-                                <button
-                                    class="flex items-center justify-center rounded-full active:bg-light-card active:dark:bg-dark-card w-[34px] h-[34px] text-light-text-secondary dark:text-dark-text-light">
-
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round">
-                                        <path
-                                            d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z" />
-                                    </svg>
-                                </button>
                             </div>
                         </div>
                         <Tabs ref="tabsComponent" v-model="activeTab" :tabs="tabs" />

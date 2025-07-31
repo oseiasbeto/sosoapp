@@ -48,6 +48,8 @@ export default {
 
   ADD_POST_FROM_MODULES(state, { postModule }) {
     const posts = state.posts;
+
+    if (!posts) return;
     posts.push(postModule);
   },
 
@@ -290,6 +292,7 @@ export default {
       item.scroll_top = value;
     }
   },
+
   SET_SCROLLTOP_FROM_POSTS(state, { byId, value }) {
     if (!state.posts) return;
 
@@ -1049,15 +1052,14 @@ export default {
       }
     });
 
-
     if (isViewPage) {
       const index = state.repliesStore.findIndex(
         (p) => p?.original_post?._id === postId
       );
-      
+
       if (index !== -1) {
         state.repliesStore.splice(index, 1);
-        state.post = {}
+        state.post = {};
       }
     }
 
