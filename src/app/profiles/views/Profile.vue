@@ -41,11 +41,11 @@
                                 </button>
                                 <button :disabled="loadingFollowUser"
                                     @click="handleFollowUser(userId, isFollowedBy && !isFollowing)"
-                                    class="flex text-sm border bg-primary text-[#fff] border-primary font-semibold gap-2 justify-center items-center bg-light-dark rounded-full h-[34px] px-4"
-                                    :class="{ 'border-transparent !text-primary bg-primary/10': isFollowing }">
+                                    class="flex text-sm bg-primary text-[#fff] font-semibold gap-2 justify-center items-center bg-light-dark rounded-full h-[34px] px-4"
+                                    :class="{ 'border-transparent !text-light-text-secondary dark:!text-dark-text-light !bg-light-card dark:bg-dark-card': isFollowing }">
                                     <p>
                                         <span v-if="isFollowing && isFollowedBy">Deixar de seguir</span>
-                                        <span v-else-if="isFollowing">Deixar de seguir</span>
+                                        <span v-else-if="isFollowing">Seguindo</span>
                                         <span v-else-if="isFollowedBy">Seguir de volta</span>
                                         <span v-else>+ Seguir</span>
                                     </p>

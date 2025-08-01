@@ -51,7 +51,6 @@ export default {
       if (isFollowing) {
         if (!state.user.following.includes(profileId)) {
           state.user.following.push(profileId);
-          console.log(user.following);
         }
       } else {
         state.user.following = state.user.following.filter(
