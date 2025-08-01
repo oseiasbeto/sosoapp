@@ -94,7 +94,8 @@ const loadHls = () => {
       autoStartLoad: false,
       startLevel: -1,
       maxBufferLength: 5,
-      maxMaxBufferLength: 10,
+      maxMaxBufferLength: 60,
+      maxBufferSize: 30 * 1000 * 1000, // 30MB
       lowLatencyMode: true,
       enableWorker: true,
       backBufferLength: 0,
@@ -301,6 +302,7 @@ const seekVideo = async (event) => {
   resetControlsTimeout();
 };
 
+let animationFrameId = null;
 // Atualizar progresso com requestAnimationFrame
 const updateProgress = () => {
   const video = videoRef.value;
@@ -309,7 +311,7 @@ const updateProgress = () => {
     progress.value = Math.min((video.currentTime / video.duration) * 100, 100);
   }
   if (isPlaying.value && !isDragging.value) {
-    requestAnimationFrame(updateProgress);
+    animationFrameId = requestAnimationFrame(updateProgress);
   }
 };
 
@@ -373,5 +375,6 @@ onUnmounted(() => {
     videoRef.value.load();
   }
   clearTimeout(window.controlsTimeout);
+  cancelAnimationFrame(animationFrameId);
 });
 </script>
