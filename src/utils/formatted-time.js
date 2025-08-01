@@ -9,7 +9,7 @@ const formattedTime = (time) => {
     const diffHours = Math.floor(diffMinutes / 60);
     const diffDays = Math.floor(diffHours / 24);
 
-    if (diffSeconds < 60) return `${diffSeconds}s`;
+    if (diffSeconds < 60) return 'agora';
     if (diffMinutes < 60) return `${diffMinutes}m`;
     if (diffHours < 24) return `${diffHours}h`;
     if (diffDays < 7) return `${diffDays}d`;

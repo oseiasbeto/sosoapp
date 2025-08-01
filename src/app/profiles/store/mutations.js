@@ -4,7 +4,7 @@ export default {
   },
 
   CLEAR_USER(state) {
-    state.user = null
+    state.user = null;
   },
 
   SET_PROFILE(state, profile) {
@@ -51,22 +51,26 @@ export default {
       if (isFollowing) {
         if (!state.user.following.includes(profileId)) {
           state.user.following.push(profileId);
+          state.user.following_count = state.user.following_count + 1;
         }
       } else {
         state.user.following = state.user.following.filter(
           (id) => id !== profileId
         );
+        state.user.following_count = state.user.following_count - 1;
       }
 
       // Atualiza followers do usuário, se necessário
       if (isFollowedBy) {
         if (!state.user.followers.includes(profileId)) {
           state.user.followers.push(profileId);
+          state.user.followers_count = state.user.followers_count + 1;
         }
       } else {
         state.user.followers = state.user.followers.filter(
           (id) => id !== profileId
         );
+        state.user.followers_count = state.user.followers_count - 1;
       }
 
       // Atualiza followers do perfil
@@ -74,11 +78,15 @@ export default {
         if (isFollowing) {
           if (!state.profile.followers.includes(userId)) {
             state.profile.followers.push(userId);
+            state.profile.followers_count = state.profile.followers_count + 1;
           }
         } else {
-          state.profile.followers = state.profile.followers.filter(
-            (id) => id !== userId
-          );
+          if (state?.profile?.followers?.length) {
+            state.profile.followers = state.profile.followers.filter(
+              (id) => id !== userId
+            );
+            state.profile.followers_count = state.profile.followers_count - 1;
+          }
         }
       }
     }

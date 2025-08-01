@@ -91,21 +91,23 @@
                         </div>
 
                         <div class="flex items-center gap-2">
-                            <router-link class="flex flex-wrap text-base hover:underline leading-3" to="#">
+                            <div class="flex flex-wrap text-base leading-3" to="#">
                                 <span
-                                    class="flex items-center text-[15px] font-medium text-light-text-primary dark:text-dark-text-primary mr-1">{{
-                                        130 }}</span>
+                                    class="flex items-center text-[15px] font-medium text-light-text-primary dark:text-dark-text-primary mr-1">
+                                    {{ formattedCount(followersCount) }}
+                                </span>
                                 <span class="text-light-text-secondary dark:text-dark-text-light text-sm mt-[0.75px]">{{
-                                    2 == 1 ?
+                                    followersCount == 1 ?
                                         'Seguidor' : 'seguidores' }}</span>
-                            </router-link>
-                            <router-link class="flex flex-wrap text-base hover:underline leading-3" to="#">
+                            </div>
+                            <div class="flex flex-wrap text-base leading-3" to="#">
                                 <span
-                                    class="flex items-center text-[15px] font-medium text-light-text-primary dark:text-dark-text-primary mr-1">{{
-                                        50 }}</span>
+                                    class="flex items-center text-[15px] font-medium text-light-text-primary dark:text-dark-text-primary mr-1">
+                                    {{ formattedCount(followingCount) }}
+                                </span>
                                 <span
                                     class="text-light-text-secondary dark:text-dark-text-light text-sm mt-[0.75px]">seguindo</span>
-                            </router-link>
+                            </div>
                         </div>
                         <!--start bio-->
                         <p v-show="profile?.bio?.length"
@@ -168,6 +170,7 @@ import ProfileSkeleton from '../components/ProfileSkeleton.vue';
 import PostList from '@/app/posts/components/PostList.vue';
 import BtnPlus from '@/components/btns/BtnPlus.vue';
 import Navbar from '@/components/base/Navbar.vue';
+import formattedCount from '@/utils/formatted-count';
 
 const { getUserById, loading: loadingGetById } = useProfile();
 const { followUser, loading: loadingFollowUser } = useProfile();
@@ -198,6 +201,11 @@ const profile = computed(() => store.getters.currentProfile);
 const profiles = computed(() => store.getters.profiles);
 const user = computed(() => store.getters.currentUser);
 const posts = computed(() => store.getters.posts)
+
+
+// Verifica se o usuário atual segue o perfil
+const followingCount = computed(() => profile?.value?.following_count || 0);
+const followersCount = computed(() => profile?.value?.followers_count || 0);
 
 // Crie um computed para o profileId que lida com todos os casos
 const profileId = computed(() => {

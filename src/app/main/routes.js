@@ -20,16 +20,6 @@ export default [
         component: () => import('./views/Search.vue')
     },
     {
-        path: '/notifications',
-        name: 'Notifications',
-        meta: {
-            requiresAuth: true,
-            rootPage: 'main',
-            title: 'Notificacoes - 1kole'
-        },
-        component: () => import('./views/Notifications.vue')
-    },
-    {
         path: '/settings',
         name: 'Settings',
         meta: {

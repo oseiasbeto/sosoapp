@@ -85,6 +85,7 @@ export function useProfile() {
             return response; // Retorna a resposta para o chamador (ex.: para exibir mensagem)
         } catch (err) {
             const data = err?.response?.data
+            console.log(err)
             if (data.message === 'Você não pode seguir de volta porque este usuário não te segue.') {
                 const currentUser = store.getters.currentUser;
                 const currentProfile = store.getters.currentProfile;

@@ -10,20 +10,5 @@ export default {
     },
     closeModal({ commit }) {
         commit('CLOSE_MODAL'); // Chama a mutação para fechar o modal
-    },
-    addNotification({ commit }, notification) {
-        commit('ADD_NOTIFICATION', notification);
-    },
-    loadNotifications({ commit }, { notifications, page, totalPages, total }) {
-        commit('LOAD_NOTIFICATIONS', { notifications, page, totalPages, total });
-    },
-    clearNotifications({ commit }) {
-        commit('CLEAR_NOTIFICATIONS');
-    },
-    markAsRead({ commit }, notificationId) {
-        commit('MARK_AS_READ', notificationId);
-    },
-    markAllAsRead({ commit }) {
-        commit('MARK_ALL_AS_READ');
     }
 };

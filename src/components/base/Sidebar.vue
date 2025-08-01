@@ -94,6 +94,7 @@ const router = useRouter()
 const store = useStore()
 
 const user = computed(() => store.getters.currentUser)
+const unreadNotificationsCount = computed(() => store.getters['unreadNotificationsCount']);
 
 defineProps({
     isDisabled: {
