@@ -7,5 +7,8 @@ export default {
     },
     markAsRead({ commit }, notificationId) {
         commit('MARK_AS_READ', notificationId);
+    },
+    addNotificationModules({ commit }, newModule) {
+        commit('ADD_NOTIFICATION_MODULES', newModule);
     }
 };
