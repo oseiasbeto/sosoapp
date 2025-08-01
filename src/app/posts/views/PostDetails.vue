@@ -74,7 +74,7 @@
                                         </path>
                                     </svg>
                                     <span v-show="repliesCount > 0" class="text-inherit text-[15px]">{{ repliesCount
-                                    }}</span>
+                                        }}</span>
                                 </button>
                                 <button class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm"
                                     :class="{ '!text-[#13c371] dark:!text-reposted': hasReposted }"
@@ -85,7 +85,7 @@
                                         </path>
                                     </svg>
                                     <span v-show="repostsCount > 0" class="text-inherit text-[15px]">{{ repostsCount
-                                    }}</span>
+                                        }}</span>
                                 </button>
                                 <button class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm"
                                     :class="{ '!text-liked': hasLiked }" :disabled="loadingToggleLike"
@@ -102,7 +102,7 @@
                                         </path>
                                     </svg>
                                     <span v-show="likesCount > 0" class="text-inherit text-[15px]">{{ likesCount
-                                    }}</span>
+                                        }}</span>
                                 </button>
                                 <button class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm">
                                     <svg fill="none" width="22" viewBox="0 0 24 24" height="22">
@@ -148,7 +148,7 @@
 <script setup>
 import { computed, watch, onMounted, nextTick, ref } from 'vue';
 import { useStore } from 'vuex';
-import { usePost } from "@/hooks/posts";
+import { usePost } from "@/app/posts/posts.hook";
 import { useRoute, useRouter } from 'vue-router';
 import formattedDate from "@/utils/formatted-date";
 import PostList from '../components/PostList.vue';
@@ -288,9 +288,9 @@ const handleScroll = (value) => {
 }
 
 watch(() => route.params.id, async (newId, oldId) => {
-   
+
     if (!newId || newId === oldId) return; // Evita chamadas se o ID for inválido ou repetido
-   
+
     resetReplies()
     hasError.value = false
 
@@ -352,7 +352,6 @@ watch(() => route.params.id, async (newId, oldId) => {
 })
 
 onMounted(async () => {
-      console.log("aki")
     if (!post.value?._id || post?.value?._id !== route.params.id) {
         await nextTick()
         setScrollPosition(0)

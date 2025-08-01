@@ -48,25 +48,5 @@ export default [
             title: 'Mensagens - 1kole'
         },
         component: () => import('./views/Messages.vue')
-    },
-     {
-        path: '/profile/:user_id',
-        name: 'Profile',
-        meta: {
-            requiresAuth: true,
-            rootPage: 'main',
-            title: 'Perfil - 1kole'
-        },
-        component: () => import('../main/views/Profile.vue')
-    },
-    {
-        path: '/profile',
-        name: 'My profile',
-        meta: {
-            requiresAuth: true,
-            rootPage: 'main',
-            title: 'Meu perfil - 1kole'
-        },
-        component: () => import('../main/views/Profile.vue')
     }
 ]

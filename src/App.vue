@@ -5,7 +5,7 @@ import { useStore } from "vuex"
 import { computed, onMounted, ref, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import Cookies from "js-cookie";
-import { useAuth } from "./hooks/auth";
+import { useAuth } from "./app/auth/auth.hook";
 import { getSocket, disconnectSocket } from '@/services/socket';
 import DrawerRepost from "./components/drawers/DrawerRepost.vue";
 import DrawerPostMoreOptions from "./components/drawers/DrawerPostMoreOptions.vue";

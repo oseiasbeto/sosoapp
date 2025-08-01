@@ -207,7 +207,7 @@
 import { computed, onMounted, onUnmounted, ref, nextTick } from 'vue';
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
-import { usePost } from "@/hooks/posts";
+import { usePost } from "@/app/posts/posts.hook";
 import axios from 'axios';
 import { useStore } from 'vuex';
 import ReplyToOriginalPost from '../components/ReplyToOriginalPost.vue';

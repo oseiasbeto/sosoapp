@@ -58,7 +58,7 @@ import { ref, onMounted, computed } from 'vue'; // Importa funções do Vue 3
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/vue'; // Importa componentes do Headless UI
 import { useRouter, useRoute } from 'vue-router';
 import { useStore } from 'vuex';
-import { usePost } from "@/hooks/posts";
+import { usePost } from "../../app/posts/posts.hook";
 const { toggleRepost, loading } = usePost()
 
 const store = useStore()

@@ -39,7 +39,7 @@
 <script setup>
 import { computed, onMounted, ref, watch, nextTick } from 'vue';
 import { useStore } from 'vuex';
-import { usePost } from '@/hooks/posts';
+import { usePost } from '@/app/posts/posts.hook';
 import PostList from '@/app/posts/components/PostList.vue';
 import BtnPlus from '@/components/btns/BtnPlus.vue';
 import { useRouter } from 'vue-router';

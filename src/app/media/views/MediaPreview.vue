@@ -16,7 +16,7 @@ import { useStore } from 'vuex';
 import ImagesMedia from '../components/ImagesMedia.vue';
 import PlayerVideo from '../components/PlayerVideo.vue';
 import { useRoute } from 'vue-router';
-import { useMedia } from '@/hooks/media';
+import { useMedia } from '../media.hook';
 
 const store = useStore()
 const route = useRoute()

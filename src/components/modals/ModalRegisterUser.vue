@@ -2,7 +2,7 @@
 <script setup>
 import { ref, computed } from 'vue'; // Importa funções do Vue 3
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/vue'; // Importa componentes do Headless UI
-import { useAuth } from "@/hooks/auth";
+import { useAuth } from "@/app/auth/auth.hook";
 const { registerUser, loading } = useAuth()
 
 // Props recebidas do componente pai

@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useInfiniteScroll } from '@vueuse/core';
-import { useNotification } from '@/hooks/notifications';
+import { useNotification } from '@/app/main/notifications.hook';
 
 const store = useStore();
 const { loading, getNotifications } = useNotification();

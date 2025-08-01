@@ -44,7 +44,7 @@ import { ref, watch, computed, nextTick } from 'vue'; // Importa funções do Vu
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/vue'; // Importa componentes do Headless UI
 import { useRouter, useRoute } from 'vue-router';
 import { useStore } from 'vuex';
-import { usePost } from "@/hooks/posts";
+import { usePost } from "../../app/posts/posts.hook";
 import ModalDeletePost from '../modals/ModalDeletePost.vue';
 const { deletePost, loading: loadingDeletePost } = usePost()
 

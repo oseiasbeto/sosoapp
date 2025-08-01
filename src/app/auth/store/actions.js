@@ -1,9 +1,8 @@
 export default {
-    login({ commit }, { user, token }) {
-        commit('SET_USER', user);
+    setAccessToken({ commit }, { token }) {
         commit('SET_ACCESS_TOKEN', token);
     },
-    logout({ commit }) {
-        commit('CLEAR_SESSION');
+    clearAcessToken({ commit }) {
+        commit('CLEAR_ACCESS_TOKEN');
     }
 };

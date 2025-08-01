@@ -88,7 +88,7 @@
 <script setup>
 import Input from '@/components/inputs/Input.vue';
 import SelectInput from '@/components/inputs/SelectInput.vue';
-import { useProfile } from '@/hooks/profiles';
+import { useProfile } from '@/app/profiles/profiles.hook';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';

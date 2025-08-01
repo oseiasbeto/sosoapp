@@ -2,7 +2,7 @@
 import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue3-toastify'
-import { useAuth } from '@/hooks/auth'
+import { useAuth } from '@/app/auth/auth.hook'
 
 // Inicializa as ferramentas necessárias
 const route = useRoute()

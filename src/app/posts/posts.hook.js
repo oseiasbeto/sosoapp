@@ -1,5 +1,5 @@
 // Importa a instância da API configurada para fazer requisições ao backend.
-import api from "../api";
+import api from "@/api";
 
 // Importa `ref` do Vue para criar variáveis reativas.
 import { ref } from "vue";

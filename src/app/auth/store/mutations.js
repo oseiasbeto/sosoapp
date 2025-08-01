@@ -1,12 +1,8 @@
 export default {
-    SET_USER(state, user) {
-        state.user = user;
-    },
     SET_ACCESS_TOKEN(state, token) {
         state.accessToken = token;
     },
-    CLEAR_SESSION(state) {
-        state.user = null;
+    CLEAR_ACCESS_TOKEN(state) {
         state.accessToken = null;
     }
 };

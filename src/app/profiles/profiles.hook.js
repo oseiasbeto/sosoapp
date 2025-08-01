@@ -1,4 +1,4 @@
-import api from "../api";
+import api from "@/api";
 
 import { ref } from 'vue';
 
@@ -84,7 +84,8 @@ export function useProfile() {
 
             return response; // Retorna a resposta para o chamador (ex.: para exibir mensagem)
         } catch (err) {
-            const data = err.response.data
+            const data = err?.response?.data
+            console.log(data)
             if (data.message === 'Você não pode seguir de volta porque este usuário não te segue.') {
                 const currentUser = store.getters.currentUser;
                 const currentProfile = store.getters.currentProfile;

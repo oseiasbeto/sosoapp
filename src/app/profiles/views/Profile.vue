@@ -159,8 +159,8 @@
 <script setup>
 import Tabs from '@/components/base/Tabs.vue';
 import Avatar from '@/components/utilities/Avatar.vue';
-import { useProfile } from '@/hooks/profiles';
-import { usePost } from '@/hooks/posts';
+import { useProfile } from '@/app/profiles/profiles.hook';
+import { usePost } from '@/app/posts/posts.hook';
 import { computed, onMounted, nextTick, watch, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
@@ -169,10 +169,8 @@ import PostList from '@/app/posts/components/PostList.vue';
 import BtnPlus from '@/components/btns/BtnPlus.vue';
 import Navbar from '@/components/base/Navbar.vue';
 
-const {
-    getUserById, loading: loadingGetById,
-    followUser, loading: loadingFollowUser
-} = useProfile();
+const { getUserById, loading: loadingGetById } = useProfile();
+const { followUser, loading: loadingFollowUser } = useProfile();
 
 const { getProfilePosts, loading: loadingPosts } = usePost()
 const { loadMoreProfilePosts, loading: loadingLoadMore } = usePost()
@@ -218,7 +216,7 @@ const isFollowing = computed(() => {
     if (!user.value?._id || !profile.value?._id || !user.value.following) {
         return false;
     }
-    return user.value.following.includes(profile.value._id);
+    return user.value.following.includes(profile?.value?._id);
 });
 
 // Verifica se o perfil segue o usuário (substituindo isFollowedBack)
@@ -232,7 +230,6 @@ const isFollowedBy = computed(() => {
 // Functions
 const handleFollowUser = async (userId, isFollowBack = false) => {
     try {
-        console.log(userId)
         await followUser({ userIdToFollow: userId, isFollowBack });
     } catch (error) {
         console.error('Erro ao seguir/deixar de seguir:', error);

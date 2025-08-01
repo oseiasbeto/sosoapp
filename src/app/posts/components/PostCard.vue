@@ -56,7 +56,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
-import { usePost } from "@/hooks/posts";
+import { usePost } from "@/app/posts/posts.hook";
 import TagAuthorRepost from './TagAuthorRepost.vue';
 import AuthorPostDetails from './PostAuthorDetails.vue';
 import PostText from './PostText.vue';
