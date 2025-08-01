@@ -37,6 +37,10 @@
                             <PostText :text="post?.content" :is-bigger="true" />
                             <!--end post text-->
 
+                            <!--start media-->
+                            <PostCardMedia :media="post?.media" />
+                            <!--end media-->
+
                             <!--start created at-->
                             <div class="text-xs mt-[10px] text-[#6f869f]">
                                 <p>{{ formattedDate(post?.created_at || Date.now()) }}</p>
@@ -70,7 +74,7 @@
                                         </path>
                                     </svg>
                                     <span v-show="repliesCount > 0" class="text-inherit text-[15px]">{{ repliesCount
-                                        }}</span>
+                                    }}</span>
                                 </button>
                                 <button class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm"
                                     :class="{ '!text-[#13c371] dark:!text-reposted': hasReposted }"
@@ -81,7 +85,7 @@
                                         </path>
                                     </svg>
                                     <span v-show="repostsCount > 0" class="text-inherit text-[15px]">{{ repostsCount
-                                        }}</span>
+                                    }}</span>
                                 </button>
                                 <button class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm"
                                     :class="{ '!text-liked': hasLiked }" :disabled="loadingToggleLike"
@@ -98,7 +102,7 @@
                                         </path>
                                     </svg>
                                     <span v-show="likesCount > 0" class="text-inherit text-[15px]">{{ likesCount
-                                        }}</span>
+                                    }}</span>
                                 </button>
                                 <button class="flex items-center gap-1 p-[5px] text-[#6f869f] text-sm">
                                     <svg fill="none" width="22" viewBox="0 0 24 24" height="22">
@@ -155,6 +159,7 @@ import PostText from '../components/PostText.vue';
 import Navbar from '@/components/base/Navbar.vue';
 import Avatar from '@/components/utilities/Avatar.vue';
 import PostLoader from '../components/PostLoader.vue';
+import PostCardMedia from '@/app/media/components/PostCardMedia.vue';
 
 const { getPostById, loading: loadingGetPostId, } = usePost()
 const { getReplies, loading: loadingGetReplies } = usePost()
@@ -283,8 +288,9 @@ const handleScroll = (value) => {
 }
 
 watch(() => route.params.id, async (newId, oldId) => {
+   
     if (!newId || newId === oldId) return; // Evita chamadas se o ID for inválido ou repetido
-
+   
     resetReplies()
     hasError.value = false
 
@@ -346,6 +352,7 @@ watch(() => route.params.id, async (newId, oldId) => {
 })
 
 onMounted(async () => {
+      console.log("aki")
     if (!post.value?._id || post?.value?._id !== route.params.id) {
         await nextTick()
         setScrollPosition(0)

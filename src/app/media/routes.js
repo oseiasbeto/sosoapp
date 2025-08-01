@@ -1,6 +1,6 @@
 export default [
   {
-    path: "/media/:id",
+    path: "/post/media/:media_id",
     name: "Media preview",
     meta: {
       requiresAuth: true,

@@ -3,9 +3,10 @@
     class="max-w-full mb-2.5 border border-light-border dark:border-dark-border mt-3 rounded-xl overflow-hidden"
     :class="mediaLayoutClass">
     <div class="flex flex-wrap gap-1">
-      <img v-for="(item, index) in media" :key="item.public_id"
-        v-lazy="item.type === 'video' ? item.thumbnail : item.url" :alt="`Mídia ${index + 1} do post`"
-        class="object-cover bg-light-card dark:bg-dark-card" :class="imageClass(index)" @click="openMediaPreview(item._id, item.type, index, media)" />
+      <img v-for="(item, index) in media" :key="item?.public_id"
+        v-lazy="item.type === 'video' ? item?.thumbnail : item?.url" :alt="`Mídia ${index + 1} do post`"
+        class="object-cover bg-light-card dark:bg-dark-card" :class="imageClass(index)"
+        @click="openMediaPreview(item?.post, item.type, index, media)" />
     </div>
   </div>
 </template>
@@ -49,12 +50,18 @@ const imageClass = (index) => {
 };
 
 // Métodos
-const openMediaPreview = ( id, type, index, items ) => {
+const openMediaPreview = (id, type, index, items) => {
   store.dispatch("setMedia", {
     type,
     index,
     items
   })
-  router.push('/media/' + id)
+  router.push({
+    path: '/post/media/' + id,
+    query: {
+      type,
+      initial_index: index
+    }
+  })
 };
 </script>
