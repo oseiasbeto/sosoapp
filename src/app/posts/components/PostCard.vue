@@ -34,7 +34,7 @@
                     <!--end content post-->
 
                     <!--start media-->
-                    <PostCardMedia :media="post?.media" />
+                    <PostCardMedia :media="post.is_repost? post?.original_post?.media : post?.media" />
                     <!--end media-->
                 </div>
                 <!--end body post-->

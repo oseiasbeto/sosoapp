@@ -66,4 +66,36 @@ export default {
     if (!notifications) return;
     notifications.push(newModule);
   },
+  ADD_NEW_NOTIFICATION(state, { newNotification, byId }) {
+    const moduleIndex = state.notifications.findIndex((m) => m.byId === byId);
+    if (moduleIndex === -1) return;
+
+    const module = state.notifications[moduleIndex];
+    if (!module) return;
+    else {
+      const existingNotificationIndex = module.notifications.findIndex(
+        (n) => n._id === newNotification._id
+      );
+      console.log(newNotification)
+      console.log(module.notifications)
+
+      if (existingNotificationIndex !== -1) {
+        module.notifications.splice(existingNotificationIndex, 1);
+        module.notifications.unshift(newNotification);
+        console.log(existingNotificationIndex)
+        console.log(module.notifications)
+      } else {
+        module.notifications = [
+          newNotification,
+          ...(Array.isArray(module.notifications) ? module.notifications : []),
+        ];
+
+        // Atualiza paginação sem conflitos
+        module.pagination.total += 1;
+        module.pagination.totalPages = Math.ceil(
+          module.pagination.total / module.pagination.limit || 10
+        );
+      }
+    }
+  },
 };

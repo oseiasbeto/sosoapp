@@ -25,7 +25,7 @@
                 <!-- Conteúdo da notificação -->
                 <div class="flex-1 min-w-0">
                     <p v-html="notification.message" class="text-sm text-gray-900 line-clamp-2"></p>
-                    <p class="text-xs text-gray-500 mt-1">{{ formattedTime(notification.created_at) }}</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ formattedTime(notification.updated_at) }}</p>
                 </div>
             </div>
 

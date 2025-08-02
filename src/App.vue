@@ -58,9 +58,10 @@ onMounted(async () => {
       const socket = getSocket();
 
       if (socket) {
-        socket.on('newNotification', (notification) => {
-          console.log('Notificação recebida no App.vue:', notification);
-          store.dispatch('addNotification', notification);
+        socket.on('newNotification', (newNotification) => {
+          console.log('Notificação recebida no App.vue:', newNotification);
+          store.dispatch('addNewNotification', { newNotification, byId: newNotification?.type });
+          store.dispatch('addNewNotification', { newNotification, byId: 'all' });
         });
         return true;
       } else {
@@ -82,7 +83,8 @@ onUnmounted(() => {
 
 <template>
 
-  <div class="font-primary w-screen text-sm h-screen text-light-text-primary dark:text-dark-text-primary bg-light-bg dark:bg-dark-bg">
+  <div
+    class="font-primary w-screen text-sm h-screen text-light-text-primary dark:text-dark-text-primary bg-light-bg dark:bg-dark-bg">
     <!-- start main app area-->
     <div v-if="!loading">
       <!--start content-->
