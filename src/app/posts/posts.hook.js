@@ -19,10 +19,13 @@ export function usePost() {
     try {
       loading.value = true;
 
-      const response = await api.post("/posts/new-post", {
-        ...data,
-        originalPost: data.isRepost ? data.originalRepost : data.originalPost,
-      });
+      const response = await api.post(
+        `/posts/new-post?post_module=${data.postModule}`,
+        {
+          ...data,
+          originalPost: data.isRepost ? data.originalRepost : data.originalPost,
+        }
+      );
 
       const { new_post } = response.data;
 
@@ -272,7 +275,21 @@ export function usePost() {
 
       store.dispatch("setPost", post);
       store.dispatch("setOriginalPost", post);
-      //  store.dispatch("addReplyFromRepliesStore", { index: 0, postModule: data.postModule, post })
+    } catch (err) {
+      console.error("Erro ao carregar a postagem:", err.message);
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const getOriginalPostById = async (id) => {
+    try {
+      loading.value = true;
+      const response = await api.get(`/posts/${id}`);
+      const { post } = response.data;
+
+      store.dispatch("setOriginalPostFromPost", post);
     } catch (err) {
       console.error("Erro ao carregar a postagem:", err.message);
       throw err;
@@ -291,7 +308,9 @@ export function usePost() {
   }) => {
     try {
       loading.value = true;
-      const response = await api.put(`/posts/like/${postId}`);
+      const response = await api.put(
+        `/posts/like/${postId}?post_module=${postModule}`
+      );
 
       if (isReply) {
         const replyId = postId;
@@ -333,7 +352,9 @@ export function usePost() {
   }) => {
     try {
       loading.value = true;
-      const response = await api.put(`/posts/repost/${originalPost._id}`);
+      const response = await api.put(
+        `/posts/repost/${originalPost._id}?post_module=${postModule}`
+      );
 
       if (originalPost.is_reply) {
         const replyId = originalPost._id;
@@ -518,13 +539,22 @@ export function usePost() {
     }
   };
 
-  const deletePost = async ({ postId, postModule, isViewPage = false, isReply }) => {
+  const deletePost = async ({
+    postId,
+    postModule,
+    isViewPage = false,
+    isReply,
+  }) => {
     try {
       loading.value = true;
       const response = await api.delete(`/posts/${postId}`);
 
       if (!isReply) {
-        store.dispatch("deletePostFromPosts", { postId, postModule, isViewPage });
+        store.dispatch("deletePostFromPosts", {
+          postId,
+          postModule,
+          isViewPage,
+        });
       }
       return response;
     } catch (err) {
@@ -544,6 +574,7 @@ export function usePost() {
     toggleRepost,
     getProfilePosts,
     loadMoreProfilePosts,
+    getOriginalPostById,
     loadMoreReplies,
     deletePost,
     loadMorePosts,

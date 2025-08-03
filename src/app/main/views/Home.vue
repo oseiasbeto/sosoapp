@@ -95,7 +95,6 @@ const _loadMorePosts = async (newPage) => {
             totalItems: homePosts?.value?.pagination?.total,
             limit: 10
         })
-        await nextTick()
     } catch (err) {
         console.error('Failed to load more posts:', err);
         // Tratamento de erro adicional pode ser adicionado aqui

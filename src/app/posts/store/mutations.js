@@ -6,6 +6,9 @@ export default {
   SET_ORIGINAL_POST(state, originalPost) {
     state.originalPost = originalPost;
   },
+  SET_ORIGINAL_POST_FROM_POST(state, originalPost) {
+    state.post.original_post = originalPost;
+  },
 
   ADD_NEW_POST(state, { newPost, postModule }) {
     const moduleIndex = state.posts.findIndex((m) => m.byId === postModule);
@@ -366,7 +369,6 @@ export default {
 
       if (index === -1) {
         post.original_post.likes.push(userId);
-        console.log(post);
 
         if (post.original_post.reposts.length) {
           posts.map((p) => {
@@ -610,20 +612,8 @@ export default {
           post.reposts.splice(index, 1);
 
           if (posts.length) {
-            /* 
-            const index = posts.findIndex(
-              (p) =>
-                p.is_repost &&
-                p.author._id === userId &&
-                p?.original_post._id === postId
-            );
-
-            if (index !== -1) {
-              posts.splice(index, 1);
-            }*/
-
             posts.map((p) => {
-              if (p?.original_post?._id === post._id) {
+              if (p?.original_post?._id === post?._id) {
                 const index = p.original_post.reposts.indexOf(userId);
 
                 if (index !== -1) {
@@ -635,7 +625,7 @@ export default {
             if (repliesStore.length && post.is_reply) {
               const indexStore = repliesStore.findIndex(
                 (r) =>
-                  r.original_post._id === post.original_post.original_post._id
+                  r.original_post?._id === post.original_post.original_post?._id
               );
               if (indexStore === -1) return;
 
@@ -655,7 +645,7 @@ export default {
         if (!module) return;
 
         const posts = module.posts;
-        const post = posts.find((p) => p?.original_post._id === postId);
+        const post = posts.find((p) => p?.original_post?._id === postId);
 
         const repliesStore = state.repliesStore;
 
@@ -665,7 +655,6 @@ export default {
 
         if (index === -1) {
           post.original_post.reposts.push(userId);
-          console.log(post);
 
           if (post.original_post.reposts.length) {
             posts.map((p) => {
@@ -718,7 +707,7 @@ export default {
           if (repliesStore.length && post.is_reply) {
             const indexStore = repliesStore.findIndex(
               (r) =>
-                r.original_post._id === post.original_post.original_post._id
+                r.original_post._id === post?.original_post.original_post?._id
             );
             if (indexStore === -1) return;
 

@@ -43,6 +43,43 @@ export function useNotification() {
     }
   };
 
+  const loadMoreNotifications = async ({
+    page = 1,
+    totalItems = 0,
+    tab = "all",
+    limit = 10,
+  }) => {
+    try {
+      loading.value = true;
+      const response = await api.get(
+        `/notifications/${tab}?page=${page}&limit=${limit}&is_load=true&total=${totalItems}`
+      );
+
+      const {
+        notifications,
+        page: currentPage,
+        total,
+        totalPages,
+        hasMore,
+      } = response.data;
+
+      const newModule = {
+        notifications,
+        page: currentPage,
+        byId: tab,
+        total,
+        totalPages,
+        hasMore,
+      };
+      store.dispatch("setLoadNotifications", newModule);
+    } catch (err) {
+      console.error("Erro ao carregar as postagens:", err.message);
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   // Retorna as funções e a variável reativa `loading` para serem usadas nos componentes Vue.
-  return { loading, getNotifications };
+  return { loading, getNotifications, loadMoreNotifications };
 }

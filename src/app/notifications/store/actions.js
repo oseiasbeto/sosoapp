@@ -11,6 +11,19 @@ export default {
   addNotificationModules({ commit }, newModule) {
     commit("ADD_NOTIFICATION_MODULES", newModule);
   },
+  setLoadNotifications(
+    { commit },
+    { notifications, byId, page, hasMore, totalPages, total }
+  ) {
+    commit("SET_LOAD_NOTIFICATIONS", {
+      notifications,
+      byId,
+      page,
+      hasMore,
+      totalPages,
+      total,
+    });
+  },
   addNewNotification({ commit }, { newNotification, byId }) {
     commit("ADD_NEW_NOTIFICATION", { newNotification, byId });
   },

@@ -9,6 +9,14 @@ export default {
 
   SET_PROFILE(state, profile) {
     state.profile = profile;
+
+    const profileExisistsIndex = state.profiles.findIndex(
+      (p) => p?._id === profile?._id
+    );
+
+    if (profileExisistsIndex === -1) {
+      state.profiles[profileExisistsIndex] = profile;
+    }
   },
 
   ADD_NEW_PROFILE_FROM_PROFILES(state, newProfile) {

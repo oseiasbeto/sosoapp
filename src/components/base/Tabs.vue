@@ -8,7 +8,7 @@
           :class="{ '!text-light-text-primary dark:!text-dark-text-primary': activeTab === tab.value }">
           {{ tab.label }}
           <!-- Borda estática apenas na tab ativa -->
-          <div v-if="activeTab === tab.value" class="absolute bottom-0 left-0 right-0 h-[3px] bg-primary"></div>
+          <div v-if="activeTab === tab.value" class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary"></div>
         </button>
       </div>
     </div>

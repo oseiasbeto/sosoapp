@@ -5,6 +5,9 @@ export default {
   setOriginalPost({ commit }, originalPost) {
     commit("SET_ORIGINAL_POST", originalPost);
   },
+  setOriginalPostFromPost({ commit }, originalPost) {
+    commit("SET_ORIGINAL_POST_FROM_POST", originalPost);
+  },
   setLoadPosts({ commit }, { posts, byId, page, hasMore, totalPages, total }) {
     commit("SET_LOAD_POSTS", { posts, page, byId, hasMore, totalPages, total });
   },

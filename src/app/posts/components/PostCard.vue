@@ -1,18 +1,24 @@
 <template>
     <div @click="goToDetails(post)" ref="postCardRef"
-        class="p-4 pb-2.5 mb-0.5 shrink-0 border-b border-light-border dark:border-dark-border">
+        class="p-4 pb-2.5 mb-0.5 shrink-0 border-b border-light-border dark:border-dark-border" :class="{
+            'border-b-0 pb-0 mb-0': isThread
+        }">
         <!--start flags-->
         <!--start original repost author tag-->
         <tag-author-repost v-if="post?.is_repost" :author="post?.author" />
         <!--end original repost author tag-->
         <!--end flags-->
         <!--<p>{{ props.totalItems }}{{ props?.index }}</p>-->
-    
+
         <div class="flex">
-            <div id="left-part" class="pl-1 pr-3">
+            <div id="left-part" class="pl-1 flex flex-col pr-3" :class="{
+                'pl-0 ml-0 mr-0': isThread
+            }">
                 <avatar
                     :url="post?.is_repost ? post?.original_post?.author?.profile_image?.low : post.author?.profile_image?.low || null"
                     alt-text="Foto" />
+
+                <div v-show="isThread" class="w-0.5 mt-1 flex-1 mx-auto bg-light-border dark:bg-dark-border"></div>
             </div>
             <div id="right-part" class="min-w-0 flex-1 flex-shrink-0">
                 <!--start header-->
@@ -34,13 +40,14 @@
                     <!--end content post-->
 
                     <!--start media-->
-                    <PostCardMedia :media="post.is_repost? post?.original_post?.media : post?.media" />
+                    <PostCardMedia :media="post.is_repost ? post?.original_post?.media : post?.media" />
                     <!--end media-->
                 </div>
                 <!--end body post-->
 
                 <!--start footer post-->
-                <post-reactions :likes-count="likesCount" :replies-count="repliesCount" :reposts-count="repostsCount"
+                <post-reactions v-if="props.showReactions" :likes-count="likesCount" :replies-count="repliesCount"
+                    :reposts-count="repostsCount"
                     @like-post="handleLike(post?.is_repost ? post.original_post._id : post._id, post._id, post?.is_repost)"
                     :loading-toggle-like="loadingToggleLike" @reply-post="goToReply(post, post?.is_repost)"
                     @repost="handleRepost(post?.is_repost ? post.original_post : post, post?.is_repost)"
@@ -83,6 +90,14 @@ const props = defineProps({
         type: Number,
         required: true
     },
+    isThread: {
+        type: Boolean,
+        default: false
+    },
+    showReactions: {
+        type: Boolean,
+        default: true
+    },
     postModule: String,
     isReply: {
         type: Boolean,
@@ -104,11 +119,6 @@ const repliesCount = computed(() => props.post?.is_repost ? props?.post.original
 
 const repostsCount = computed(() => props.post?.is_repost ? props?.post?.original_post?.reposts.length : props.post?.reposts?.length || 0);
 
-/* 
-const isLastPost = computed(() => {
-    // Supondo que você tenha acesso ao total de posts e ao índice atual
-    return props.index === props.totalItems - 1 && props.totalItems  > 1; // ou outra lógica para determinar o último
-});*/
 
 const goToDetails = (post) => {
     store.dispatch("setPost", post.is_repost ? {
