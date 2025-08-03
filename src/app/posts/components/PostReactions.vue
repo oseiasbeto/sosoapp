@@ -1,5 +1,5 @@
 <template>
-    <div  class="flex h-7 justify-between text-sm items-center gap-5">
+    <div  class="flex h-7 overflow-x-auto justify-between text-sm items-center gap-5">
         <button class="flex ml-[-6px] text-[#6f869f] flex-1 py-[3px] px-[5px] h-full rounded-full items-center gap-1.5" @click.stop @click="replyPost">
             <span class="flex items-center h-full" name="icon">
                 <svg fill="currentColor" width="18" viewBox="0 0 24 24" height="18"

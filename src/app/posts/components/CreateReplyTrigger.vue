@@ -1,8 +1,8 @@
 <template>
-    <div v-show="props.show" class="fixed flex items-center w-full border-t border-light-border dark:border-dark-border p-2 px-2 bg-light-bg dark:bg-dark-bg bottom-[56px] h-14"
+    <div v-show="props.show" class="fixed flex items-center w-full pt-0  px-2 bg-light-bg dark:bg-dark-bg bottom-[55px] h-10"
         @click="goToReply(props.originalPost)">
         <div
-            class="flex bg-light-card dark:bg-dark-card text-light-text-secondary dark:text-dark-text-light items-center py-2 px-2 rounded-3xl w-full">
+            class="flex bg-light-card mt-[-16px] dark:bg-dark-card text-light-text-secondary dark:text-dark-text-light items-center py-2 px-2 rounded-3xl w-full">
             <div class="flex items-center gap-2 text-sm">
                 <Avatar :url="user?.profile_image?.low" size="xs" />
                 <p> Escreva a sua resposta</p>

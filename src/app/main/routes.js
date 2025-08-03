@@ -10,16 +10,6 @@ export default [
         component: () => import('./views/Home.vue')
     },
     {
-        path: '/search',
-        name: 'Search',
-        meta: {
-            requiresAuth: true,
-            rootPage: 'main',
-            title: 'Explorar - 1kole'
-        },
-        component: () => import('./views/Search.vue')
-    },
-    {
         path: '/settings',
         name: 'Settings',
         meta: {

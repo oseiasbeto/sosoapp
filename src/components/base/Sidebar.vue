@@ -1,6 +1,6 @@
 <template>
     <ul class="flex items-center gap-2 w-full border-t border-light-border dark:border-dark-border h-14 bg-light-bg dark:bg-dark-bg text-inherit fixed bottom-0 overflow-hidden"
-        :class="{ 'pointer-events-none': isDisabled }">
+        :class="{ 'pointer-events-none': isDisabled, '!border-light-bg dark:!border-dark-bg' : route.name === 'Post details' }">
         <li class="flex-1 h-full">
             <router-link class="flex items-center h-full" to="/home">
                 <svg v-if="route.name === 'Home'" fill="none" class="mx-auto" width="27" viewBox="0 0 24 24" height="27"

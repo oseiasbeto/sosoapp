@@ -67,5 +67,6 @@ const goToTarget = (target, type) => {
         default:
             break;
     }
+    store.dispatch('markAsRead', { notificationId: props.notification._id, byId: props.notification.type });
 }
 </script>

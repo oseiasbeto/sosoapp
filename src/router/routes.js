@@ -4,6 +4,7 @@ import posts from '../app/posts/routes'
 import profiles from '../app/profiles/routes'
 import media from '../app/media/routes'
 import notifications from '../app/notifications/routes'
+import search from '../app/search/routes'
 
 export default [
     ...auth,
@@ -11,5 +12,6 @@ export default [
     ...posts,
     ...profiles,
     ...media,
-    ...notifications
+    ...notifications,
+    ...search
 ]

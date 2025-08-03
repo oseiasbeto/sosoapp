@@ -1,7 +1,7 @@
 <template>
     <div @click="goToDetails(post)" ref="postCardRef"
         class="p-4 pb-2.5 mb-0.5 shrink-0 border-b border-light-border dark:border-dark-border" :class="{
-            'border-b-0 pb-0 mb-0': isThread
+            'border-b-0 !pb-0 !mb-0': isThread
         }">
         <!--start flags-->
         <!--start original repost author tag-->
@@ -12,7 +12,7 @@
 
         <div class="flex">
             <div id="left-part" class="pl-1 flex flex-col pr-3" :class="{
-                'pl-0 ml-0 mr-0': isThread
+                '!pl-0 !ml-0 !mr-0': isThread
             }">
                 <avatar
                     :url="post?.is_repost ? post?.original_post?.author?.profile_image?.low : post.author?.profile_image?.low || null"

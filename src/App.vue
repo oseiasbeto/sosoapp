@@ -62,6 +62,7 @@ onMounted(async () => {
           console.log('Notificação recebida no App.vue:', newNotification);
           store.dispatch('addNewNotification', { newNotification, byId: newNotification?.type });
           store.dispatch('addNewNotification', { newNotification, byId: 'all' });
+          store.dispatch('setHasNewNotification');
         });
         return true;
       } else {

@@ -12,6 +12,7 @@ module.exports = {
       'primary': 'rgb(32,139,254)',
       // Light Mode
       'light-bg': '#fff',
+      'light-muted': '#6f869f',
       'light-card': '#f1f3f5',
       'light-border': '#d4dbe2',
       'light-link': 'rgb(32,139,254)',

@@ -43,15 +43,38 @@ export default {
       (n) => !n.read
     ).length;
   },
-  
-  MARK_AS_READ(state, notificationId) {
-    const notification = state.notifications.find(
+
+  MARK_AS_READ(state, {notificationId, byId}) {
+    // Encontra o módulo de notificações pelo byId
+    // Se o byId não for fornecido, assume que é 'all'
+    if (!byId) byId = 'all';
+    const moduleIndex = state.notifications.findIndex((m) => m.byId === byId);
+
+    // Verifica se o módulo existe
+    // Se o módulo não existir, não faz nada
+    if (moduleIndex === -1) return;
+    // Se o módulo não existir, não faz nada
+    const module = state.notifications[moduleIndex];
+
+    // Se o módulo não existir, não faz nada
+    if (!module) return;
+    const notification = module.notifications.find(
       (n) => n.id === notificationId
     );
+
     if (notification && !notification.read) {
       notification.read = true;
       state.unreadNotificationsCount -= 1;
     }
+  },
+
+  SET_HAS_NEW_NOTIFICATION(state) {
+    state.unreadNotificationsCount += 1;
+  },
+
+  
+  RESET_UNREAD_NOTIFICATIONS_COUNT(state) {
+    state.unreadNotificationsCount = 0;
   },
 
   MARK_ALL_AS_READ(state) {
@@ -68,7 +91,10 @@ export default {
     notifications.push(newModule);
   },
 
-  SET_LOAD_NOTIFICATIONS(state, { notifications, page, totalPages, byId, hasMore }) {
+  SET_LOAD_NOTIFICATIONS(
+    state,
+    { notifications, page, totalPages, byId, hasMore }
+  ) {
     const index = state.notifications.findIndex((m) => m.byId === byId);
 
     if (index !== -1) {
@@ -78,11 +104,15 @@ export default {
       const uniqueNewNotifications = notifications.filter(
         (newNotification) =>
           !_cachedData.notifications.some(
-            (existingNotification) => existingNotification._id === newNotification._id
+            (existingNotification) =>
+              existingNotification._id === newNotification._id
           )
       );
 
-      _cachedData.notifications = [..._cachedData.notifications, ...uniqueNewNotifications];
+      _cachedData.notifications = [
+        ..._cachedData.notifications,
+        ...uniqueNewNotifications,
+      ];
       _cachedData.pagination.page = page;
       _cachedData.pagination.totalPages = totalPages;
       _cachedData.pagination.hasMore = hasMore;
