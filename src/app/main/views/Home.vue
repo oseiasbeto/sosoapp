@@ -1,7 +1,8 @@
 <template>
     <div class="mb-14 overflow-hidden">
         <!--start post list-->
-        <post-list :posts="homePosts?.posts || []" :is-replies="false" :loading="loadingPosts || loadingPostsGlobal"
+        <post-list 
+            :posts="homePosts?.posts || []" :is-replies="false" :loading="loadingPosts || loadingPostsGlobal"
             :posts-module="activeTab" :b-space="140" :loading-load-more="loadingLoadMorePosts"
             :pagination="homePosts?.pagination" @load-more="_loadMorePosts" ref="postListComponent"
             @on-scroll="handleScroll">

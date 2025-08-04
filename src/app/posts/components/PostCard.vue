@@ -8,8 +8,6 @@
         <tag-author-repost v-if="post?.is_repost" :author="post?.author" />
         <!--end original repost author tag-->
         <!--end flags-->
-        <!--<p>{{ props.totalItems }}{{ props?.index }}</p>-->
-
         <div class="flex">
             <div id="left-part" class="pl-1 flex flex-col pr-3" :class="{
                 '!pl-0 !ml-0 !mr-0': isThread

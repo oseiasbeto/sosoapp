@@ -35,6 +35,7 @@
           :totalItems="props.pagination.total" 
           :post-module="props.usersModule" 
           :index="index" 
+          :tab="props.usersModule"
           :is-reply="props.isReplies" 
           :profile="item" />
         </DynamicScrollerItem>

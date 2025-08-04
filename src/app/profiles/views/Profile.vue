@@ -173,7 +173,7 @@ import Navbar from '@/components/base/Navbar.vue';
 import formattedCount from '@/utils/formatted-count';
 
 const { getUserById, loading: loadingGetById } = useProfile();
-const { followUser, loading: loadingFollowUser } = useProfile();
+const { followProfile, loading: loadingFollowUser } = useProfile();
 
 const { getProfilePosts, loading: loadingPosts } = usePost()
 const { loadMoreProfilePosts, loading: loadingLoadMore } = usePost()
@@ -238,7 +238,7 @@ const isFollowedBy = computed(() => {
 // Functions
 const handleFollowUser = async (userId, isFollowBack = false) => {
     try {
-        await followUser({ userIdToFollow: userId, isFollowBack });
+        await followProfile({ userIdToFollow: userId, isFollowBack });
     } catch (error) {
         console.error('Erro ao seguir/deixar de seguir:', error);
     }
