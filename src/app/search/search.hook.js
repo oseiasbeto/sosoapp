@@ -12,8 +12,46 @@ export function useSearch() {
   const getSuggestedUsers = async ({ page = 1, tab = "feed", limit = 10 }) => {
     try {
       loading.value = true;
+      const response = await api.get(`/users?page=${page}&limit=${limit}`);
+
+      const {
+        users,
+        page: currentPage,
+        total,
+        hasMore,
+        totalPages,
+      } = response.data;
+
+      const userModule = {
+        byId: tab,
+        users,
+        pagination: {
+          page: currentPage,
+          total,
+          hasMore,
+          totalPages,
+        },
+      };
+
+      store.dispatch("addUsersFromModules", { userModule });
+    } catch (err) {
+      console.error("Erro ao carregar usuarios sugestivos:", err.message);
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const searchUsers = async ({
+    page = 1,
+    searchQuery,
+    tab = "search_users",
+    limit = 10,
+  }) => {
+    try {
+      loading.value = true;
       const response = await api.get(
-        `/users?page=${page}&limit=${limit}`
+        `/users/search-users?q=${searchQuery}&page=${page}&limit=${limit}`
       );
 
       const {
@@ -35,7 +73,10 @@ export function useSearch() {
         },
       };
 
-      store.dispatch("addUsersFromModules", {userModule});
+      if(tab !== 'search_users_autocomplit') {
+        store.dispatch("addUsersFromModules", { userModule });
+      }
+      return response.data;
     } catch (err) {
       console.error("Erro ao carregar usuarios sugestivos:", err.message);
       throw err;
@@ -45,5 +86,5 @@ export function useSearch() {
   };
 
   // Retorna as funções e a variável reativa `loading` para serem usadas nos componentes Vue.
-  return { loading, getSuggestedUsers };
+  return { loading, getSuggestedUsers, searchUsers };
 }

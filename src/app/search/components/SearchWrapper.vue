@@ -1,5 +1,5 @@
 <template>
-    <div class="p-3 rounded-lg text-light-muted dark:text-dark-text-secondary bg-light-card dark:bg-dark-card">
+    <div @click="handlePress" class="p-3 rounded-lg text-light-muted dark:text-dark-text-secondary bg-light-card dark:bg-dark-card">
         <div class="flex gap-2 overflow-hidden items-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
@@ -11,3 +11,10 @@
 
     </div>
 </template>
+
+<script setup>
+const emit = defineEmits(['on-press']);
+const handlePress = () => {
+    emit('on-press');
+};
+</script>

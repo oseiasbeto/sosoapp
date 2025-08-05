@@ -1,6 +1,5 @@
 <template>
-    <div class="relative w-screen overflow-y-auto box-border flex flex-col"
-        :style="{ height: `calc(${viewportHeight}px - 52px)` }">
+    <div class="relative w-screen overflow-y-auto box-border flex flex-col">
 
         <!--start header-->
         <div class="flex fixed top-0 w-full z-[100] h-14 p-2 bg-light-bg dark:bg-dark-bg items-center justify-between">
@@ -308,16 +307,6 @@ const dashArrayUploadProgress = computed(() => {
 const footerTransform = computed(() =>
     isKeyboardOpen.value ? `translateY(-${window.innerHeight - window.visualViewport.height}px)` : ''
 );
-
-const handleViewportResize = () => {
-    viewportHeight.value = window.visualViewport.height;
-    isKeyboardOpen.value = (window.visualViewport.height < window.innerHeight * 0.8);
-    if (isKeyboardOpen.value && textAreaRef.value) {
-        setTimeout(() => {
-            textAreaRef?.value?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 300);
-    }
-};
 
 const resetForm = () => {
     postContent.value = '';
@@ -728,7 +717,6 @@ onBeforeRouteLeave((to, from, next) => {
 });
 
 onMounted(async () => {
-    window.visualViewport.addEventListener('resize', handleViewportResize);
     textAreaRef.value.focus();
     if (!originalPost.value?._id && route?.query?.replyto) {
         await getPostById(route?.query?.replyto);
@@ -736,7 +724,4 @@ onMounted(async () => {
     adjustTextareaHeight();
 });
 
-onUnmounted(() => {
-    window.visualViewport.removeEventListener('resize', handleViewportResize);
-});
 </script>

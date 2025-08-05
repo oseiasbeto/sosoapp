@@ -1,5 +1,6 @@
 <template>
-    <div class="p-4 border-y border-light-border dark:border-dark-border">
+    <div @click="goTo(props.profile)" class="p-4 border-y border-light-border dark:border-dark-border"
+        :class="{ 'border-y-0 py-2': !props?.showBtnFollow }">
         <div class="flex">
             <div id="left-part" class="flex flex-col pr-3">
                 <Avatar :url="profile?.profile_image?.low || null" alt-text="Foto" />
@@ -13,9 +14,11 @@
                     <!--end profile details-->
 
                     <!--start btn follow-->
-                    <div class="shrink-0 flex-1">
-                        <button @click="handleFollowUser(props?.profile?._id, user._id)" class="py-2 px-3 font-semibold text-[13px] bg-primary text-[#fff] rounded-lg"
+                    <div :disabled="loadingFollowUser" @click.stop v-if="props?.showBtnFollow" class="shrink-0 flex-1">
+                        <button @click="handleFollowUser(props?.profile?._id, user._id)"
+                            class="py-2 px-3 disabled:opacity-80 font-semibold text-[13px] bg-primary text-[#fff] rounded-lg"
                             :class="{ '!bg-light-card dark:!bg-dark-card !text-light-text-secondary dark:!text-dark-text-secondary': isFollowing }">
+
                             {{ isFollowing ? 'Seguindo' : 'Seguir' }}
                         </button>
                     </div>
@@ -25,7 +28,7 @@
             </div>
         </div>
         <!--start bio-->
-        <p v-show="profile?.bio?.length > 0"
+        <p v-show="profile?.bio?.length > 0 && props?.showBio"
             class="text-sm mt-3 line-clamp-2 whitespace-pre-wrap text-light-text-primary dark:text-dark-text-primary max-w-full">
             {{ profile?.bio || 'Bio' }}
         </p>
@@ -39,6 +42,7 @@ import ProfileCardDetails from './ProfileCardDetails.vue';
 import { useStore } from 'vuex';
 import { computed } from 'vue';
 import { useProfile } from '../profiles.hook';
+import { useRoute, useRouter } from 'vue-router';
 const { followUser, loading: loadingFollowUser } = useProfile();
 
 
@@ -46,6 +50,18 @@ const props = defineProps({
     profile: {
         type: Object,
         required: true
+    },
+    target: {
+        type: String,
+        default: 'profile'
+    },
+    showBtnFollow: {
+        type: Boolean,
+        default: true
+    },
+    showBio: {
+        type: Boolean,
+        default: true
     },
     tab: {
         type: String,
@@ -56,6 +72,8 @@ const props = defineProps({
 
 const store = useStore()
 const user = computed(() => store.getters.currentUser)
+const router = useRouter();
+const route = useRoute()
 
 // Verifica se o usuário atual segue o perfil
 const isFollowing = computed(() => {
@@ -72,4 +90,14 @@ const handleFollowUser = async (followingId, followerId) => {
         console.error('Erro ao seguir/deixar de seguir:', error);
     }
 };
+
+const goTo = (author) => {
+    if (props?.target === 'profile') {
+        store.dispatch("addNewProfileFromProfiles", author)
+
+        if (route?.params?.user_id !== author?._id) {
+            router.push(`/profile/${author?._id}`)
+        }
+    }
+}
 </script>

@@ -21,4 +21,7 @@ export default {
   addNewProfileFromProfiles({ commit }, newProfile) {
     commit("ADD_NEW_PROFILE_FROM_PROFILES", newProfile);
   },
+  toggleFollowing({ commit }, profileId) {
+    commit("TOGGLE_FOLLOWING", profileId);
+  },
 };

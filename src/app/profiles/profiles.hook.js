@@ -72,6 +72,8 @@ export function useProfile() {
         userIdToFollow: followingId,
         userId: followerId,
       })
+
+      store.dispatch("toggleFollowing", followingId);
       return response; // Retorna a resposta para o chamador (ex.: para exibir mensagem)
     } catch (err) {
       const data = err?.response?.data;

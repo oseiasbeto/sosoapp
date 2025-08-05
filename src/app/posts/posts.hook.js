@@ -502,6 +502,46 @@ export function usePost() {
     }
   };
 
+  const serchPosts = async ({
+    page = 1,
+    tab = "feed",
+    recentOnly = false,
+    searchQuery,
+    limit = 10,
+  }) => {
+    try {
+      loading.value = true;
+      const response = await api.get(
+        `/posts/search?q=${searchQuery}&page=${page}&limit=${limit}&recent_only=${recentOnly}`
+      );
+      const {
+        posts,
+        page: currentPage,
+        total,
+        hasMore,
+        totalPages,
+      } = response.data;
+
+      const newModule = {
+        byId: tab,
+        posts,
+        pagination: {
+          page: currentPage,
+          total,
+          hasMore,
+          totalPages,
+        },
+      };
+
+      return newModule;
+    } catch (err) {
+      console.error("Erro ao carregar as postagens:", err.message);
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   const loadMorePosts = async ({
     page = 1,
     totalItems = 0,
@@ -578,6 +618,7 @@ export function usePost() {
     loadMoreReplies,
     deletePost,
     loadMorePosts,
+    serchPosts,
     getPosts,
     getPostById,
   };

@@ -2,7 +2,7 @@
   <div v-if="profile !== null" class="flex items-center min-w-0 w-full">
     <div class="w-full mt-0.5">
       <div class="flex items-baseline text-sm min-w-0 max-w-full overflow-hidden">
-        <span @click.stop @click="goToProfile(props.profile)"
+        <span 
           class="font-semibold text-light-text-primary dark:text-dark-text-primary truncate text-ellipsis">
           {{ profile?.name || 'Nome' }}
         </span>
@@ -18,7 +18,7 @@
       </div>
       <div class="flex items-baseline text-sm min-w-0 max-w-full overflow-hidden">
         <span class="flex text-light-text-secondary dark:text-dark-text-light items-baseline min-w-0 overflow-hidden">
-          <span @click.stop @click="goToProfile(props.author)" class="text-gray-500 truncate text-ellipsis">
+          <span class="text-gray-500 truncate text-ellipsis">
             @{{ profile?.username }}
           </span>
         </span>
@@ -27,28 +27,12 @@
   </div>
 </template>
 <script setup>
-import { useRoute, useRouter } from 'vue-router';
-import { useStore } from 'vuex';
-
 const props = defineProps({
   profile: {
     type: Object,
     default: null
   }
 });
-
-const store = useStore()
-const router = useRouter()
-const route = useRoute()
-
-
-const goToProfile = (author) => {
-  store.dispatch("addNewProfileFromProfiles", author)
-
-  if (route?.params?.user_id !== author?._id) {
-    router.push(`/profile/${author?._id}`)
-  }
-}
 </script>
 
 <style scoped></style>

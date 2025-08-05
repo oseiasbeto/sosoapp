@@ -6,8 +6,7 @@
       :min-item-size="120"
       class="scroller" 
       :style="{
-        'padding-bottom': `${bSpace}px`,
-        'overflow': props.loading ? 'hidden' : 'auto'
+        'padding-bottom': `${bSpace}px`
       } " 
       key-field="_id">
       <!-- Slot para conteúdo ANTES da lista -->
@@ -35,6 +34,8 @@
           :totalItems="props.pagination.total" 
           :post-module="props.usersModule" 
           :index="index" 
+          :show-btn-follow="props.showBtnFollow"
+          :show-bio="props.showBio"
           :tab="props.usersModule"
           :is-reply="props.isReplies" 
           :profile="item" />
@@ -71,6 +72,14 @@ const props = defineProps({
   usersModule: {
     type: String,
     default: 'feed',
+  },
+  showBtnFollow: {
+    type: Boolean,
+    default: true,
+  },
+  showBio: {
+    type: Boolean,
+    default: true,
   },
   pagination: {
     type: Object,

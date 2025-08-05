@@ -53,6 +53,17 @@ export default {
     }
   },
 
+  TOGGLE_FOLLOWING(state, profileId) {
+    if (!state.user) return;  
+    if (!state.user.following.includes(profileId)) {
+      state.user.following.push(profileId);
+      state.user.following_count = state.user.following_count + 1;
+    } else {
+      state.user.following = state.user.following.filter(followingId => followingId !== profileId);
+      state.user.following_count = state.user.following_count - 1; 
+    }
+  },
+
   UPDATE_FOLLOW_STATE(state, { userId, profileId, isFollowing, isFollowedBy }) {
     if (state?.user?._id === userId) {
       // Atualiza following do usuário
@@ -66,19 +77,6 @@ export default {
           (id) => id !== profileId
         );
         state.user.following_count = state.user.following_count - 1;
-      }
-
-      // Atualiza followers do usuário, se necessário
-      if (isFollowedBy) {
-        if (!state.user.followers.includes(profileId)) {
-          state.user.followers.push(profileId);
-          state.user.followers_count = state.user.followers_count + 1;
-        }
-      } else {
-        state.user.followers = state.user.followers.filter(
-          (id) => id !== profileId
-        );
-        state.user.followers_count = state.user.followers_count - 1;
       }
 
       // Atualiza followers do perfil
